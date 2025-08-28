@@ -1,2 +1,3 @@
-# IT-Project-team56-OOSD-Question-Bank
-A new, currently empty repository for our project.
+# IT-Project-team56-Questify
+This is the repo for IT project team56. The product we are making is Questify Website.
+
