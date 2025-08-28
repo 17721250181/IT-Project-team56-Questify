@@ -6,7 +6,7 @@ Tech stack: **React (Vite) + Django REST Framework + SQLite**.
 
 ---
 
-## 📌 Prerequisites
+## Prerequisites
 
 Before starting, ensure your environment matches these versions:
 
@@ -17,7 +17,7 @@ Before starting, ensure your environment matches these versions:
 
 ---
 
-## 🛠 Backend Setup (Django + DRF + SQLite)
+## Backend Setup (Django + DRF + SQLite)
 
 1. Navigate to backend folder:
    ```bash
@@ -41,12 +41,6 @@ Before starting, ensure your environment matches these versions:
    pip install -r requirements.txt
    ```
 
-   (If `requirements.txt` doesn’t exist yet, run:)
-   ```bash
-   pip install django djangorestframework django-cors-headers
-   pip freeze > requirements.txt
-   ```
-
 4. Run database migrations:
    ```bash
    python manage.py migrate
@@ -62,9 +56,9 @@ Before starting, ensure your environment matches these versions:
 
 ---
 
-## 🎨 Frontend Setup (React + Vite)
+## Frontend Setup (React + Vite)
 
-1. Navigate to frontend:
+1. Navigate to frontend (under the root directory):
    ```bash
    cd frontend
    ```
@@ -75,7 +69,7 @@ Before starting, ensure your environment matches these versions:
    npm install axios
    ```
 
-3. Create `.env` file inside `frontend/`:
+3. Create `.env` file inside `frontend/` and paste:
    ```
    VITE_API_BASE_URL=http://127.0.0.1:8000/api
    ```
@@ -89,6 +83,29 @@ Before starting, ensure your environment matches these versions:
 `http://localhost:5173`
 
 ---
+
+## Running the project each time
+
+- **Backend**  
+  1. Navigate to `backend/`  
+  2. Activate the virtual environment:  
+     - macOS/Linux: `source env/bin/activate`  
+     - Windows (cmd): `env\Scripts\activate`  
+     - Windows (PowerShell): `.\env\Scripts\Activate.ps1`  
+  3. Start the server:  
+     ```bash
+     python manage.py runserver 8000
+     ```  
+  👉 Note: `pip install -r requirements.txt` (Step 3 in setup) is only needed the first time or when dependencies are updated.  
+  `python manage.py migrate` (Step 4) is only needed when models are added/changed.
+
+- **Frontend**  
+  1. Navigate to `frontend/`  
+  2. Start the dev server:  
+     ```bash
+     npm run dev
+     ```  
+  👉 Note: `npm install` (Step 2 in setup) is only needed the first time or when dependencies are updated.
 
 ## ⚠️ Common Pitfalls
 
@@ -113,50 +130,6 @@ Before starting, ensure your environment matches these versions:
 
 - **db.sqlite3 committed to Git**  
   Database file must be ignored (see `.gitignore`).
-
----
-
-## 📂 Project Structure
-```
-repo-root/
-├─ backend/
-│  ├─ config/         # Django project (settings, urls, wsgi/asgi)
-│  ├─ api/            # Django app with models & views
-│  ├─ manage.py
-│  ├─ requirements.txt
-│  └─ db.sqlite3      # Local dev database (ignored in git)
-├─ frontend/
-│  ├─ src/            # React components
-│  ├─ index.html
-│  ├─ package.json
-│  └─ .env            # API base URL (not committed)
-├─ legacy/            # Old code archived
-├─ README.md
-└─ .gitignore
-```
-
----
-
-## 🔄 Development Workflow
-
-- Always pull latest code:  
-  ```bash
-  git pull origin main
-  ```
-
-- Work on a feature branch:  
-  ```bash
-  git checkout -b feat/my-feature
-  ```
-
-- After changes:
-  ```bash
-  git add .
-  git commit -m "feat: add new feature"
-  git push origin feat/my-feature
-  ```
-
-- Open a Pull Request (PR) on GitHub.
 
 ---
 
