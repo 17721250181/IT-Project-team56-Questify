@@ -1,0 +1,41 @@
+# Python (Django)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+
+# Virtual env
+backend/env/
+venv/
+env/
+
+# Django local files
+local_settings.py
+media/
+staticfiles/
+
+# Node (React/Vite)
+node_modules/
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files (never commit secrets!)
+.env
+frontend/.env
+backend/.env
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
