@@ -66,10 +66,9 @@ jobs:
         run: |
           npm ci
 
-      # - name: Run frontend tests
-      #   working-directory: frontend
-      #   run: |
-      #     npm -s test -- --ci --passWithNoTests
+      - name: Run frontend tests
+        working-directory: frontend
+        run: npm run test
 
       - name: Build frontend (Vite)
         working-directory: frontend
