@@ -8,23 +8,18 @@ import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Importing custom components
-import Logo from './components/Logo';
-import LoginForm from './components/LoginForm';
+import QuestifyNavBar from './components/QuestifyNavBar.jsx';
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <div className='mt-3 ms-4'>
-      <a href="/index.html">
-        <Logo />
-      </a>
-    </div>  
+    <QuestifyNavBar />
     <hr />
     <Container className='mt-3'>
       <Row>
         <Col xs={0} md={2} />
         <Col align='center' xs={12} md={8}>
-          <h2>Welcome to OOSD Questify</h2>
-          <LoginForm />
+          <h1>Question List</h1>
         </Col>
         <Col xs={0} md={2} />
       </Row>
