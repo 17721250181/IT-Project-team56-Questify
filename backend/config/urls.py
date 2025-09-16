@@ -16,20 +16,11 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
-from questions import views
+from django.urls import path, include
 from questions.views import hello
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("questions/hello/", hello),
-    
-    # Authentication endpoints
-    path("api/auth/register/", views.register, name="register"),
-    path("api/auth/login/", views.login_view, name="login"),
-    path("api/auth/logout/", views.logout_view, name="logout"),
-    path("api/auth/password-reset/", views.password_reset_request, name="password_reset_request"),
-    path("api/auth/password-reset-confirm/", views.password_reset_confirm, name="password_reset_confirm"),
-    path("api/me/", views.me, name="me"),
-    path("api/csrf/", views.get_csrf_token, name="get_csrf_token"),
+    path("api/", include("user.urls")),
 ]
