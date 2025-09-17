@@ -5,6 +5,8 @@ import {ListGroup} from 'react-bootstrap';
 
 // Importing custom components
 import QuestionListItem from './QuestionListItem.jsx';
+import QuestionListSortingOption from './QuestionListSortingOption.jsx';
+import QuestionListFilterOption from './QuestionListFilterOption.jsx';
 
 // Example content data
 const EXAMPLE_QUESTION = [
@@ -38,6 +40,14 @@ const QuestionList = ({
     <div>
         <h1 className=''>{title}</h1>
         <div className='border rounded-4 p-2 bg-body-tertiary'>
+            <div className='d-flex justify-content-between m-1'>
+                <div>
+                    <QuestionListSortingOption />
+                    <QuestionListFilterOption />
+                </div>
+                <div>test</div>
+                
+            </div>
             
             <hr />
             <ListGroup variant='flush' className='bg-body-secondary'>
