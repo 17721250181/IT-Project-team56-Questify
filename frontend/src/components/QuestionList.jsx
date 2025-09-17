@@ -45,7 +45,9 @@ const QuestionList = ({
                     <QuestionListSortingOption />
                     <QuestionListFilterOption />
                 </div>
-                <div>test</div>
+                <div className='align-self-center'>
+                    <p className='mb-0'>Implement Search function here</p>
+                </div>
                 
             </div>
             
