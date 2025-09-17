@@ -1,23 +1,61 @@
 import React from 'react';
 
 // Importing the React-Bootstrap components
-import Stack from 'react-bootstrap/Stack';
+import {ListGroup} from 'react-bootstrap';
 
 // Importing custom components
 import QuestionListItem from './QuestionListItem.jsx';
 
-const QuestionList = () => {
+// Example content data
+const EXAMPLE_QUESTION = [
+    {
+        id: 1,
+        title: "Question 1",
+        week: "Week 1",
+        attempted: true,
+        questionType: "Multiple Choice",
+        rating: 4.5,
+        correctness: 0.8,
+        numAttempts: 7
+    },
+    {
+        id: 2,
+        title: "Question 2",
+        week: "Week 2",
+        attempted: false,
+        questionType: "True/False",
+        rating: 3.0,
+        correctness: 0.5,
+        numAttempts: 5
+    },
+]
+
+const QuestionList = ({
+    title='Question List',
+    content=EXAMPLE_QUESTION,
+}) => {
   return (
-    <div className='border rounded-4 p-2 bg-body-tertiary'>
-        <h1>Question List</h1>
-        <hr />
-        <Stack gap={1}>
-            <QuestionListItem title="Question 1" />
-            <QuestionListItem title="Question 2" />
-            <QuestionListItem title="Question 3" />
-        </Stack>
+    <div>
+        <h1 className=''>{title}</h1>
+        <div className='border rounded-4 p-2 bg-body-tertiary'>
+            
+            <hr />
+            <ListGroup variant='flush' className='bg-body-secondary'>
+                {content.map((item) => (
+                    <QuestionListItem 
+                        key={item.id} 
+                        title={item.title} 
+                        week={item.week}
+                        attempted={item.attempted}
+                        questionType={item.questionType}
+                        rating={item.rating}
+                        correctness={item.correctness}
+                        numAttempts={item.numAttempts}
+                    />
+                ))}
+            </ListGroup>
+        </div>
     </div>
-    
   )
 }
 
