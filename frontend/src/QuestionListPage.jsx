@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Importing custom components
 import QuestifyNavBar from './components/QuestifyNavBar.jsx';
+import QuestionList from './components/QuestionList.jsx';
 
 
 createRoot(document.getElementById('root')).render(
@@ -19,7 +20,7 @@ createRoot(document.getElementById('root')).render(
       <Row>
         <Col xs={0} md={2} />
         <Col align='center' xs={12} md={8}>
-          <h1>Question List</h1>
+          <QuestionList />
         </Col>
         <Col xs={0} md={2} />
       </Row>
