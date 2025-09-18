@@ -7,6 +7,7 @@ import {ListGroup} from 'react-bootstrap';
 import QuestionListItem from './QuestionListItem.jsx';
 import QuestionListSortingOption from './QuestionListSortingOption.jsx';
 import QuestionListFilterOption from './QuestionListFilterOption.jsx';
+import QuestionListSearch from './QuestionListSearch.jsx';
 
 // Example content data
 const EXAMPLE_QUESTION = [
@@ -46,7 +47,7 @@ const QuestionList = ({
                     <QuestionListFilterOption />
                 </div>
                 <div className='align-self-center'>
-                    <p className='mb-0'>Implement Search function here</p>
+                    <QuestionListSearch />
                 </div>
                 
             </div>
