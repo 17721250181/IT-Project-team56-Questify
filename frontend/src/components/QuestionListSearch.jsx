@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Form, Button, InputGroup} from 'react-bootstrap';
 
-const QuestionListSearch = () => {
+const QuestionListSearch = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Handle search action
   const handleSearch = () => {
     console.log('Search query:', searchQuery);
-    // Add your search logic here
-    // For example: call an API or pass it to a parent component
+    // Pass the search query to parent component
+    if (onSearch) {
+      onSearch(searchQuery);
+    }
   };
 
   // Handle form submission

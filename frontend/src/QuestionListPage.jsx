@@ -18,11 +18,9 @@ createRoot(document.getElementById('root')).render(
     <hr />
     <Container className='mt-3'>
       <Row>
-        <Col xs={0} md={1} />
-        <Col align='center' xs={12} md={10}>
+        <Col align='center'>
           <QuestionList />
         </Col>
-        <Col xs={0} md={1} />
       </Row>
     </Container>
   </StrictMode>,

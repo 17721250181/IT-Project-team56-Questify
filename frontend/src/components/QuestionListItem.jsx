@@ -1,28 +1,55 @@
 import React from 'react'
-import { Badge, ListGroupItem } from 'react-bootstrap'
+import { Badge, ListGroupItem, Row, Col } from 'react-bootstrap'
 
 const QuestionListItem = ({ 
     title='Question Title',
     week='Week 0', 
+    topic='Topic 0',
     attempted=false, 
+    verified=false,
     questionType='undefined type',
     rating = 0.0,
-    correctness = 0.0,
     numAttempts = 0
 }) => {
   return (
     <ListGroupItem className='p-1 border-bottom'>
-        <h6 className='float-start mb-0'>
-            {title}&nbsp;
-            <Badge className='m-1' bg='secondary'>{week}</Badge>
-            <Badge className='m-1' bg='secondary'>{attempted ? 'Attempted✔️' : 'Not Attempted❌'}</Badge>
-            <Badge className='m-1' bg='secondary'>{questionType}</Badge>
-        </h6>
-        <p className='float-end mb-0'>
+      <Row className="align-items-start">
+        {/* Title Area */}
+        <Col xs={12} md={6} lg={3} className="text-start">
+          <h6 className='mb-1 mb-md-0'>
+              <span style={{
+                  display: 'inline-block',
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  verticalAlign: 'middle',
+                  textAlign: 'left'
+              }}>
+                  {title}
+              </span>
+          </h6>
+        </Col>
+
+        {/* Rating information Area */}
+        <Col xs={12} md={6} lg={3} className="text-start text-md-end order-lg-3">
+          <div>
             <Badge className='m-1' bg='info'>Rating: {rating}</Badge>
-            <Badge className='m-1' bg='info'>Correctness: {correctness*100}%</Badge>
             <Badge className='m-1' bg='info'>User Attempts: {numAttempts}</Badge>
-        </p>
+          </div>
+        </Col>
+        
+        {/* Question Tags Area */}
+        <Col xs={12} md={12} lg={6} className="text-start">
+          <div>
+            <Badge className='m-1' bg='secondary'>{week}</Badge>
+            <Badge className='m-1' bg='secondary'>{topic}</Badge>
+            <Badge className='m-1' bg='secondary'>{questionType}</Badge>
+            {verified ? <Badge className='m-1' bg='secondary'>Verified✅</Badge> : <Badge className='m-1' bg='secondary'>Not Verified</Badge>}
+            {attempted ? <Badge className='m-1' bg='secondary'>Attempted</Badge> : null}
+          </div>
+        </Col>
+      </Row>
     </ListGroupItem>
   )
 }
