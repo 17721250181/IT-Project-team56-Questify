@@ -1,0 +1,342 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Container, Card, Row, Col, Form, Button, Alert, Spinner, Badge } from 'react-bootstrap';
+// import axios from 'axios'; // TODO: Uncomment when integrating with backend
+
+const DoQuestion = ({ questionId }) => {
+    const [question, setQuestion] = useState(null);
+    const [selectedAnswers, setSelectedAnswers] = useState([]);
+    const [userAnswer, setUserAnswer] = useState('');
+    const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [showResult, setShowResult] = useState(false);
+    // const [isUsingTemplate, setIsUsingTemplate] = useState(false); // Currently always using template data
+
+    // Template question data
+    const getTemplateQuestion = (id) => {
+        const templates = [
+            {
+                id: 1,
+                content: "What is useState in React?",
+                description: "Please select the most accurate answer",
+                type: "multiple_choice",
+                multiple_answers: false,
+                points: 10,
+                options: [
+                    "A React Hook for managing component state",
+                    "A regular JavaScript function",
+                    "A React component",
+                    "A CSS style class"
+                ]
+            },
+            {
+                id: 2,
+                content: "Which of the following are JavaScript data types?",
+                description: "Multiple answers can be selected",
+                type: "multiple_choice",
+                multiple_answers: true,
+                points: 15,
+                options: [
+                    "string",
+                    "number",
+                    "boolean",
+                    "array",
+                    "object"
+                ]
+            },
+            {
+                id: 3,
+                content: "Please explain what a Closure is and provide a simple example.",
+                description: "Describe in your own words and provide a code example",
+                type: "open_question",
+                points: 20
+            }
+        ];
+
+        return templates.find(q => q.id === id) || templates[0];
+    };
+
+    // Fetch question data from backend
+    const fetchQuestion = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // TODO: Backend API integration
+            // const response = await axios.get(`/api/questions/${questionId}/`);
+            // const questionData = response.data;
+            
+            // Currently using template data directly
+            const questionData = getTemplateQuestion(questionId);
+            setQuestion(questionData);
+
+            // Initialize answer state based on question type
+            if (questionData.type === 'multiple_choice') {
+                setSelectedAnswers([]);
+            } else {
+                setUserAnswer('');
+            }
+        } catch (err) {
+            console.error('Failed to fetch question:', err);
+            setError('Unable to load question, please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    }, [questionId]);
+
+    // Handle multiple choice answer selection
+    const handleOptionChange = (optionIndex, isChecked) => {
+        if (question.multiple_answers) {
+            // Multiple choice question
+            if (isChecked) {
+                setSelectedAnswers([...selectedAnswers, optionIndex]);
+            } else {
+                setSelectedAnswers(selectedAnswers.filter((index) => index !== optionIndex));
+            }
+        } else {
+            // Single choice question
+            setSelectedAnswers([optionIndex]);
+        }
+    };
+
+    // Submit answer
+    const handleSubmitAnswer = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const answerData = {
+                question_id: questionId,
+                answer: question.type === 'multiple_choice' ? selectedAnswers : userAnswer,
+                type: question.type,
+            };
+
+            // TODO: Backend API integration
+            // const response = await axios.post('/api/questions/submit/', answerData);
+            // console.log('Answer submitted successfully:', response.data);
+            
+            // Currently only output answer data to console
+            console.log('Submitted answer data:', answerData);
+
+            setSubmitted(true);
+            setShowResult(true);
+        } catch (err) {
+            console.error('Failed to submit answer:', err);
+            setError('Failed to submit answer, please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch question data when component mounts
+    useEffect(() => {
+        if (questionId) {
+            fetchQuestion();
+        }
+    }, [questionId, fetchQuestion]);
+
+    // Check if answer can be submitted
+    const canSubmit = () => {
+        if (submitted) return false;
+
+        if (question?.type === 'multiple_choice') {
+            return selectedAnswers.length > 0;
+        } else {
+            return userAnswer.trim().length > 0;
+        }
+    };
+
+    // Render multiple choice options
+    const renderMultipleChoice = () => {
+        return (
+            <Form>
+                {question.options?.map((option, index) => (
+                    <Form.Check
+                        key={index}
+                        type={question.multiple_answers ? 'checkbox' : 'radio'}
+                        id={`option-${index}`}
+                        name="question-options"
+                        label={option}
+                        checked={selectedAnswers.includes(index)}
+                        onChange={(e) => handleOptionChange(index, e.target.checked)}
+                        disabled={submitted}
+                        className="mb-2"
+                    />
+                ))}
+            </Form>
+        );
+    };
+
+    // Render open-ended question
+    const renderOpenQuestion = () => {
+        return (
+            <Form>
+                <Form.Group className="mb-3">
+                    <Form.Label>Your Answer:</Form.Label>
+                    <Form.Control
+                        as="textarea"
+                        rows={4}
+                        value={userAnswer}
+                        onChange={(e) => setUserAnswer(e.target.value)}
+                        disabled={submitted}
+                        placeholder="Please enter your answer here..."
+                    />
+                </Form.Group>
+            </Form>
+        );
+    };
+
+    // Loading state
+    if (loading) {
+        return (
+            <Container className="mt-4 text-center">
+                <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+                <p className="mt-2">Loading question...</p>
+            </Container>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <Container className="mt-4">
+                <Alert variant="danger">
+                    <Alert.Heading>Error</Alert.Heading>
+                    <p>{error}</p>
+                    <Button variant="outline-danger" onClick={fetchQuestion}>
+                        Reload
+                    </Button>
+                </Alert>
+            </Container>
+        );
+    }
+
+    // No question data
+    if (!question) {
+        return (
+            <Container className="mt-4">
+                <Alert variant="warning">
+                    <Alert.Heading>Question Not Found</Alert.Heading>
+                    <p>Please check if the question ID is correct.</p>
+                </Alert>
+            </Container>
+        );
+    }
+
+    return (
+        <Container className="mt-4">
+            <Row className="justify-content-center">
+                <Col lg={8} md={10} sm={12}>
+                    <Card className="shadow">
+                        <Card.Header className="bg-primary text-white">
+                            <Row className="align-items-center">
+                                <Col>
+                                    <h4 className="mb-0">Question #{question.id}</h4>
+                                </Col>
+                                <Col xs="auto">
+                                    <Badge
+                                        bg={
+                                            question.type === 'multiple_choice' ? 'success' : 'info'
+                                        }
+                                    >
+                                        {question.type === 'multiple_choice' ? 'Multiple Choice' : 'Open Question'}
+                                    </Badge>
+                                    {question.multiple_answers && (
+                                        <Badge bg="warning" className="ms-1">
+                                            Multiple
+                                        </Badge>
+                                    )}
+                                </Col>
+                            </Row>
+                        </Card.Header>
+
+                        <Card.Body>
+                            {/* Question content */}
+                            <div className="mb-4">
+                                <h5 className="text-primary mb-3">Question:</h5>
+                                <p className="fs-5 lh-base">{question.content}</p>
+
+                                {question.description && (
+                                    <div className="mt-3">
+                                        <small className="text-muted">
+                                            <strong>Description:</strong> {question.description}
+                                        </small>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Answer area */}
+                            <div className="mb-4">
+                                <h5 className="text-success mb-3">
+                                    {question.type === 'multiple_choice'
+                                        ? 'Please select answer:'
+                                        : 'Please enter answer:'}
+                                </h5>
+
+                                {question.type === 'multiple_choice'
+                                    ? renderMultipleChoice()
+                                    : renderOpenQuestion()}
+                            </div>
+
+                            {/* Submit result */}
+                            {showResult && submitted && (
+                                <Alert variant="success">
+                                    <Alert.Heading>Submitted Successfully!</Alert.Heading>
+                                    <p>Your answer has been submitted successfully.</p>
+                                </Alert>
+                            )}
+
+                            {/* Error message */}
+                            {error && (
+                                <Alert variant="danger" className="mb-3">
+                                    {error}
+                                </Alert>
+                            )}
+                        </Card.Body>
+
+                        <Card.Footer className="bg-light">
+                            <Row className="align-items-center">
+                                <Col>
+                                    {question.points && (
+                                        <small className="text-muted">
+                                            Points: {question.points}
+                                        </small>
+                                    )}
+                                </Col>
+                                <Col xs="auto">
+                                    <Button
+                                        variant="primary"
+                                        size="lg"
+                                        disabled={!canSubmit() || loading}
+                                        onClick={handleSubmitAnswer}
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <Spinner
+                                                    as="span"
+                                                    animation="border"
+                                                    size="sm"
+                                                    role="status"
+                                                    className="me-2"
+                                                />
+                                                Submitting...
+                                            </>
+                                        ) : submitted ? (
+                                            'Submitted'
+                                        ) : (
+                                            'Submit Answer'
+                                        )}
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Card.Footer>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
+    );
+};
+
+export default DoQuestion;
