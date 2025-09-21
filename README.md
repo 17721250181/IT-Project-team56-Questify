@@ -111,9 +111,13 @@ Make sure your environment matches these versions:
 cd backend
 
 # 1. Create venv
+# macOS/Linux
+python3 -m venv env
+source env/bin/activate
+
+# Windows
 python -m venv env
-source env/bin/activate   # macOS/Linux
-env\Scripts\activate      # Windows
+env\Scripts\activate      
 
 # 2. Install dependencies
 pip install -r requirements.txt
