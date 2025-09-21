@@ -10,42 +10,75 @@ import QuestionListFilterOption from './QuestionListFilterOption.jsx';
 import QuestionListSearch from './QuestionListSearch.jsx';
 
 // Importing API service
-import { QuestionService } from 'services/QuestionService.js';
+import { QuestionService } from '../services/QuestionService.js';
 
 // Example content data (fallback when API fails)
 const EXAMPLE_QUESTION = [
     {
         id: 1,
-        title: 'Sample MCQ Question',
-        week: 'Week 1',
-        topic: 'Topic 1',
+        title: 'Java Variables and Data Types',
+        week: 'Week 2',
+        topic: 'Java Basics',
         attempted: true,
-        verified: false,
+        verified: true,
         questionType: 'Multiple Choice',
         rating: 4.5,
-        numAttempts: 7,
+        numAttempts: 12,
     },
     {
         id: 2,
-        title: 'Sample True/False Question',
-        week: 'Week 2',
-        topic: 'Topic 2',
+        title: 'Object-Oriented Design Principles',
+        week: 'Week 4',
+        topic: 'OOP Concepts',
         attempted: false,
         verified: true,
-        questionType: 'True/False',
-        rating: 3.0,
-        numAttempts: 5,
+        questionType: 'Multiple Choice',
+        rating: 4.2,
+        numAttempts: 8,
     },
     {
         id: 3,
-        title: 'Sample Short Answer Question',
-        week: 'Week 3',
-        topic: 'Topic 3',
+        title: 'Java Class Constructors',
+        week: 'Week 5',
+        topic: 'Classes and Objects',
+        attempted: true,
+        verified: false,
+        questionType: 'Short Answer',
+        rating: 3.8,
+        numAttempts: 15,
+    },
+    {
+        id: 4,
+        title: 'Inheritance and Polymorphism',
+        week: 'Week 7',
+        topic: 'Advanced OOP',
         attempted: true,
         verified: true,
-        questionType: 'Short Answer',
-        rating: 4.0,
-        numAttempts: 3,
+        questionType: 'Long Answer',
+        rating: 4.7,
+        numAttempts: 6,
+    },
+    {
+        id: 5,
+        title: 'Exception Handling in Java',
+        week: 'Week 8',
+        topic: 'Error Management',
+        attempted: false,
+        verified: true,
+        questionType: 'Multiple Choice',
+        rating: 4.1,
+        numAttempts: 10,
+    },
+    {
+        id: 6,
+        title: 'Array and ArrayList Operations',
+        week: 'Week 3',
+        topic: 'Data Structures',
+        attempted: true,
+        verified: true,
+        questionType: 'Coding Exercise',
+        rating: 3.9,
+        numAttempts: 18,
     },
 ];
 
@@ -137,6 +170,7 @@ const QuestionList = ({
                     {filteredContent.map((item) => (
                         <QuestionListItem
                             key={item.id}
+                            id={item.id}
                             title={item.title}
                             week={item.week}
                             topic={item.topic}

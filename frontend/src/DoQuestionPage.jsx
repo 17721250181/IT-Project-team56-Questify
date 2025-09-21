@@ -11,6 +11,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import QuestifyNavBar from './components/QuestifyNavBar.jsx';
 import DoQuestion from './components/DoQuestion.jsx';
 
+// Get question ID from URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const questionId = parseInt(urlParams.get('questionId')) || 1;
+
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <QuestifyNavBar />
@@ -19,7 +23,7 @@ createRoot(document.getElementById('root')).render(
             <Row>
                 <Col xs={0} md={2} />
                 <Col align="center" xs={12} md={8}>
-                    <DoQuestion questionId={1} />
+                    <DoQuestion questionId={questionId} />
                 </Col>
                 {/* <Col align="center" xs={12} md={2}>
                     <CommentSection />

@@ -2,6 +2,7 @@ import React from 'react'
 import { Badge, ListGroupItem, Row, Col } from 'react-bootstrap'
 
 const QuestionListItem = ({ 
+    id,
     title='Question Title',
     week='Week 0', 
     topic='Topic 0',
@@ -11,8 +12,18 @@ const QuestionListItem = ({
     rating = 0.0,
     numAttempts = 0
 }) => {
+  // Handle click to navigate to DoQuestion page
+  const handleQuestionClick = () => {
+    // Navigate to DoQuestion page with question ID as URL parameter
+    window.open(`DoQuestion.html?questionId=${id}`, '_blank');
+  };
+
   return (
-    <ListGroupItem className='p-1 border-bottom'>
+    <ListGroupItem 
+      className='p-1 border-bottom' 
+      style={{ cursor: 'pointer' }}
+      onClick={handleQuestionClick}
+    >
       <Row className="align-items-start">
         {/* Title Area */}
         <Col xs={12} md={6} lg={3} className="text-start">

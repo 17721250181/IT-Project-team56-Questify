@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Card, Row, Col, Form, Button, Alert, Spinner, Badge } from 'react-bootstrap';
-import { QuestionService } from 'services/QuestionService.js';
+import { QuestionService } from '../services/QuestionService.js';
 
 const DoQuestion = ({ questionId }) => {
     const [question, setQuestion] = useState(null);
@@ -17,43 +17,69 @@ const DoQuestion = ({ questionId }) => {
         const templates = [
             {
                 id: 1,
-                content: "What is useState in React?",
-                description: "Please select the most accurate answer",
-                type: "multiple_choice",
-                multiple_answers: false,
+                title: 'Java Variables and Data Types',
+                content: 'Which of the following are primitive data types in Java?',
+                type: 'multiple_choice',
+                multipleAnswers: true,
                 points: 10,
-                options: [
-                    "A React Hook for managing component state",
-                    "A regular JavaScript function",
-                    "A React component",
-                    "A CSS style class"
-                ]
+                options: ['int', 'String', 'boolean', 'double', 'ArrayList'],
             },
             {
                 id: 2,
-                content: "Which of the following are JavaScript data types?",
-                description: "Multiple answers can be selected",
-                type: "multiple_choice",
-                multiple_answers: true,
+                title: 'Object-Oriented Design Principles',
+                content:
+                    'Which of the following are core principles of Object-Oriented Programming?',
+                type: 'multiple_choice',
+                multipleAnswers: true,
                 points: 15,
                 options: [
-                    "string",
-                    "number",
-                    "boolean",
-                    "array",
-                    "object"
-                ]
+                    'Encapsulation',
+                    'Inheritance',
+                    'Polymorphism',
+                    'Abstraction',
+                    'Compilation',
+                ],
             },
             {
                 id: 3,
-                content: "Please explain what a Closure is and provide a simple example.",
-                description: "Describe in your own words and provide a code example",
-                type: "open_question",
-                points: 20
-            }
+                title: 'Java Class Constructors',
+                content:
+                    'Explain what a constructor is in Java and write a simple example of a class with a constructor.',
+                type: 'open_question',
+                points: 20,
+            },
+            {
+                id: 4,
+                title: 'Inheritance and Polymorphism',
+                content: 'Describe the relationship between inheritance and polymorphism in Java. Provide a code example demonstrating both concepts.',
+                type: 'open_question',
+                points: 25,
+            },
+            {
+                id: 5,
+                title: 'Exception Handling in Java',
+                content: 'Which keywords are used for exception handling in Java?',
+                type: 'multiple_choice',
+                multipleAnswers: true,
+                points: 12,
+                options: [
+                    'try',
+                    'catch',
+                    'finally',
+                    'throw',
+                    'handle'
+                ],
+            },
+            {
+                id: 6,
+                title: 'Array and ArrayList Operations',
+                content: 'What is the main difference between arrays and ArrayLists in Java? Write a simple code example showing how to create and add elements to an ArrayList.',
+                type: 'open_question',
+                points: 18,
+            },
         ];
 
-        return templates.find(q => q.id === id) || templates[0];
+        return templates.find((q) => q.id === id) || templates[0];
     };
 
     // Fetch question data from backend
@@ -77,15 +103,22 @@ const DoQuestion = ({ questionId }) => {
             // Fallback to template data if API fails
             const questionData = getTemplateQuestion(questionId);
             setQuestion(questionData);
-            
+
             // Initialize answer state for fallback data
             if (questionData.type === 'multiple_choice') {
                 setSelectedAnswers([]);
             } else {
                 setUserAnswer('');
             }
-            
-            setError('Unable to load question from server, using template data.');
+
+            // Only set error if we couldn't get template data either
+            if (!questionData) {
+                setError('Unable to load question from server and no template available.');
+            }
+            // If we have template data, clear any previous error
+            else {
+                setError(null);
+            }
         } finally {
             setLoading(false);
         }
@@ -93,7 +126,7 @@ const DoQuestion = ({ questionId }) => {
 
     // Handle multiple choice answer selection
     const handleOptionChange = (optionIndex, isChecked) => {
-        if (question.multiple_answers) {
+        if (question.multipleAnswers) {
             // Multiple choice question
             if (isChecked) {
                 setSelectedAnswers([...selectedAnswers, optionIndex]);
@@ -126,10 +159,8 @@ const DoQuestion = ({ questionId }) => {
             setShowResult(true);
         } catch (err) {
             console.error('Failed to submit answer:', err);
-            // Still allow submission to proceed for demo purposes, but show warning
-            setError('Failed to submit to server, but answer recorded locally.');
-            setSubmitted(true);
-            setShowResult(true);
+            // Only show error message, don't mark as successfully submitted
+            setError('Failed to submit to server.');
         } finally {
             setLoading(false);
         }
@@ -160,7 +191,7 @@ const DoQuestion = ({ questionId }) => {
                 {question.options?.map((option, index) => (
                     <Form.Check
                         key={index}
-                        type={question.multiple_answers ? 'checkbox' : 'radio'}
+                        type={question.multipleAnswers ? 'checkbox' : 'radio'}
                         id={`option-${index}`}
                         name="question-options"
                         label={option}
@@ -205,8 +236,8 @@ const DoQuestion = ({ questionId }) => {
         );
     }
 
-    // Error state
-    if (error) {
+    // Error state - only show if we have a blocking error and no question data
+    if (error && !question) {
         return (
             <Container className="mt-4">
                 <Alert variant="danger">
@@ -240,7 +271,7 @@ const DoQuestion = ({ questionId }) => {
                         <Card.Header className="bg-primary text-white">
                             <Row className="align-items-center">
                                 <Col>
-                                    <h4 className="mb-0">Question #{question.id}</h4>
+                                    <h4 className="mb-0">{question.title}</h4>
                                 </Col>
                                 <Col xs="auto">
                                     <Badge
@@ -248,13 +279,12 @@ const DoQuestion = ({ questionId }) => {
                                             question.type === 'multiple_choice' ? 'success' : 'info'
                                         }
                                     >
-                                        {question.type === 'multiple_choice' ? 'Multiple Choice' : 'Open Question'}
+                                        {question.type === 'multiple_choice'
+                                            ? question.multipleAnswers
+                                                ? 'Multiple Choice'
+                                                : 'Single Choice'
+                                            : 'Open Question'}
                                     </Badge>
-                                    {question.multiple_answers && (
-                                        <Badge bg="warning" className="ms-1">
-                                            Multiple
-                                        </Badge>
-                                    )}
                                 </Col>
                             </Row>
                         </Card.Header>
@@ -264,14 +294,6 @@ const DoQuestion = ({ questionId }) => {
                             <div className="mb-4">
                                 <h5 className="text-primary mb-3">Question:</h5>
                                 <p className="fs-5 lh-base">{question.content}</p>
-
-                                {question.description && (
-                                    <div className="mt-3">
-                                        <small className="text-muted">
-                                            <strong>Description:</strong> {question.description}
-                                        </small>
-                                    </div>
-                                )}
                             </div>
 
                             {/* Answer area */}

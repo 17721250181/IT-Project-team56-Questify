@@ -37,7 +37,7 @@ api.interceptors.response.use(
 );
 
 // Question service API methods
-export const questionService = {
+export const QuestionService = {
     // Get all questions from backend
     getAllQuestions: async () => {
         try {
