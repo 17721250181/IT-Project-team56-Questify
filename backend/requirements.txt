@@ -8,3 +8,4 @@ psycopg2-binary>=2.9
 pytest
 pytest-django
 python-dotenv
+openai>=1.0.0
