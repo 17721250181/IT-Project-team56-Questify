@@ -10,7 +10,7 @@ import QuestionListFilterOption from './QuestionListFilterOption.jsx';
 import QuestionListSearch from './QuestionListSearch.jsx';
 
 // Importing API service
-import { questionService } from '../services/questionService.js';
+import { QuestionService } from 'services/QuestionService.js';
 
 // Example content data (fallback when API fails)
 const EXAMPLE_QUESTION = [

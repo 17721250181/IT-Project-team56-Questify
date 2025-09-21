@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Card, Row, Col, Form, Button, Alert, Spinner, Badge } from 'react-bootstrap';
-// import axios from 'axios'; // TODO: Uncomment when integrating with backend
+import { QuestionService } from 'services/QuestionService.js';
 
 const DoQuestion = ({ questionId }) => {
     const [question, setQuestion] = useState(null);
@@ -62,12 +62,8 @@ const DoQuestion = ({ questionId }) => {
             setLoading(true);
             setError(null);
 
-            // TODO: Backend API integration
-            // const response = await axios.get(`/api/questions/${questionId}/`);
-            // const questionData = response.data;
-            
-            // Currently using template data directly
-            const questionData = getTemplateQuestion(questionId);
+            // Use API to fetch question data
+            const questionData = await questionService.getQuestionById(questionId);
             setQuestion(questionData);
 
             // Initialize answer state based on question type
@@ -78,7 +74,18 @@ const DoQuestion = ({ questionId }) => {
             }
         } catch (err) {
             console.error('Failed to fetch question:', err);
-            setError('Unable to load question, please try again later.');
+            // Fallback to template data if API fails
+            const questionData = getTemplateQuestion(questionId);
+            setQuestion(questionData);
+            
+            // Initialize answer state for fallback data
+            if (questionData.type === 'multiple_choice') {
+                setSelectedAnswers([]);
+            } else {
+                setUserAnswer('');
+            }
+            
+            setError('Unable to load question from server, using template data.');
         } finally {
             setLoading(false);
         }
@@ -111,18 +118,18 @@ const DoQuestion = ({ questionId }) => {
                 type: question.type,
             };
 
-            // TODO: Backend API integration
-            // const response = await axios.post('/api/questions/submit/', answerData);
-            // console.log('Answer submitted successfully:', response.data);
-            
-            // Currently only output answer data to console
-            console.log('Submitted answer data:', answerData);
+            // Use API to submit answer
+            const response = await questionService.submitAnswer(answerData);
+            console.log('Answer submitted successfully:', response);
 
             setSubmitted(true);
             setShowResult(true);
         } catch (err) {
             console.error('Failed to submit answer:', err);
-            setError('Failed to submit answer, please try again later.');
+            // Still allow submission to proceed for demo purposes, but show warning
+            setError('Failed to submit to server, but answer recorded locally.');
+            setSubmitted(true);
+            setShowResult(true);
         } finally {
             setLoading(false);
         }

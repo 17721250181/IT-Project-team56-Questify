@@ -99,6 +99,16 @@ export const questionService = {
             throw new Error(`Failed to delete question with id ${id}`);
         }
     },
+
+    // Submit answer for a question
+    submitAnswer: async (answerData) => {
+        try {
+            const response = await api.post('/api/questions/submit/', answerData);
+            return response.data;
+        } catch (error) {
+            throw new Error('Failed to submit answer');
+        }
+    },
 };
 
 export default api;
