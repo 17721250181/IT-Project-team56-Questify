@@ -7,3 +7,4 @@ dj-database-url==2.2.0
 psycopg2-binary>=2.9
 pytest
 pytest-django
+python-dotenv
