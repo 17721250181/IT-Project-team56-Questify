@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Badge, ListGroupItem, Row, Col } from 'react-bootstrap'
 
 const QuestionListItem = ({ 
@@ -12,10 +13,12 @@ const QuestionListItem = ({
     rating = 0.0,
     numAttempts = 0
 }) => {
+  const navigate = useNavigate();
+  
   // Handle click to navigate to DoQuestion page
   const handleQuestionClick = () => {
     // Navigate to DoQuestion page with question ID as URL parameter
-    window.open(`DoQuestion.html?questionId=${id}`, '_blank');
+    navigate(`/question/${id}`);
   };
 
   return (

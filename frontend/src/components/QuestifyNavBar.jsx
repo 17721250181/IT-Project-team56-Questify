@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 // Importing the React-Bootstrap components
 import NavBar from 'react-bootstrap/Navbar';
@@ -11,7 +12,7 @@ const QuestifyNavBar = () => {
 return (
     <NavBar className='bg-body-tertiary'>
         <Container fluid>
-            <NavBar.Brand href='./index.html'>
+            <NavBar.Brand as={Link} to='/'>
                 <Logo />
                 OOSD Questify
             </NavBar.Brand>

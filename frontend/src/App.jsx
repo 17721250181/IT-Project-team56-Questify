@@ -1,14 +1,32 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-const API = import.meta.env.VITE_API_BASE_URL;
+// Importing the Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Importing page components
+import { QuestionListPage, LoginPage, DoQuestionPage } from './pages';
 
 function App() {
-  const [msg, setMsg] = useState("");
-  useEffect(() => {
-    axios.get(`${API}/questions/hello/`).then(r => setMsg(r.data.msg));
-  }, []);
-  return <h1>Backend says: {msg || "..."}</h1>;
+  return (
+    <Router>
+      <Routes>
+        {/* Login Route */}
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* Question List Route */}
+        <Route path="/questions" element={<QuestionListPage />} />
+        
+        {/* Do Question Route with dynamic questionId */}
+        <Route path="/question/:questionId" element={<DoQuestionPage />} />
+        
+        {/* Default redirect to questions list */}
+        <Route path="/" element={<Navigate to="/questions" replace />} />
+        
+        {/* Catch all route - redirect to questions */}
+        <Route path="*" element={<Navigate to="/questions" replace />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;
