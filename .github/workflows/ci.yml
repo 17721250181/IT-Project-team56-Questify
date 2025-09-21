@@ -147,6 +147,44 @@ jobs:
   #         # base url for testing
   #         BASE_URL: http://localhost:5173
   #       run: |
-  #         # 如果你使用了 playwright.config.ts 并配置了 webServer，可直接 `npx playwright test`
-  #         # 这里假设你在 tests 中使用 process.env.BASE_URL
+  #         # if you use playwright.config.ts and implemented webServer，could directly use `npx playwright test`
+  #         # Assuming you're using process.env.BASE_URL in tests
   #         npx playwright test --reporter=line
+
+
+
+  # -----------------------------------------------------------------
+  # BACKEND DEPLOY: Trigger Render via Deploy Hook (CD)
+  # -----------------------------------------------------------------
+  backend-deploy:
+    name: Deploy Backend to Render
+    needs: backend-test       # Deploy only if backend tests passed
+    if: github.ref == 'refs/heads/main'   # Deploys only on main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
+  # -----------------------------------------------------------------
+  # FRONTEND DEPLOY: Publish artifact to GitHub Pages (CD)
+  # -----------------------------------------------------------------
+  frontend-deploy:
+    name: Deploy Frontend to GitHub Pages
+    needs: frontend-test-build    # Publish only if frontend build succeeded
+    if: github.ref == 'refs/heads/main'   # Deploys only on main
+    runs-on: ubuntu-latest
+
+    # Required permissions for the deploy-pages action:
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

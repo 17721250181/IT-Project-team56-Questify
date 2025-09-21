@@ -42,7 +42,7 @@ def test_create_mcq_attempt(django_user_model):
     # check database
     assert Attempt.objects.count() == 1
     attempt = Attempt.objects.first()
-    assert attempt.student.username == "student1"
+    assert attempt.attempter.username == "student1"
     assert attempt.is_correct is True
 
 
@@ -78,5 +78,5 @@ def test_create_short_answer_attempt(django_user_model):
     # check database
     assert Attempt.objects.count() == 1
     attempt = Attempt.objects.first()
-    assert attempt.student.username == "student2"
+    assert attempt.attempter.username == "student2"
     assert attempt.is_correct is None
