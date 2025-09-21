@@ -2,15 +2,12 @@ import uuid
 from django.db import models
 from django.conf import settings
 from questions.models import Question
+from django.contrib.auth.models import User
 
 
 class Attempt(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    student = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="attempts"
-    )
+    attempter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="attempts")
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE,

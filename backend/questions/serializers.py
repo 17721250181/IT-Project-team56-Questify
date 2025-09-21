@@ -28,6 +28,7 @@ class ShortAnswerQuestionSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     mcq_detail = MCQQuestionSerializer(read_only=True)
     short_detail = ShortAnswerQuestionSerializer(read_only=True)
+    creator = serializers.CharField(source="creator.username", read_only=True)
 
     class Meta:
         model = Question
@@ -38,6 +39,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "verify_status",
             "created_at",
             "updated_at",
+            "creator",
             "mcq_detail",
             "short_detail",
         ]
@@ -58,7 +60,8 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = [
-            "id", "question", "source", "verify_status", "created_at", "updated_at",
+            "id", "question", "source", "verify_status", "created_at", "updated_at", "creator", 
             "type", "answer", "ai_answer",
             "option_a", "option_b", "option_c", "option_d", "option_e", "correct_option"
         ]
+        read_only_fields = ["creator"]

@@ -23,6 +23,7 @@ jobs:
       # CI use Postgres；local use SQLite（if DATABASE_URL not set then SQLite）
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/appdb
       SECRET_KEY: test-secret
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +47,7 @@ jobs:
       - name: Run backend tests
         working-directory: backend
         run: |
-          pytest -q
+          pytest -s -v
 
   frontend-test-build:
     name: Frontend (Jest + Build)

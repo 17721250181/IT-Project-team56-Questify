@@ -17,10 +17,13 @@ class QuestionCreateView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         q_type = request.data.get("type")
 
+        user = request.user
+
         # create question objects
         question = Question.objects.create(
             question=request.data["question"],
             source="STUDENT",
+            creator=user,
         )
 
         if q_type == "SHORT":
@@ -38,6 +41,7 @@ class QuestionCreateView(generics.CreateAPIView):
                 "id": question.id,
                 "question": question.question,
                 "type": "SHORT",
+                "creator": user.username,
                 "answer": answer,
                 "ai_answer": ai_answer
             }, status=status.HTTP_201_CREATED)
@@ -69,6 +73,7 @@ class QuestionCreateView(generics.CreateAPIView):
                 "id": question.id,
                 "type": "MCQ",
                 "question": question.question,
+                "creator": user.username,
                 "options": {
                     "A": mcq_q.option_a,
                     "B": mcq_q.option_b,

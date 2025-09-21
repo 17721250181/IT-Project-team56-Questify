@@ -24,6 +24,8 @@ def test_create_short_answer_question_real_openai(django_user_model, settings):
     assert data["type"] == "SHORT"
     assert data["answer"] == "Paris"
 
+    assert data["creator"] == "realuser"
+
     print("AI Explanation:", data["ai_answer"])
     assert "Paris" in data["ai_answer"] or len(data["ai_answer"]) > 0
 
@@ -56,6 +58,8 @@ def test_create_mcq_question_real(django_user_model):
     assert data["type"] == "MCQ"
     assert data["correct_option"] == "B"
     assert "options" in data
+
+    assert data["creator"] == "realuser2"
 
     assert Question.objects.count() == 1
     assert MCQQuestion.objects.count() == 1

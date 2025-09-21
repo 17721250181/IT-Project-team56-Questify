@@ -7,7 +7,7 @@ from questions.models import Question
 class AttemptCreateView(generics.CreateAPIView):
     queryset = Attempt.objects.all()
     serializer_class = AttemptSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         question_id = request.data.get("question")
@@ -20,8 +20,13 @@ class AttemptCreateView(generics.CreateAPIView):
 
         is_correct = None
 
+        # correctness for MCQ
+        if hasattr(question, "mcq_detail"):
+            correct = question.mcq_detail.correct_option.upper()
+            is_correct = (user_answer.strip().upper() == correct)
+
         attempt = Attempt.objects.create(
-            student=request.user,
+            attempter=request.user,
             question=question,
             answer=user_answer,
             is_correct=is_correct
@@ -30,7 +35,6 @@ class AttemptCreateView(generics.CreateAPIView):
         return Response({
             "id": attempt.id,
             "is_correct": attempt.is_correct,
-            "score": attempt.score,
             "answer": attempt.answer,
             "submitted_at": attempt.submitted_at
         }, status=status.HTTP_201_CREATED)

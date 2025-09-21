@@ -1,12 +1,12 @@
 import uuid
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Question(models.Model):
     class Source(models.TextChoices):
         STUDENT = "STUDENT", "Student"
         TEACHING_TEAM = "TEACHING_TEAM", "Teaching Team"
-        ADMIN = "ADMIN", "Admin"
 
     class VerifyStatus(models.TextChoices):
         PENDING = "PENDING", "Pending"
@@ -14,6 +14,7 @@ class Question(models.Model):
         REJECTED = "REJECTED", "Rejected"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="questions")
     question = models.TextField()
     source = models.CharField(max_length=20, choices=Source.choices, default=Source.STUDENT)
     verify_status = models.CharField(max_length=20, choices=VerifyStatus.choices, default=VerifyStatus.PENDING)  #verified by teaching team
