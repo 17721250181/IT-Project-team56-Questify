@@ -1,11 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 
 // Importing the Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Importing the React-Bootstrap components
+import {Container, Row, Col} from 'react-bootstrap';
 
 // Importing custom components
 import QuestifyNavBar from './components/QuestifyNavBar.jsx';
@@ -18,11 +18,9 @@ createRoot(document.getElementById('root')).render(
     <hr />
     <Container className='mt-3'>
       <Row>
-        <Col xs={0} md={2} />
-        <Col align='center' xs={12} md={8}>
+        <Col align='center'>
           <QuestionList />
         </Col>
-        <Col xs={0} md={2} />
       </Row>
     </Container>
   </StrictMode>,
