@@ -63,7 +63,7 @@ const DoQuestion = ({ questionId }) => {
             setError(null);
 
             // Use API to fetch question data
-            const questionData = await questionService.getQuestionById(questionId);
+            const questionData = await QuestionService.getQuestionById(questionId);
             setQuestion(questionData);
 
             // Initialize answer state based on question type
@@ -119,7 +119,7 @@ const DoQuestion = ({ questionId }) => {
             };
 
             // Use API to submit answer
-            const response = await questionService.submitAnswer(answerData);
+            const response = await QuestionService.submitAnswer(answerData);
             console.log('Answer submitted successfully:', response);
 
             setSubmitted(true);

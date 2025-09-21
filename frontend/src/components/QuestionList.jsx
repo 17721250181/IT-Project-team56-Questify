@@ -71,7 +71,7 @@ const QuestionList = ({
             setError('');
             
             try {
-                const data = await questionService.getAllQuestions();
+                const data = await QuestionService.getAllQuestions();
                 setQuestions(data);
             } catch (err) {
                 console.error('Error fetching questions:', err);
