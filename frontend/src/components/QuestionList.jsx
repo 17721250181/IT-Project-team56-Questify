@@ -122,10 +122,19 @@ const QuestionList = ({
     // Local filtering function (client-side filtering)
     const filteredContent = questions.filter(
         (item) =>
-            item.title.toLowerCase().replace(/\s+/g, '').includes(searchQuery.toLowerCase()) ||
-            item.week.toLowerCase().replace(/\s+/g, '').includes(searchQuery.toLowerCase()) ||
-            item.topic?.toLowerCase().replace(/\s+/g, '').includes(searchQuery.toLowerCase()) ||
-            item.questionType.toLowerCase().replace(/\s+/g, '').includes(searchQuery.toLowerCase())
+            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.week
+                .toLowerCase()
+                .replace(/\s+/g, '')
+                .includes(searchQuery.toLowerCase().replace(/\s+/g, '')) ||
+            item.topic
+                ?.toLowerCase()
+                .replace(/\s+/g, '')
+                .includes(searchQuery.toLowerCase().replace(/\s+/g, '')) ||
+            item.questionType
+                .toLowerCase()
+                .replace(/\s+/g, '')
+                .includes(searchQuery.toLowerCase().replace(/\s+/g, ''))
     );
 
     // Handle search from child component (local filtering only)
