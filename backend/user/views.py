@@ -9,7 +9,8 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
 from .serializers import (
     UserSerializer,
     UserRegistrationSerializer,
@@ -22,15 +23,21 @@ from .serializers import (
 
 class GetCSRFTokenView(APIView):
     """Get CSRF token for frontend authentication"""
+    permission_classes = [AllowAny]
 
+    # def get(self, request):
+    #     serializer = CSRFTokenSerializer(data={'csrfToken': get_token(request)})
+    #     serializer.is_valid()
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+   
     def get(self, request):
-        serializer = CSRFTokenSerializer(data={'csrfToken': get_token(request)})
-        serializer.is_valid()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        token = get_token(request)
+        return Response({"csrfToken": token}, status=status.HTTP_200_OK)
 
 
 class RegisterView(APIView):
     """User registration endpoint"""
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -55,7 +62,7 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     """User login endpoint"""
-
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
 
@@ -87,16 +94,13 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
-    """User logout endpoint"""
-
+    permission_classes = [AllowAny]
     def post(self, request):
         logout(request)
-        return Response({
-            "ok": True,
-            "message": "Logout successful"
-        }, status=status.HTTP_200_OK)
-
-
+        response = Response({"ok": True, "message": "Logout successful"}, status=status.HTTP_200_OK)
+        response.delete_cookie("sessionid")  # 세션 쿠키 제거
+        return response
+   
 class MeView(APIView):
     """Get current user information"""
     permission_classes = [IsAuthenticated]
@@ -108,6 +112,7 @@ class MeView(APIView):
 
 class PasswordResetRequestView(APIView):
     """Request password reset"""
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
@@ -147,6 +152,7 @@ class PasswordResetRequestView(APIView):
 
 class PasswordResetConfirmView(APIView):
     """Confirm password reset with token"""
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
