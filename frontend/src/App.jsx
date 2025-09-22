@@ -10,8 +10,8 @@ import { QuestionListPage, LoginPage, DoQuestionPage } from './pages';
 function App() {
   return (
     <Routes>
-      {/* Default redirect to questions */}
-      <Route path="/" element={<Navigate to="/questions" replace />} />
+      {/* Default redirect to login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
       
       {/* Login page */}
       <Route path="/login" element={<LoginPage />} />

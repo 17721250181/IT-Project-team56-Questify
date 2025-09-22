@@ -24,31 +24,92 @@ const LoginForm = () => {
         }
     };
 
+    // Handle register action (placeholder)
+    const handleRegister = () => {
+        setMessage('Register functionality coming soon!');
+    };
+
+    // Handle forgot password action (placeholder)
+    const handleForgotPassword = () => {
+        setMessage('Forgot password functionality coming soon!');
+    };
+
     return (
-        <Form className="p-2" onSubmit={handleSubmit}>
-            <Form.Group align="left" controlId="formEmail" className="p-2">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control
-                    type="email"
-                    placeholder="Enter email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-            </Form.Group>
-            <Form.Group align="left" controlId="formPassword" className="p-2">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-            </Form.Group>
-            <Button variant="primary" type="submit" className="m-2">
-                Login
-            </Button>
-            {message && <p className="m-2">{message}</p>}
-        </Form>
+        <div className="login-form-container">
+            <Form className="login-form" onSubmit={handleSubmit}>
+                {/* Email Field */}
+                <Form.Group className="mb-3">
+                    <Form.Label className="form-label">
+                        Email Address
+                    </Form.Label>
+                    <Form.Control
+                        type="email"
+                        placeholder="Enter your email address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="form-input"
+                        required
+                    />
+                </Form.Group>
+
+                {/* Password Field */}
+                <Form.Group className="mb-4">
+                    <Form.Label className="form-label">
+                        Password
+                    </Form.Label>
+                    <Form.Control
+                        type="password"
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="form-input"
+                        required
+                    />
+                </Form.Group>
+
+                {/* Primary Login Button */}
+                <div className="d-grid mb-3">
+                    <Button
+                        variant="primary"
+                        type="submit"
+                        size="lg"
+                        className="login-btn"
+                    >
+                        Sign In
+                    </Button>
+                </div>
+
+                {/* Secondary Actions */}
+                <div className="secondary-actions">
+                    <div className="d-grid mb-2">
+                        <Button
+                            variant="outline-primary"
+                            onClick={handleRegister}
+                            className="register-btn"
+                        >
+                            Create New Account
+                        </Button>
+                    </div>
+
+                    <div className="text-center">
+                        <Button
+                            variant="link"
+                            onClick={handleForgotPassword}
+                            className="forgot-password-link"
+                        >
+                            Forgot your password?
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Message Display */}
+                {message && (
+                    <div className={`alert ${message.includes('failed') ? 'alert-danger' : 'alert-success'}`}>
+                        {message}
+                    </div>
+                )}
+            </Form>
+        </div>
     );
 };
 
