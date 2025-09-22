@@ -21,7 +21,6 @@ const DoQuestion = ({ questionId }) => {
                 content: 'Which of the following are primitive data types in Java?',
                 type: 'multiple_choice',
                 multipleAnswers: true,
-                points: 10,
                 options: ['int', 'String', 'boolean', 'double', 'ArrayList'],
             },
             {
@@ -31,7 +30,6 @@ const DoQuestion = ({ questionId }) => {
                     'Which of the following are core principles of Object-Oriented Programming?',
                 type: 'multiple_choice',
                 multipleAnswers: true,
-                points: 15,
                 options: [
                     'Encapsulation',
                     'Inheritance',
@@ -46,14 +44,13 @@ const DoQuestion = ({ questionId }) => {
                 content:
                     'Explain what a constructor is in Java and write a simple example of a class with a constructor.',
                 type: 'open_question',
-                points: 20,
             },
             {
                 id: 4,
                 title: 'Inheritance and Polymorphism',
-                content: 'Describe the relationship between inheritance and polymorphism in Java. Provide a code example demonstrating both concepts.',
+                content:
+                    'Describe the relationship between inheritance and polymorphism in Java. Provide a code example demonstrating both concepts.',
                 type: 'open_question',
-                points: 25,
             },
             {
                 id: 5,
@@ -61,21 +58,14 @@ const DoQuestion = ({ questionId }) => {
                 content: 'Which keywords are used for exception handling in Java?',
                 type: 'multiple_choice',
                 multipleAnswers: true,
-                points: 12,
-                options: [
-                    'try',
-                    'catch',
-                    'finally',
-                    'throw',
-                    'handle'
-                ],
+                options: ['try', 'catch', 'finally', 'throw', 'handle'],
             },
             {
                 id: 6,
                 title: 'Array and ArrayList Operations',
-                content: 'What is the main difference between arrays and ArrayLists in Java? Write a simple code example showing how to create and add elements to an ArrayList.',
+                content:
+                    'What is the main difference between arrays and ArrayLists in Java? Write a simple code example showing how to create and add elements to an ArrayList.',
                 type: 'open_question',
-                points: 18,
             },
         ];
 
@@ -187,7 +177,7 @@ const DoQuestion = ({ questionId }) => {
     // Render multiple choice options
     const renderMultipleChoice = () => {
         return (
-            <Form>
+            <Form className='m-1'>
                 {question.options?.map((option, index) => (
                     <Form.Check
                         key={index}
@@ -208,8 +198,8 @@ const DoQuestion = ({ questionId }) => {
     // Render open-ended question
     const renderOpenQuestion = () => {
         return (
-            <Form>
-                <Form.Group className="mb-3">
+            <Form className='m-1'>
+                <Form.Group className="m-1">
                     <Form.Label>Your Answer:</Form.Label>
                     <Form.Control
                         as="textarea"
@@ -264,104 +254,83 @@ const DoQuestion = ({ questionId }) => {
     }
 
     return (
-        <Container className="mt-4">
-            <Row className="justify-content-center">
-                <Col lg={8} md={10} sm={12}>
-                    <Card className="shadow">
-                        <Card.Header className="bg-primary text-white">
-                            <Row className="align-items-center">
-                                <Col>
-                                    <h4 className="mb-0">{question.title}</h4>
-                                </Col>
-                                <Col xs="auto">
-                                    <Badge
-                                        bg={
-                                            question.type === 'multiple_choice' ? 'success' : 'info'
-                                        }
-                                    >
-                                        {question.type === 'multiple_choice'
-                                            ? question.multipleAnswers
-                                                ? 'Multiple Choice'
-                                                : 'Single Choice'
-                                            : 'Open Question'}
-                                    </Badge>
-                                </Col>
-                            </Row>
-                        </Card.Header>
+        <Container className="p-4 rounded shadow-sm bg-light">
+            {/* Question title and type badge */}
+            <Row className='mb-3'>
+                <Col className='text-center text-md-start' xs={12} md={9}>
+                    <h4 className="m-1">{question.title}</h4>
+                </Col>
+                <Col className='text-center text-md-end' xs={12} md={3}>
+                    <Badge bg={question.type === 'multiple_choice' ? 'success' : 'info'}>
+                        {question.type === 'multiple_choice'
+                            ? question.multipleAnswers
+                                ? 'Multiple Choice'
+                                : 'Single Choice'
+                            : 'Open Question'}
+                    </Badge>
+                </Col>
+            </Row>
+            <hr />
+            
+            {/* Question content */}
+            <Row className="mb-1 text-start">
+                <p className="m-1">{question.content}</p>
+            </Row>
 
-                        <Card.Body>
-                            {/* Question content */}
-                            <div className="mb-4">
-                                <h5 className="text-primary mb-3">Question:</h5>
-                                <p className="fs-5 lh-base">{question.content}</p>
-                            </div>
+            {/* Answer area */}
+            <Row className="mb-3 text-start">
+                <p className="text-secondary m-1">
+                    {question.type === 'multiple_choice'
+                        ? 'Please select answer:'
+                        : 'Please enter answer:'}
+                </p>
 
-                            {/* Answer area */}
-                            <div className="mb-4">
-                                <h5 className="text-success mb-3">
-                                    {question.type === 'multiple_choice'
-                                        ? 'Please select answer:'
-                                        : 'Please enter answer:'}
-                                </h5>
+                {question.type === 'multiple_choice'
+                    ? renderMultipleChoice()
+                    : renderOpenQuestion()}
+            </Row>
 
-                                {question.type === 'multiple_choice'
-                                    ? renderMultipleChoice()
-                                    : renderOpenQuestion()}
-                            </div>
+            {/* Submit result */}
+            {showResult && submitted && (
+                <Alert variant="success">
+                    <Alert.Heading>Submitted Successfully!</Alert.Heading>
+                    <p>Your answer has been submitted successfully.</p>
+                </Alert>
+            )}
 
-                            {/* Submit result */}
-                            {showResult && submitted && (
-                                <Alert variant="success">
-                                    <Alert.Heading>Submitted Successfully!</Alert.Heading>
-                                    <p>Your answer has been submitted successfully.</p>
-                                </Alert>
-                            )}
+            {/* Error message */}
+            {error && (
+                <Alert variant="danger" className="mb-3">
+                    {error}
+                </Alert>
+            )}
 
-                            {/* Error message */}
-                            {error && (
-                                <Alert variant="danger" className="mb-3">
-                                    {error}
-                                </Alert>
-                            )}
-                        </Card.Body>
-
-                        <Card.Footer className="bg-light">
-                            <Row className="align-items-center">
-                                <Col>
-                                    {question.points && (
-                                        <small className="text-muted">
-                                            Points: {question.points}
-                                        </small>
-                                    )}
-                                </Col>
-                                <Col xs="auto">
-                                    <Button
-                                        variant="primary"
-                                        size="lg"
-                                        disabled={!canSubmit() || loading}
-                                        onClick={handleSubmitAnswer}
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <Spinner
-                                                    as="span"
-                                                    animation="border"
-                                                    size="sm"
-                                                    role="status"
-                                                    className="me-2"
-                                                />
-                                                Submitting...
-                                            </>
-                                        ) : submitted ? (
-                                            'Submitted'
-                                        ) : (
-                                            'Submit Answer'
-                                        )}
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </Card.Footer>
-                    </Card>
+            {/* Submit button */}
+            <Row className="align-items-center">
+                <Col xs="auto">
+                    <Button
+                        variant="primary"
+                        size="md"
+                        disabled={!canSubmit() || loading}
+                        onClick={handleSubmitAnswer}
+                    >
+                        {loading ? (
+                            <>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    className="me-2"
+                                />
+                                Submitting...
+                            </>
+                        ) : submitted ? (
+                            'Submitted'
+                        ) : (
+                            'Submit Answer'
+                        )}
+                    </Button>
                 </Col>
             </Row>
         </Container>
