@@ -14,7 +14,7 @@ return (
         <Container fluid>
             <NavBar.Brand as={Link} to='/'>
                 <Logo />
-                OOSD Questify
+                <h4 className="d-inline">OOSD Questify</h4>
             </NavBar.Brand>
         </Container>
     </NavBar>
