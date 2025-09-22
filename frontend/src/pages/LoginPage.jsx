@@ -6,40 +6,89 @@ import Col from 'react-bootstrap/Col';
 // Importing custom components
 import Logo from '../components/Logo';
 import LoginForm from '../components/LoginForm';
+import '../styles/LoginPage.css';
 
 const LoginPage = () => {
+  // Get current semester and year
+  const getCurrentSemester = () => {
+    const now = new Date();
+    const month = now.getMonth() + 1; // getMonth() returns 0-11
+    const year = now.getFullYear();
+
+    // Semester 1: February to June (months 2-6)
+    // Semester 2: July to November (months 7-11)
+    // December and January are considered break periods, default to S1 of current/next year
+    if (month >= 2 && month <= 6) {
+      return `S1 ${year}`;
+    } else if (month >= 7 && month <= 11) {
+      return `S2 ${year}`;
+    } else {
+      // December or January - default to S1 of current year
+      return `S1 ${year}`;
+    }
+  };
+
   return (
     <div className="login-page">
       <Container fluid className="vh-100 p-0">
         <Row className="h-100 g-0 m-0">
           {/* Left Side - Introduction */}
-          <Col lg={7} md={6} className="login-intro-section d-flex flex-column justify-content-center">
-            <div className="intro-content">
-              <div className="logo-container mb-4">
-                <Link to="/">
-                  <Logo />
-                </Link>
+          <Col lg={7} md={6} className="login-intro-section d-flex flex-column">
+            <div className="intro-header">
+              <div className="brand-section">
+                <div className="brand-area">
+                  <Link to="/" className="brand-link">
+                    <Logo />
+                    <div className="brand-info">
+                      <span className="brand-text">Questify</span>
+                      <span className="university-name">The University of Melbourne</span>
+                    </div>
+                  </Link>
+                </div>
+                <div className="course-context">
+                  <div className="course-header">
+                    <span className="course-code">SWEN20003</span>
+                    <span className="semester-badge">{getCurrentSemester()}</span>
+                  </div>
+                  <div className="course-title">Object-Oriented Software Development</div>
+                </div>
               </div>
+            </div>
 
-              <h1 className="intro-title">Welcome to OOSD Questify</h1>
+            <div className="intro-content">
+              <div className="main-content">
+                <h1 className="intro-title">Welcome to OOSD Questify</h1>
 
-              <div className="intro-description">
-                <h4 className="intro-subtitle">A collaborative learning platform where students create, share, and evaluate OOSD questions together</h4>
+                <div className="intro-description">
+                  <h4 className="intro-subtitle">A collaborative learning platform where students create, share, and evaluate OOSD questions together</h4>
 
-                <div className="feature-list">
-                  <div className="feature-item">
-                    <h5>Create Questions</h5>
-                    <p>Design questions on OOSD topics. Writing explanations helps you understand concepts better.</p>
+                  <div className="feature-list">
+                    <div className="feature-item">
+                      <h5>Create Questions</h5>
+                      <p>Design questions on OOSD topics. Writing explanations helps you understand concepts better.</p>
+                    </div>
+
+                    <div className="feature-item">
+                      <h5>Answer & Discuss</h5>
+                      <p>Try questions from classmates, compare answers, and join discussions about different approaches.</p>
+                    </div>
+
+                    <div className="feature-item">
+                      <h5>Learn Together</h5>
+                      <p>Rate & save questions, track your progress, and build your understanding through peer collaboration.</p>
+                    </div>
+
+                    <div className="feature-item">
+                      <h5>AI Assistant</h5>
+                      <p>Get instant help with built-in AI chatbot and receive AI-generated explanations alongside peer answers.</p>
+                    </div>
                   </div>
 
-                  <div className="feature-item">
-                    <h5>Answer & Discuss</h5>
-                    <p>Try questions from classmates, compare answers, and join discussions about different approaches.</p>
-                  </div>
-
-                  <div className="feature-item">
-                    <h5>Learn Together</h5>
-                    <p>Rate questions, track your progress, and build your understanding through peer collaboration.</p>
+                  <div className="quote-section">
+                    <blockquote className="intro-quote">
+                      "Tell me and I forget, teach me and I may remember, involve me and I learn."
+                    </blockquote>
+                    <cite className="quote-author">— Xunzi (ancient Chinese philosopher)</cite>
                   </div>
                 </div>
               </div>
@@ -58,117 +107,6 @@ const LoginPage = () => {
           </Col>
         </Row>
       </Container>
-
-      <style jsx>{`
-        .login-page {
-          height: 100vh;
-          background: #1f2937;
-          overflow: hidden;
-        }
-
-        .login-intro-section {
-          background: #1f2937;
-          color: white;
-          padding: 3rem 2rem;
-        }
-
-        .intro-content {
-          max-width: 600px;
-          margin: 0 auto;
-        }
-
-        .logo-container {
-          margin-bottom: 2rem;
-        }
-
-        .intro-title {
-          font-size: 2.5rem;
-          font-weight: 600;
-          margin-bottom: 1rem;
-          line-height: 1.1;
-          color: #f9fafb;
-        }
-
-        .intro-subtitle {
-          font-size: 1.1rem;
-          font-weight: 400;
-          margin-bottom: 2.5rem;
-          opacity: 0.8;
-          line-height: 1.5;
-          color: #d1d5db;
-        }
-
-        .feature-list {
-          margin-top: 2rem;
-        }
-
-        .feature-item {
-          margin-bottom: 1.5rem;
-          padding: 0;
-          border-left: 3px solid #6b7280;
-          padding-left: 1rem;
-        }
-
-        .feature-item h5 {
-          font-size: 1.1rem;
-          font-weight: 600;
-          margin-bottom: 0.5rem;
-          color: white;
-        }
-
-        .feature-item p {
-          font-size: 0.9rem;
-          opacity: 0.8;
-          margin: 0;
-          line-height: 1.4;
-        }
-
-        .login-form-section {
-          background: #ffffff;
-          padding: 3rem 2rem;
-          border-left: 1px solid #e5e7eb;
-        }
-
-        .form-wrapper {
-          width: 100%;
-          max-width: 400px;
-        }
-
-        .form-title {
-          font-size: 1.75rem;
-          font-weight: 600;
-          color: #111827;
-          margin-bottom: 0.5rem;
-        }
-
-        .form-subtitle {
-          font-size: 0.95rem;
-          color: #6b7280;
-          margin-bottom: 2rem;
-        }
-
-        @media (max-width: 768px) {
-          .login-intro-section {
-            padding: 2rem 1.5rem;
-          }
-
-          .intro-title {
-            font-size: 2rem;
-          }
-
-          .intro-subtitle {
-            font-size: 1.1rem;
-          }
-
-          .feature-item {
-            padding: 0.75rem;
-          }
-
-          .login-form-section {
-            padding: 1.5rem;
-          }
-        }
-      `}</style>
     </div>
   );
 };
