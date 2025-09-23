@@ -90,7 +90,7 @@ class TestCsrfAndAuthFlow:
 
         # 2) Register (uses an allowed email domain, and logs us in)
         email = _pick_allowed_email()
-        payload = {"name": "Alice Smith", "email": email, "password": "Str0ng!Pass123"}
+        payload = {"name": "Alice Smith", "student_id": "ALICE123", "email": email, "password": "Str0ng!Pass123"}
         r = client.post(
             f"{API}/auth/register/",
             payload,
