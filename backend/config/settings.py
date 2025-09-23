@@ -27,7 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-print("DEBUG OPENAI KEY:", OPENAI_API_KEY[:8])
+if OPENAI_API_KEY:
+    print("DEBUG OPENAI KEY:", OPENAI_API_KEY[:8])
+else:
+    print("DEBUG: OPENAI_API_KEY not set")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

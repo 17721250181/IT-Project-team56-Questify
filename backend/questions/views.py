@@ -1,11 +1,9 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from .models import Question, ShortAnswerQuestion, MCQQuestion
-from .serializers import QuestionCreateSerializer
-import openai
+from .serializers import QuestionCreateSerializer, QuestionSerializer
 import os
 import requests
-from openai import OpenAI
 from django.conf import settings
 
 
@@ -137,3 +135,17 @@ class QuestionCreateView(generics.CreateAPIView):
 
         except Exception as e:
             return f"AI explanation failed: {e}"
+
+
+class QuestionListView(generics.ListAPIView):
+    """Get all questions"""
+    queryset = Question.objects.all().order_by('-created_at')
+    serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class QuestionDetailView(generics.RetrieveAPIView):
+    """Get specific question details"""
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticated]

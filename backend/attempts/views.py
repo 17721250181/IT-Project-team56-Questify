@@ -38,3 +38,22 @@ class AttemptCreateView(generics.CreateAPIView):
             "answer": attempt.answer,
             "submitted_at": attempt.submitted_at
         }, status=status.HTTP_201_CREATED)
+
+
+class UserAttemptListView(generics.ListAPIView):
+    """Get all attempts by the current user"""
+    serializer_class = AttemptSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Attempt.objects.filter(attempter=self.request.user).order_by('-submitted_at')
+
+
+class QuestionAttemptListView(generics.ListAPIView):
+    """Get all attempts for a specific question"""
+    serializer_class = AttemptSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        question_id = self.kwargs['question_id']
+        return Attempt.objects.filter(question_id=question_id).order_by('-submitted_at')
