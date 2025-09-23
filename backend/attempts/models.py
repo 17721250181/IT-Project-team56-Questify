@@ -18,4 +18,4 @@ class Attempt(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.student} - {self.question} ({self.is_correct})"
+        return f"{self.attempter} - {self.question} ({self.is_correct})"
