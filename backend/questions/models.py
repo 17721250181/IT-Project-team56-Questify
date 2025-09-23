@@ -22,7 +22,7 @@ class Question(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.content[:40]
+        return self.question[:40]
 
 
 class MCQQuestion(models.Model):
