@@ -53,6 +53,7 @@ def test_register_success():
 
     payload = {
         "name": "Test User",
+        "student_id": "TEST123456",
         "email": email,
         "password": "StrongPass123!"
     }
@@ -66,6 +67,7 @@ def test_register_success():
     assert data["message"] == "Registration successful"
     assert data["user"]["email"] == email
     assert data["user"]["name"] == "Test User"
+    assert data["user"]["student_id"] == "TEST123456"
 
     assert User.objects.filter(email=email).exists()
 
@@ -76,6 +78,7 @@ def test_register_invalid_email():
 
     payload = {
         "name": "Test User",
+        "student_id": "INVALID123",
         "email": "test@invalid-domain.com",
         "password": "StrongPass123!"
     }

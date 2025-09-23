@@ -3,21 +3,30 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from .models import UserProfile
 
 class UserSerializer(serializers.ModelSerializer):
     # User serializer which excludes password field for security
     name = serializers.SerializerMethodField()
+    student_id = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'is_staff', 'date_joined', 'last_login']
+        fields = ['id', 'email', 'name', 'student_id', 'is_staff', 'date_joined', 'last_login']
 
     def get_name(self, obj):
         return obj.get_full_name() or obj.username
 
+    def get_student_id(self, obj):
+        try:
+            return obj.profile.student_id
+        except UserProfile.DoesNotExist:
+            return None
+
 class UserRegistrationSerializer(serializers.Serializer):
     # Serializer for user registration with secure password handling
     name = serializers.CharField(max_length=150, required=True)
+    student_id = serializers.CharField(max_length=20, required=True)
     email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True)
 
@@ -37,6 +46,15 @@ class UserRegistrationSerializer(serializers.Serializer):
 
         return email
 
+    def validate_student_id(self, value):
+        student_id = value.strip()
+
+        # Check if student ID already exists
+        if UserProfile.objects.filter(student_id=student_id).exists():
+            raise serializers.ValidationError("Student ID already exists")
+
+        return student_id
+
     def validate_password(self, value):
         try:
             validate_password(value)
@@ -48,6 +66,7 @@ class UserRegistrationSerializer(serializers.Serializer):
         email = validated_data['email']
         password = validated_data['password']
         name = validated_data['name']
+        student_id = validated_data['student_id']
 
         user = User.objects.create_user(
             username=email,
@@ -61,6 +80,12 @@ class UserRegistrationSerializer(serializers.Serializer):
         if len(name_parts) > 1:
             user.last_name = name_parts[1]
         user.save()
+
+        # Create user profile with student_id
+        UserProfile.objects.create(
+            user=user,
+            student_id=student_id
+        )
 
         return user
 
