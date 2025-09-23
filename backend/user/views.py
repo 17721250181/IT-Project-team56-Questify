@@ -98,7 +98,7 @@ class LogoutView(APIView):
     def post(self, request):
         logout(request)
         response = Response({"ok": True, "message": "Logout successful"}, status=status.HTTP_200_OK)
-        response.delete_cookie("sessionid")  # 세션 쿠키 제거
+        response.delete_cookie("sessionid")  # Remove session cookie
         return response
    
 class MeView(APIView):
