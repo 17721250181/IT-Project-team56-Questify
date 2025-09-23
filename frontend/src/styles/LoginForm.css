@@ -45,11 +45,6 @@
 .login-form .login-btn:hover {
     background-color: #2563eb !important;
     border-color: #2563eb !important;
-    transform: translateY(-1px);
-}
-
-.login-form .login-btn:active {
-    transform: translateY(0);
 }
 
 /* Register Button */
@@ -68,11 +63,6 @@
     background-color: #f9fafb !important;
     border-color: #374151 !important;
     color: #374151 !important;
-    transform: translateY(-1px);
-}
-
-.login-form .register-btn:active {
-    transform: translateY(0);
 }
 
 /* Forgot Password Link */

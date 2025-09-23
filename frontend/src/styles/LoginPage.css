@@ -21,10 +21,6 @@
   align-items: flex-start;
 }
 
-.brand-area {
-  flex-shrink: 0;
-}
-
 .brand-link {
   display: flex;
   align-items: center;
@@ -147,8 +143,11 @@
 
 .quote-section {
   margin-top: 3rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem 1rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  text-align: center;
 }
 
 .intro-quote {
