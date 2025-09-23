@@ -1,8 +1,7 @@
 /* LoginPage Styles */
 .login-page {
-  height: 100vh;
+  min-height: 100vh;
   background: #1f2937;
-  overflow: hidden;
 }
 
 .login-intro-section {
