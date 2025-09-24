@@ -4,8 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // Importing React Router components
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-// Importing page components  
-import { QuestionListPage, LoginPage, DoQuestionPage } from './pages';
+// Importing page components
+import { QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage } from './pages';
 
 function App() {
   return (
@@ -15,7 +15,13 @@ function App() {
       
       {/* Login page */}
       <Route path="/login" element={<LoginPage />} />
-      
+
+      {/* Register page */}
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Forgot password page */}
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
       {/* Question list page */}
       <Route path="/questions" element={<QuestionListPage />} />
       

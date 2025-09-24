@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const LoginForm = () => {
@@ -24,15 +25,6 @@ const LoginForm = () => {
         }
     };
 
-    // Handle register action (placeholder)
-    const handleRegister = () => {
-        setMessage('Register functionality coming soon!');
-    };
-
-    // Handle forgot password action (placeholder)
-    const handleForgotPassword = () => {
-        setMessage('Forgot password functionality coming soon!');
-    };
 
     return (
         <div className="login-form-container">
@@ -83,8 +75,9 @@ const LoginForm = () => {
                 <div className="secondary-actions">
                     <div className="d-grid mb-2">
                         <Button
+                            as={Link}
+                            to="/register"
                             variant="outline-primary"
-                            onClick={handleRegister}
                             className="register-btn"
                         >
                             Create New Account
@@ -92,13 +85,12 @@ const LoginForm = () => {
                     </div>
 
                     <div className="text-center">
-                        <Button
-                            variant="link"
-                            onClick={handleForgotPassword}
+                        <Link
+                            to="/forgot-password"
                             className="forgot-password-link"
                         >
                             Forgot your password?
-                        </Button>
+                        </Link>
                     </div>
                 </div>
 
