@@ -10,7 +10,7 @@ import QuestionListFilterOption from './QuestionListFilterOption.jsx';
 import QuestionListSearch from './QuestionListSearch.jsx';
 
 // Importing API service
-import { QuestionService } from '../services/QuestionService.js';
+import { QuestionService } from '../services/questionService.js';
 
 // Example content data (fallback when API fails)
 const EXAMPLE_QUESTION = [
@@ -82,8 +82,8 @@ const EXAMPLE_QUESTION = [
     },
 ];
 
-const QuestionList = ({ 
-    title = 'Question List', 
+const QuestionList = ({
+    title = 'Question List',
     useApi = true // Control whether to use API or fallback data
 }) => {
     // State for questions data
@@ -102,7 +102,7 @@ const QuestionList = ({
 
             setLoading(true);
             setError('');
-            
+
             try {
                 const data = await QuestionService.getAllQuestions();
                 setQuestions(data);
@@ -157,14 +157,14 @@ const QuestionList = ({
                 </div>
 
                 <hr />
-                
+
                 {/* Error display */}
                 {error && (
                     <Alert variant="danger" className="mb-3">
                         {error}
                     </Alert>
                 )}
-                
+
                 {/* Loading indicator */}
                 {loading && (
                     <div className="text-center mb-3">
@@ -173,7 +173,7 @@ const QuestionList = ({
                         </Spinner>
                     </div>
                 )}
-                
+
                 {/* Questions list */}
                 <ListGroup variant="flush" className="bg-body-secondary">
                     {filteredContent.map((item) => (
@@ -191,7 +191,7 @@ const QuestionList = ({
                         />
                     ))}
                 </ListGroup>
-                
+
                 {/* No results message */}
                 {!loading && filteredContent.length === 0 && (
                     <Alert variant="info" className="text-center">
