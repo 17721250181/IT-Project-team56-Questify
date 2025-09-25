@@ -1,14 +1,21 @@
 # -------------------------------------------------------------
-# CI (Backend + Frontend) and CD (Render + GitHub Pages)
+# CI (Backend + Frontend)  +  CD (Render backend + GitHub Pages)
 # -------------------------------------------------------------
 name: CI (Backend + Frontend + Deploy)
 
 on:
-  push:
-    branches: [TestMainBranch]           # deploy only from main
-  pull_request:                  # PRs run tests/build only
+  # CI on any PR; CD will not run on PRs (only tests/build)
+  pull_request:
+    branches: ['**']
 
-# Required for GitHub Pages actions
+  # CI + CD on pushes to the deployment branch
+  push:
+    branches: [ TestMainBranch ]
+
+  # Manual runs (useful for debugging)
+  workflow_dispatch:
+
+# Permissions required by Pages actions
 permissions:
   contents: read
   pages: write
@@ -16,13 +23,17 @@ permissions:
 
 # Avoid overlapping Pages publishes
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
+# Single source of truth for the deploy branch
+env:
+  DEPLOY_BRANCH: TestMainBranch
+
 jobs:
-  # ----------------------------
-  # BACKEND: test on Postgres
-  # ----------------------------
+  # -----------------------------------------------------------
+  # BACKEND CI: Django tests on Postgres
+  # -----------------------------------------------------------
   backend-test:
     name: Backend (Django + pytest on Postgres)
     runs-on: ubuntu-latest
@@ -34,14 +45,12 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: appdb
-        ports:
-          - 5432:5432
+        ports: [ "5432:5432" ]
         options: >-
           --health-cmd="pg_isready -U postgres -d appdb"
           --health-interval=10s --health-timeout=5s --health-retries=5
 
     env:
-      # CI uses Postgres; your settings.py should fall back to SQLite locally.
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/appdb
       SECRET_KEY: test-secret
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -49,10 +58,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python 3.11 (with pip cache)
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
 
       - name: Install backend deps
         working-directory: backend
@@ -68,9 +79,9 @@ jobs:
         working-directory: backend
         run: pytest -s -v
 
-  # ----------------------------
-  # FRONTEND: test + build + upload Pages artifact
-  # ----------------------------
+  # -----------------------------------------------------------
+  # FRONTEND CI: tests + build + (on deploy branch) upload Pages artifact
+  # -----------------------------------------------------------
   frontend-test-build:
     name: Frontend (tests + build)
     runs-on: ubuntu-latest
@@ -79,10 +90,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js 20 (with npm cache)
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend deps
         working-directory: frontend
@@ -96,51 +109,54 @@ jobs:
         working-directory: frontend
         run: npm -s run build
 
-      # Enable & configure Pages for this repo (safe to run repeatedly)
+      # Enable & configure Pages (safe to run repeatedly).
+      # Only on push to the deploy branch (never on PRs).
       - name: Configure Pages
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', vars.DEPLOY_BRANCH)
         uses: actions/configure-pages@v4
         with:
           enablement: true
 
-      # Upload the built site as the Pages artifact
+      # Upload the built site as the Pages artifact (for deploy job)
       - name: Upload artifact for Pages
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', vars.DEPLOY_BRANCH)
         uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist
 
-  # ----------------------------
-  # BACKEND: deploy to Render
-  # ----------------------------
+  # -----------------------------------------------------------
+  # BACKEND CD: trigger Render deployment (deploy hook)
+  # -----------------------------------------------------------
   backend-deploy:
     name: Deploy Backend to Render
     runs-on: ubuntu-latest
     needs: backend-test
-    if: github.ref == 'refs/heads/main'
+    # CD only on push to DEPLOY_BRANCH (never on PRs)
+    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', vars.DEPLOY_BRANCH)
 
     steps:
       - name: Fail clearly if the deploy hook secret is missing
         run: |
           if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
-            echo "RENDER_DEPLOY_HOOK secret is missing."
+            echo "::error::RENDER_DEPLOY_HOOK secret is missing."
             echo "Add it in Repo → Settings → Secrets and variables → Actions."
             exit 1
           fi
 
-      - name: Trigger Render deploy hook
+      - name: Trigger Render deploy hook (show HTTP status)
         run: |
-          # show HTTP status while wiring; change to '-fsS' once stable
+          # For initial wiring, show the status line; switch to -fsS once stable.
           curl -i -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
-  # ----------------------------
-  # FRONTEND: publish to GitHub Pages
-  # ----------------------------
+  # -----------------------------------------------------------
+  # FRONTEND CD: publish to GitHub Pages
+  # -----------------------------------------------------------
   frontend-deploy:
     name: Deploy Frontend to GitHub Pages
     runs-on: ubuntu-latest
     needs: frontend-test-build
-    if: github.ref == 'refs/heads/main'
+    # CD only on push to DEPLOY_BRANCH (never on PRs)
+    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', vars.DEPLOY_BRANCH)
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -149,5 +165,3 @@ jobs:
       - name: Deploy to Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-        #testing
