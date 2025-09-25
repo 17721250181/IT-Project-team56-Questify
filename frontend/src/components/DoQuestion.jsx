@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Card, Row, Col, Form, Button, Alert, Spinner, Badge } from 'react-bootstrap';
-import { QuestionService } from '../services/QuestionService.js';
+import { QuestionService } from '../services/questionService.js';
 
 const DoQuestion = ({ questionId }) => {
     const [question, setQuestion] = useState(null);
