@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Importing page components
-import { QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage } from './pages';
+import { QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage, PostQuestionPage } from './pages';
 
 function App() {
   return (
@@ -24,6 +24,9 @@ function App() {
 
       {/* Question list page */}
       <Route path="/questions" element={<QuestionListPage />} />
+      
+      {/* Post new question page */}
+      <Route path="/post-question" element={<PostQuestionPage />} />
       
       {/* Individual question page with dynamic ID */}
       <Route path="/question/:questionId" element={<DoQuestionPage />} />
