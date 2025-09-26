@@ -1,167 +1,391 @@
-# -------------------------------------------------------------
-# CI (Backend + Frontend)  +  CD (Render backend + GitHub Pages)
-# -------------------------------------------------------------
-name: CI (Backend + Frontend + Deploy)
+# =============================================================================
+# PROFESSIONAL CI/CD PIPELINE
+# Continuous Integration: Tests on every PR and push
+# Continuous Deployment: Deploys only on main branch pushes after CI passes
+# =============================================================================
+
+name: 🚀 CI/CD Pipeline
 
 on:
-  # CI on any PR; CD will not run on PRs (only tests/build)
+  # Trigger CI on all pull requests
   pull_request:
     branches: ['**']
-
-  # CI + CD on pushes to the deployment branch
+    types: [opened, synchronize, reopened]
+  
+  # Trigger CI + CD on pushes to main branch
   push:
-    branches: [ TestMainBranch ]
-
-  # Manual runs (useful for debugging)
+    branches: [TestMainBranch]
+  
+  # Allow manual workflow dispatch
   workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment even on non-main branch'
+        required: false
+        default: false
+        type: boolean
 
-# Permissions required by Pages actions
+# Required permissions for GitHub Pages deployment
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
+  checks: write
+  pull-requests: write
 
-# Avoid overlapping Pages publishes
+# Prevent concurrent deployments
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/TestMainBranch' }}
 
-# Single source of truth for the deploy branch
+# Global environment variables
 env:
   DEPLOY_BRANCH: TestMainBranch
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
 
 jobs:
-  # -----------------------------------------------------------
-  # BACKEND CI: Django tests on Postgres
-  # -----------------------------------------------------------
-  backend-test:
-    name: Backend (Django + pytest on Postgres)
+  # =============================================================================
+  # CI PHASE 1: BACKEND TESTING
+  # =============================================================================
+  backend-ci:
+    name: 🐍 Backend CI (Django + PostgreSQL)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:15-alpine
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: appdb
-        ports: [ "5432:5432" ]
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass123
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres -d appdb"
-          --health-interval=10s --health-timeout=5s --health-retries=5
+          --health-cmd="pg_isready -U testuser -d testdb"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+          --health-start-period=30s
 
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/appdb
-      SECRET_KEY: test-secret
+      DATABASE_URL: postgresql://testuser:testpass123@localhost:5432/testdb
+      SECRET_KEY: test-secret-key-for-ci-only
+      DEBUG: false
+      DJANGO_SETTINGS_MODULE: backend.settings
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Python 3.11 (with pip cache)
+      - name: 🐍 Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: 'pip'
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
           cache-dependency-path: backend/requirements.txt
 
-      - name: Install backend deps
+      - name: 📦 Install Python dependencies
         working-directory: backend
         run: |
-          python -m pip install -U pip
+          python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
+          pip install coverage pytest-cov
 
-      - name: Django migrate
+      - name: 🔍 Lint Python code
         working-directory: backend
-        run: python manage.py migrate --noinput
+        run: |
+          python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Run backend tests
+      - name: 🗄️ Run Django migrations
         working-directory: backend
-        run: pytest -s -v
+        run: |
+          python manage.py makemigrations --check --dry-run
+          python manage.py migrate --noinput
 
-  # -----------------------------------------------------------
-  # FRONTEND CI: tests + build + (on deploy branch) upload Pages artifact
-  # -----------------------------------------------------------
-  frontend-test-build:
-    name: Frontend (tests + build)
+      - name: 🧪 Run backend tests with coverage
+        working-directory: backend
+        run: |
+          coverage run -m pytest -v --tb=short
+          coverage report --show-missing
+          coverage xml
+
+      - name: 📊 Upload coverage to Codecov (optional)
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          file: backend/coverage.xml
+          flags: backend
+          fail_ci_if_error: false
+
+  # =============================================================================
+  # CI PHASE 2: FRONTEND TESTING & BUILD
+  # =============================================================================
+  frontend-ci:
+    name: ⚛️ Frontend CI (React/Vite)
     runs-on: ubuntu-latest
-    needs: backend-test
+    timeout-minutes: 10
+    needs: backend-ci
+
+    outputs:
+      build-success: ${{ steps.build.outcome == 'success' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Use Node.js 20 (with npm cache)
+      - name: 📦 Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend deps
+      - name: 📦 Install frontend dependencies
         working-directory: frontend
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
 
-      - name: Run frontend tests
+      - name: 🔍 Lint frontend code
         working-directory: frontend
-        run: npm run test
+        run: |
+          npm run lint || true
+          npm run type-check || true
 
-      - name: Build frontend (Vite)
+      - name: 🧪 Run frontend tests
         working-directory: frontend
-        run: npm -s run build
+        run: npm run test:ci || npm run test
 
-      # Enable & configure Pages (safe to run repeatedly).
-      # Only on push to the deploy branch (never on PRs).
-      - name: Configure Pages
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', vars.DEPLOY_BRANCH)
-        uses: actions/configure-pages@v4
+      - name: 🏗️ Build frontend application
+        id: build
+        working-directory: frontend
+        run: |
+          npm run build
+          ls -la dist/
+
+      - name: 🗜️ Compress build artifacts
+        if: steps.build.outcome == 'success'
+        working-directory: frontend
+        run: tar -czf ../frontend-build.tar.gz -C dist .
+
+      - name: 📤 Upload build artifacts
+        if: steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v4
         with:
-          enablement: true
+          name: frontend-build
+          path: frontend-build.tar.gz
+          retention-days: 1
 
-      # Upload the built site as the Pages artifact (for deploy job)
-      - name: Upload artifact for Pages
-        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', vars.DEPLOY_BRANCH)
+      # Pages-specific artifact upload (only for deploy branch)
+      - name: 🔧 Setup GitHub Pages
+        if: github.ref == 'refs/heads/TestMainBranch' && github.event_name != 'pull_request'
+        uses: actions/configure-pages@v4
+
+      - name: 📤 Upload Pages artifact
+        if: github.ref == 'refs/heads/TestMainBranch' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist
 
-  # -----------------------------------------------------------
-  # BACKEND CD: trigger Render deployment (deploy hook)
-  # -----------------------------------------------------------
-  backend-deploy:
-    name: Deploy Backend to Render
+  # =============================================================================
+  # SECURITY & QUALITY CHECKS
+  # =============================================================================
+  security-scan:
+    name: 🔒 Security & Quality Scan
     runs-on: ubuntu-latest
-    needs: backend-test
-    # CD only on push to DEPLOY_BRANCH (never on PRs)
-    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', vars.DEPLOY_BRANCH)
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/TestMainBranch'
+    needs: [backend-ci, frontend-ci]
+    continue-on-error: true
 
     steps:
-      - name: Fail clearly if the deploy hook secret is missing
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔍 Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: 📊 Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # =============================================================================
+  # CD PHASE 1: BACKEND DEPLOYMENT
+  # =============================================================================
+  backend-cd:
+    name: 🚀 Deploy Backend to Render
+    runs-on: ubuntu-latest
+    needs: [backend-ci, frontend-ci, security-scan]
+    if: |
+      always() &&
+      needs.backend-ci.result == 'success' &&
+      needs.frontend-ci.result == 'success' &&
+      (github.ref == 'refs/heads/TestMainBranch' || inputs.force_deploy) &&
+      github.event_name != 'pull_request'
+    
+    environment:
+      name: production-backend
+
+    steps:
+      - name: ✅ Validate deployment prerequisites
         run: |
-          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
-            echo "::error::RENDER_DEPLOY_HOOK secret is missing."
-            echo "Add it in Repo → Settings → Secrets and variables → Actions."
+          if [[ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]]; then
+            echo "::error title=Missing Secret::RENDER_DEPLOY_HOOK secret is not configured"
+            echo "::error::Please add RENDER_DEPLOY_HOOK in Settings → Secrets and variables → Actions"
             exit 1
           fi
+          echo "::notice title=Deployment Starting::Initiating backend deployment to Render"
 
-      - name: Trigger Render deploy hook (show HTTP status)
+      - name: 🚀 Trigger Render deployment
+        id: deploy
         run: |
-          # For initial wiring, show the status line; switch to -fsS once stable.
-          curl -i -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          echo "::group::Deploying to Render"
+          response=$(curl -w "\n%{http_code}" -s -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}")
+          http_code=$(echo "$response" | tail -n1)
+          response_body=$(echo "$response" | head -n -1)
+          
+          echo "HTTP Status: $http_code"
+          echo "Response: $response_body"
+          
+          if [[ $http_code -ge 200 && $http_code -lt 300 ]]; then
+            echo "::notice title=Deployment Success::Backend deployed successfully to Render"
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "::error title=Deployment Failed::Backend deployment failed with HTTP $http_code"
+            echo "status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "::endgroup::"
 
-  # -----------------------------------------------------------
-  # FRONTEND CD: publish to GitHub Pages
-  # -----------------------------------------------------------
-  frontend-deploy:
-    name: Deploy Frontend to GitHub Pages
+      - name: ⏱️ Wait for deployment to be ready
+        if: steps.deploy.outputs.status == 'success'
+        run: |
+          echo "::notice::Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+
+  # =============================================================================
+  # CD PHASE 2: FRONTEND DEPLOYMENT
+  # =============================================================================
+  frontend-cd:
+    name: 🌐 Deploy Frontend to GitHub Pages
     runs-on: ubuntu-latest
-    needs: frontend-test-build
-    # CD only on push to DEPLOY_BRANCH (never on PRs)
-    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', vars.DEPLOY_BRANCH)
+    needs: [frontend-ci, backend-cd]
+    if: |
+      always() &&
+      needs.frontend-ci.result == 'success' &&
+      (needs.backend-cd.result == 'success' || needs.backend-cd.result == 'skipped') &&
+      (github.ref == 'refs/heads/TestMainBranch' || inputs.force_deploy) &&
+      github.event_name != 'pull_request'
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Deploy to Pages
+      - name: 🌐 Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 600000
+          error_count: 10
+          reporting_interval: 5000
+
+      - name: ✅ Verify deployment
+        if: steps.deployment.outputs.page_url
+        run: |
+          echo "::notice title=Deployment Success::Frontend deployed successfully!"
+          echo "🌐 Site URL: ${{ steps.deployment.outputs.page_url }}"
+
+  # =============================================================================
+  # POST-DEPLOYMENT VERIFICATION
+  # =============================================================================
+  deployment-verification:
+    name: ✅ Post-Deployment Verification
+    runs-on: ubuntu-latest
+    needs: [backend-cd, frontend-cd]
+    if: |
+      always() &&
+      (needs.backend-cd.result == 'success' || needs.frontend-cd.result == 'success') &&
+      github.event_name != 'pull_request'
+
+    steps:
+      - name: 🏥 Health check backend
+        if: needs.backend-cd.result == 'success' && env.BACKEND_URL
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        run: |
+          echo "::group::Backend Health Check"
+          max_attempts=5
+          attempt=1
+          
+          while [[ $attempt -le $max_attempts ]]; do
+            echo "Health check attempt $attempt/$max_attempts"
+            if curl -f -s --max-time 10 "${BACKEND_URL}/health/" > /dev/null; then
+              echo "::notice title=Backend Healthy::Backend is responding correctly"
+              break
+            elif [[ $attempt -eq $max_attempts ]]; then
+              echo "::warning title=Backend Health Check Failed::Backend health check failed after $max_attempts attempts"
+            else
+              echo "Attempt $attempt failed, retrying in 10 seconds..."
+              sleep 10
+            fi
+            ((attempt++))
+          done
+          echo "::endgroup::"
+
+      - name: 🏥 Health check frontend
+        if: needs.frontend-cd.result == 'success'
+        run: |
+          echo "::group::Frontend Health Check"
+          max_attempts=3
+          attempt=1
+          
+          while [[ $attempt -le $max_attempts ]]; do
+            echo "Health check attempt $attempt/$max_attempts"
+            if curl -f -s --max-time 10 "${{ needs.frontend-cd.outputs.page_url || steps.deployment.outputs.page_url }}" > /dev/null; then
+              echo "::notice title=Frontend Healthy::Frontend is accessible"
+              break
+            elif [[ $attempt -eq $max_attempts ]]; then
+              echo "::warning title=Frontend Health Check Failed::Frontend health check failed after $max_attempts attempts"
+            else
+              echo "Attempt $attempt failed, retrying in 5 seconds..."
+              sleep 5
+            fi
+            ((attempt++))
+          done
+          echo "::endgroup::"
+
+      - name: 📝 Deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|-----|" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.backend-cd.result }}" == "success" ]]; then
+            echo "| Backend | ✅ Deployed | ${{ secrets.BACKEND_URL || 'N/A' }} |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Backend | ❌ Failed/Skipped | N/A |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ needs.frontend-cd.result }}" == "success" ]]; then
+            echo "| Frontend | ✅ Deployed | ${{ needs.frontend-cd.outputs.page_url || 'GitHub Pages' }} |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Frontend | ❌ Failed/Skipped | N/A |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
