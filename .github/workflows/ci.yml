@@ -1,6 +1,7 @@
 # ============================================================
-# CI (tests on PRs and pushes) + CD (Render backend + GH Pages)
-# Branch for CD: TestMainBranch
+# CI (tests on PRs and pushes) + CD (staging/production deployments)
+# Staging branch: TestMainBranch
+# Production branch: main
 # ============================================================
 
 name: CI/CD Pipeline
@@ -8,8 +9,8 @@ name: CI/CD Pipeline
 on:
   pull_request:            # CI for all PRs
     branches: ['**']
-  push:                    # CI + CD on branch below
-    branches: [ TestMainBranch ]
+  push:                    # CI + CD on specified branches
+    branches: [ TestMainBranch, main ]
   workflow_dispatch:
 
 # Permissions required by Pages
@@ -19,7 +20,8 @@ permissions:
   id-token: write
 
 env:
-  DEPLOY_BRANCH: TestMainBranch
+  STAGING_BRANCH: TestMainBranch
+  PRODUCTION_BRANCH: main
   PYTHON_VERSION: "3.11"
   NODE_VERSION: "20"
 
@@ -102,7 +104,7 @@ jobs:
         run: npm run build
 
   # ----------------------------------------------------
-  # PREPARE PAGES ARTIFACT (only on pushes to DEPLOY_BRANCH)
+  # PREPARE PAGES ARTIFACT (only on pushes to production branch)
   # - enables Pages if needed (idempotent)
   # - uploads frontend/dist as the Pages artifact
   # ----------------------------------------------------
@@ -110,7 +112,7 @@ jobs:
     name: Prepare GitHub Pages artifact
     runs-on: ubuntu-latest
     needs: frontend-ci
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/TestMainBranch'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions/checkout@v4
@@ -139,34 +141,55 @@ jobs:
           path: frontend/dist
 
   # -------------------------------------
-  # BACKEND CD: Deploy to Render via hook
+  # BACKEND STAGING: Deploy to Render Staging
   # -------------------------------------
-  backend-deploy:
-    name: Deploy Backend to Render
+  backend-deploy-staging:
+    name: Deploy Backend to Render (Staging)
     runs-on: ubuntu-latest
     needs: backend-ci
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/TestMainBranch'
 
     steps:
-      - name: Ensure RENDER_DEPLOY_HOOK is set
+      - name: Ensure RENDER_STAGING_DEPLOY_HOOK is set
         run: |
-          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
-            echo "::error::RENDER_DEPLOY_HOOK secret is missing."
+          if [ -z "${{ secrets.RENDER_STAGING_DEPLOY_HOOK }}" ]; then
+            echo "::error::RENDER_STAGING_DEPLOY_HOOK secret is missing."
             echo "Add it in Settings → Secrets and variables → Actions."
             exit 1
           fi
 
-      - name: Trigger Render deploy hook
-        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+      - name: Trigger Render staging deploy hook
+        run: curl -fsS -X POST "${{ secrets.RENDER_STAGING_DEPLOY_HOOK }}"
+
+  # -------------------------------------
+  # BACKEND PRODUCTION: Deploy to Render Production
+  # -------------------------------------
+  backend-deploy-production:
+    name: Deploy Backend to Render (Production)
+    runs-on: ubuntu-latest
+    needs: backend-ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Ensure RENDER_PRODUCTION_DEPLOY_HOOK is set
+        run: |
+          if [ -z "${{ secrets.RENDER_PRODUCTION_DEPLOY_HOOK }}" ]; then
+            echo "::error::RENDER_PRODUCTION_DEPLOY_HOOK secret is missing."
+            echo "Add it in Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Trigger Render production deploy hook
+        run: curl -fsS -X POST "${{ secrets.RENDER_PRODUCTION_DEPLOY_HOOK }}"
 
   # -------------------------------------------
-  # FRONTEND CD: Publish Pages artifact to Pages
+  # FRONTEND PRODUCTION: Publish Pages artifact to Pages
   # -------------------------------------------
   frontend-deploy:
-    name: Deploy Frontend to GitHub Pages
+    name: Deploy Frontend to GitHub Pages (Production)
     runs-on: ubuntu-latest
     needs: pages-prepare
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/TestMainBranch'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
