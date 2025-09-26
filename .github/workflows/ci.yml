@@ -1,36 +1,35 @@
 # =============================================================================
 # CI/CD PIPELINE
 # - CI: tests/build on PRs and on pushes
-# - CD: deploys only on pushes to TestMainBranch after CI passes
+# - CD: deploys only on pushes to TestMainBranch (after CI passes)
 # =============================================================================
 
 name: CI/CD Pipeline
 
 on:
   pull_request:
-    branches: ['**']                      # CI on all PRs
+    branches: ['**']                  # CI on all PRs
   push:
-    branches: [TestMainBranch]            # CI + CD on this branch
+    branches: [ TestMainBranch ]      # CI + CD on this branch
   workflow_dispatch:
     inputs:
       force_deploy:
-        description: 'Force deployment even if not on deploy branch'
+        description: 'Force deploy even if not on deploy branch'
         required: false
         default: false
         type: boolean
 
-# Permissions needed for GitHub Pages
+# Permissions needed for GitHub Pages deploy
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Prevent overlapping Pages publishes; do not cancel main-branch publishes
+# Prevent overlapping Pages publishes; do not cancel deploys on TestMainBranch
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/TestMainBranch' }}
 
-# Shared config
 env:
   DEPLOY_BRANCH: TestMainBranch
   NODE_VERSION: '20'
@@ -65,22 +64,16 @@ jobs:
       DATABASE_URL: postgresql://testuser:testpass123@localhost:5432/testdb
       SECRET_KEY: test-secret-key-for-ci-only
       DEBUG: false
-      # If your manage.py sets settings, you can remove this line:
-      # DJANGO_SETTINGS_MODULE: backend.settings
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
-          cache-dependency-path: backend/requirements.txt
 
       - name: Install backend dependencies
         working-directory: backend
@@ -116,8 +109,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -129,6 +120,10 @@ jobs:
 
       - name: Build frontend (Vite)
         working-directory: frontend
+        env:
+          # Set this repo Action Variable in Settings → Variables → Actions
+          # e.g. https://<your-render-service>.onrender.com
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
         run: npm run build
 
       # Configure Pages and upload artifact ONLY on pushes to the deploy branch
@@ -166,7 +161,7 @@ jobs:
 
       - name: Trigger Render deploy
         run: |
-          # Show HTTP status during initial wiring. Switch to -fsS once stable.
+          # Show HTTP status while wiring; switch to -fsS once stable.
           curl -i -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
   # ===========================================================================
@@ -182,10 +177,6 @@ jobs:
       needs.frontend-ci.result == 'success' &&
       (needs.backend-cd.result == 'success' || needs.backend-cd.result == 'skipped')
 
-    # Expose the Pages URL for visibility
-    outputs:
-      page_url: ${{ steps.deployment.outputs.page_url }}
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -194,8 +185,3 @@ jobs:
       - name: Deploy to Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      - name: Show site URL
-        if: steps.deployment.outputs.page_url
-        run: |
-          echo "Site URL: ${{ steps.deployment.outputs.page_url }}"
