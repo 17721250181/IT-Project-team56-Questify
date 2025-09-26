@@ -7,10 +7,10 @@
 name: CI/CD Pipeline
 
 on:
-  pull_request:            # CI for all PRs
-    branches: ['**']
-  push:                    # CI + CD on specified branches
-    branches: [ TestMainBranch, main ]
+  pull_request: # CI for all PRs
+    branches: ["**"]
+  push: # CI + CD on specified branches
+    branches: [TestMainBranch, main]
   workflow_dispatch:
 
 # Permissions required by Pages

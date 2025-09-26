@@ -35,7 +35,11 @@ else:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1"  # default for local/dev
+).split(",")
+
 
 
 # Application definition
@@ -61,11 +65,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
+# Frontend origins allowed by CORS
+CORS_ALLOWED_ORIGINS = [o for o in [
     "http://localhost:5173",
     os.getenv("FRONTEND_URL", "").strip(),
-]
-CORS_ALLOWED_ORIGINS = [url for url in CORS_ALLOWED_ORIGINS if url]
+] if o]
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "config.urls"
@@ -175,3 +179,9 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # For developm
 # EMAIL_HOST_USER = "your-email@gmail.com"
 # EMAIL_HOST_PASSWORD = "your-app-password"
 DEFAULT_FROM_EMAIL = "noreply@questify.com"
+
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "CSRF_TRUSTED_ORIGINS",
+    ""                     # set in Render env
+).split(",") if os.getenv("CSRF_TRUSTED_ORIGINS") else []
+
