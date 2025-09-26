@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const RegisterForm = () => {
     // State variables for inputs
@@ -16,6 +16,10 @@ const RegisterForm = () => {
     });
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    const { register } = useAuth();
+    const navigate = useNavigate();
 
     // Handle input changes
     const handleChange = (e) => {
@@ -90,19 +94,39 @@ const RegisterForm = () => {
             return;
         }
 
-        console.log('Registration Data:', formData);
+        setLoading(true);
+        setMessage('');
+
         try {
-            // Need update URL to actual registration endpoint
-            const response = await axios.post('/api/register', {
-                fullName: formData.fullName,
-                studentId: formData.studentId,
-                email: formData.email,
-                password: formData.password
+            const response = await register(
+                formData.fullName,
+                formData.studentId,
+                formData.email,
+                formData.password
+            );
+
+            console.log('Registration successful:', response);
+            setMessage('Registration successful! Redirecting to questions...');
+
+            // Clear form
+            setFormData({
+                fullName: '',
+                studentId: '',
+                email: '',
+                password: '',
+                confirmPassword: '',
+                agreeToTerms: false
             });
-            setMessage('Registration successful! Please check your email to verify your account.');
+
+            // Redirect to questions after a short delay
+            setTimeout(() => {
+                navigate('/questions', { replace: true });
+            }, 1500);
         } catch (error) {
             console.error('Registration error:', error);
-            setMessage('Registration failed. Please try again.');
+            setMessage(error.message || 'Registration failed. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -122,6 +146,7 @@ const RegisterForm = () => {
                         onChange={handleChange}
                         className="form-input"
                         isInvalid={!!errors.fullName}
+                        disabled={loading}
                     />
                     <Form.Control.Feedback type="invalid">
                         {errors.fullName}
@@ -141,6 +166,7 @@ const RegisterForm = () => {
                         onChange={handleChange}
                         className="form-input"
                         isInvalid={!!errors.studentId}
+                        disabled={loading}
                     />
                     <Form.Control.Feedback type="invalid">
                         {errors.studentId}
@@ -160,6 +186,7 @@ const RegisterForm = () => {
                         onChange={handleChange}
                         className="form-input"
                         isInvalid={!!errors.email}
+                        disabled={loading}
                     />
                     <Form.Control.Feedback type="invalid">
                         {errors.email}
@@ -179,6 +206,7 @@ const RegisterForm = () => {
                         onChange={handleChange}
                         className="form-input"
                         isInvalid={!!errors.password}
+                        disabled={loading}
                     />
                     <Form.Control.Feedback type="invalid">
                         {errors.password}
@@ -198,6 +226,7 @@ const RegisterForm = () => {
                         onChange={handleChange}
                         className="form-input"
                         isInvalid={!!errors.confirmPassword}
+                        disabled={loading}
                     />
                     <Form.Control.Feedback type="invalid">
                         {errors.confirmPassword}
@@ -212,6 +241,7 @@ const RegisterForm = () => {
                         checked={formData.agreeToTerms}
                         onChange={handleChange}
                         isInvalid={!!errors.agreeToTerms}
+                        disabled={loading}
                         label={
                             <span>
                                 I agree to the <Link to="/terms" target="_blank">Terms and Conditions</Link> and <Link to="/privacy" target="_blank">Privacy Policy</Link>
@@ -230,8 +260,16 @@ const RegisterForm = () => {
                         type="submit"
                         size="lg"
                         className="login-btn"
+                        disabled={loading}
                     >
-                        Create Account
+                        {loading ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Creating Account...
+                            </>
+                        ) : (
+                            'Create Account'
+                        )}
                     </Button>
                 </div>
 
@@ -247,7 +285,10 @@ const RegisterForm = () => {
 
                 {/* Message Display */}
                 {message && (
-                    <div className={`alert ${message.includes('failed') ? 'alert-danger' : 'alert-success'}`}>
+                    <div className={`alert ${message.includes('failed') || message.includes('error')
+                        ? 'alert-danger'
+                        : 'alert-success'
+                        }`}>
                         {message}
                     </div>
                 )}
