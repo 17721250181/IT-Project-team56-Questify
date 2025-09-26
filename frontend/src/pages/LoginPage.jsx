@@ -57,7 +57,7 @@ const LoginPage = () => {
             <Container fluid className="vh-100 p-0">
                 <Row className="h-100 g-0 m-0">
                     {/* Left Side - Introduction */}
-                    <Col lg={7} md={6} className="login-intro-section d-flex flex-column">
+                    <Col xxl={6} lg={7} md={6} className="login-intro-section d-flex flex-column">
                         <div className="intro-header">
                             <div className="brand-section">
                                 <Link to="/" className="brand-link">
@@ -115,6 +115,7 @@ const LoginPage = () => {
 
                     {/* Right Side - Login Form */}
                     <Col
+                        xxl={6}
                         lg={5}
                         md={6}
                         className="login-form-section d-flex align-items-center justify-content-center"
