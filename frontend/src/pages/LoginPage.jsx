@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col';
 import Logo from '../components/Logo';
 import LoginForm from '../components/LoginForm';
 import '../styles/LoginPage.css';
+import '../styles/responsive-overrides.css';
 
 const LoginPage = () => {
     // Feature list data
