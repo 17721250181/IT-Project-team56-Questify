@@ -3,7 +3,7 @@ import axios from 'axios';
 // Create Axios instance with base configuration
 const api = axios.create({
     baseURL: 'http://localhost:8000', // Replace with your backend API URL
-    timeout: 100,  // low timeout for local testing
+    timeout: 10000,  // 10 seconds timeout for development
     withCredentials: true, // Send cookies if needed
 });
 

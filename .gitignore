@@ -41,3 +41,4 @@ backend/.env
 Thumbs.db
 
 CLAUDE.md
+AUTHENTICATION_IMPLEMENTATION.md
