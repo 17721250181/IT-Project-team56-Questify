@@ -161,7 +161,7 @@ jobs:
         run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
   # ==========================================
-  # FRONTEND CD: publish artifact to GH Pages
+  # FRONTEND CD: publish artifact to GH Pages e
   # ==========================================
   frontend-deploy:
     name: Deploy Frontend to GitHub Pages
