@@ -108,7 +108,7 @@ export const QuestionService = {
     },
 
     // Create Multiple Choice Question
-    createMCQQuestion: async (questionText, options, correctOption) => {
+    createMCQQuestion: async (questionText, options, correctOptions) => {
         try {
             const questionData = {
                 question: questionText,
@@ -118,7 +118,7 @@ export const QuestionService = {
                 option_c: options.C,
                 option_d: options.D,
                 option_e: options.E,
-                correct_option: correctOption
+                correct_options: correctOptions
             };
             const response = await api.post('/questions/create/', questionData);
             return response.data;

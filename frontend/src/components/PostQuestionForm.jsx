@@ -12,7 +12,7 @@ const PostQuestionForm = () => {
         option_c: '',
         option_d: '',
         option_e: '',
-        correct_option: 'A'
+        correct_options: []
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -37,7 +37,16 @@ const PostQuestionForm = () => {
             option_c: '',
             option_d: '',
             option_e: '',
-            correct_option: 'A'
+            correct_options: []
+        }));
+    };
+
+    const handleCorrectOptionChange = (option, isChecked) => {
+        setFormData(prev => ({
+            ...prev,
+            correct_options: isChecked 
+                ? [...prev.correct_options, option]
+                : prev.correct_options.filter(opt => opt !== option)
         }));
     };
 
@@ -64,7 +73,7 @@ const PostQuestionForm = () => {
                 await QuestionService.createMCQQuestion(
                     formData.question,
                     options,
-                    formData.correct_option
+                    formData.correct_options
                 );
             }
 
@@ -79,7 +88,7 @@ const PostQuestionForm = () => {
                 option_c: '',
                 option_d: '',
                 option_e: '',
-                correct_option: 'A'
+                correct_options: []
             });
         } catch (err) {
             console.error('Error creating question:', err);
@@ -143,10 +152,12 @@ const PostQuestionForm = () => {
                     {/* Multiple Choice Fields */}
                     {formData.type === 'MCQ' && (
                         <>
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Option A</Form.Label>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Options (Check the correct answers)</Form.Label>
+                                
+                                {/* Option A */}
+                                <Row className="align-items-center mb-2">
+                                    <Col md={10}>
                                         <Form.Control
                                             name="option_a"
                                             value={formData.option_a}
@@ -154,11 +165,21 @@ const PostQuestionForm = () => {
                                             placeholder="Enter option A..."
                                             required
                                         />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Option B</Form.Label>
+                                    </Col>
+                                    <Col md={2} className="text-center">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-a"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('A')}
+                                            onChange={(e) => handleCorrectOptionChange('A', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+
+                                {/* Option B */}
+                                <Row className="align-items-center mb-2">
+                                    <Col md={10}>
                                         <Form.Control
                                             name="option_b"
                                             value={formData.option_b}
@@ -166,13 +187,21 @@ const PostQuestionForm = () => {
                                             placeholder="Enter option B..."
                                             required
                                         />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Option C</Form.Label>
+                                    </Col>
+                                    <Col md={2} className="text-center">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-b"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('B')}
+                                            onChange={(e) => handleCorrectOptionChange('B', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+
+                                {/* Option C */}
+                                <Row className="align-items-center mb-2">
+                                    <Col md={10}>
                                         <Form.Control
                                             name="option_c"
                                             value={formData.option_c}
@@ -180,11 +209,21 @@ const PostQuestionForm = () => {
                                             placeholder="Enter option C..."
                                             required
                                         />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Option D</Form.Label>
+                                    </Col>
+                                    <Col md={2} className="text-center">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-c"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('C')}
+                                            onChange={(e) => handleCorrectOptionChange('C', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+
+                                {/* Option D */}
+                                <Row className="align-items-center mb-2">
+                                    <Col md={10}>
                                         <Form.Control
                                             name="option_d"
                                             value={formData.option_d}
@@ -192,13 +231,21 @@ const PostQuestionForm = () => {
                                             placeholder="Enter option D..."
                                             required
                                         />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Option E</Form.Label>
+                                    </Col>
+                                    <Col md={2} className="text-center">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-d"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('D')}
+                                            onChange={(e) => handleCorrectOptionChange('D', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+
+                                {/* Option E */}
+                                <Row className="align-items-center mb-2">
+                                    <Col md={10}>
                                         <Form.Control
                                             name="option_e"
                                             value={formData.option_e}
@@ -206,26 +253,25 @@ const PostQuestionForm = () => {
                                             placeholder="Enter option E..."
                                             required
                                         />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Correct Answer</Form.Label>
-                                        <Form.Select
-                                            name="correct_option"
-                                            value={formData.correct_option}
-                                            onChange={handleInputChange}
-                                            required
-                                        >
-                                            <option value="A">A</option>
-                                            <option value="B">B</option>
-                                            <option value="C">C</option>
-                                            <option value="D">D</option>
-                                            <option value="E">E</option>
-                                        </Form.Select>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
+                                    </Col>
+                                    <Col md={2} className="text-center">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-e"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('E')}
+                                            onChange={(e) => handleCorrectOptionChange('E', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+                            </Form.Group>
+                            
+                            {/* Validation message */}
+                            {formData.correct_options.length === 0 && (
+                                <Alert variant="warning" className="mb-3">
+                                    Please select at least one correct answer.
+                                </Alert>
+                            )}
                         </>
                     )}
 

@@ -4,7 +4,7 @@ import PostQuestionForm from '../components/PostQuestionForm.jsx';
 
 const PostQuestionPage = () => {
     return (
-        <Container className="mt-4">
+        <Container className="mt-3">
             <Row className="justify-content-center">
                 <Col lg={8} md={10}>
                     <PostQuestionForm />
