@@ -8,10 +8,10 @@ name: CI/CD Pipeline
 
 on:
   pull_request:
-    branches: ['testmainbranch']  # CI on PRs to these branches
+    branches: ['TestMainBranch']  # CI on PRs to these branches
     
   push:
-    branches: ['testmainbranch']  # CI on pushes to these branches
+    branches: ['TestMainBranch']  # CI on pushes to these branches
   workflow_dispatch:          # manual runs
 
 # Permissions needed by GitHub Pages
