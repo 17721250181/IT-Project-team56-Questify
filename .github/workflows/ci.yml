@@ -1,73 +1,60 @@
-# ==============================================================
-# CI/CD: Django backend + React/Vite frontend
-# - CI on PRs and pushes (tests + build)
-# - CD only on pushes to DEPLOY_BRANCH after CI passes
-# ==============================================================
+# ============================================================
+# CI (tests on PRs and pushes) + CD (Render backend + GH Pages)
+# Branch for CD: TestMainBranch
+# ============================================================
 
 name: CI/CD Pipeline
 
 on:
-  pull_request:
-    branches: ['TestMainBranch']  # CI on PRs to these branches
-    
-  push:
-    branches: ['TestMainBranch']  # CI on pushes to these branches
-  workflow_dispatch:          # manual runs
+  pull_request:            # CI for all PRs
+    branches: ['**']
+  push:                    # CI + CD on branch below
+    branches: [ TestMainBranch ]
+  workflow_dispatch:
 
-# Permissions needed by GitHub Pages
+# Permissions required by Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Avoid overlapping Pages publishes
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
-# ---- Configure your deploy branch here ----
 env:
   DEPLOY_BRANCH: TestMainBranch
-  PYTHON_VERSION: '3.11'
-  NODE_VERSION: '20'
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
 
-# =========================
-# BACKEND CI: Django + Pytest
-# =========================
 jobs:
+  # -----------------------------
+  # BACKEND CI: Django + Postgres
+  # -----------------------------
   backend-ci:
     name: Backend CI (Django + PostgreSQL)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
     services:
       postgres:
-        image: postgres:15-alpine
+        image: postgres:15
         env:
           POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass123
+          POSTGRES_PASSWORD: testpass
           POSTGRES_DB: testdb
-        ports:
-          - 5432:5432
+        ports: ["5432:5432"]
         options: >-
           --health-cmd="pg_isready -U testuser -d testdb"
           --health-interval=10s --health-timeout=5s --health-retries=5
-          --health-start-period=30s
 
     env:
-      DATABASE_URL: postgresql://testuser:testpass123@localhost:5432/testdb
-      SECRET_KEY: test-secret-key
-      DEBUG: "False"
+      DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
+      SECRET_KEY: test-secret
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
+          cache: pip
           cache-dependency-path: backend/requirements.txt
 
       - name: Install backend deps
@@ -76,7 +63,7 @@ jobs:
           python -m pip install -U pip
           pip install -r requirements.txt
 
-      - name: Migrate DB
+      - name: Migrate
         working-directory: backend
         run: python manage.py migrate --noinput
 
@@ -84,93 +71,107 @@ jobs:
         working-directory: backend
         run: pytest -q
 
-  # =========================
-  # FRONTEND CI: tests + build
-  # =========================
+  # ------------------------------------
+  # FRONTEND CI: tests + production build
+  # ------------------------------------
   frontend-ci:
     name: Frontend CI (tests + build)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    needs: backend-ci
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install frontend deps
         working-directory: frontend
         run: npm ci
 
-      - name: Run frontend tests
+      - name: Run frontend tests (vitest)
         working-directory: frontend
-        # --if-present avoids failing if "test" script is missing
-        run: npm test --if-present -- --passWithNoTests
+        run: npm run test -- --run
 
       - name: Build frontend (Vite)
         working-directory: frontend
         run: npm run build
 
-  # =====================================================
-  # PREPARE PAGES ARTIFACT (only on deploy branch, push)
-  # Moves Pages config out of CI so CI cannot fail on it.
-  # =====================================================
+  # ----------------------------------------------------
+  # PREPARE PAGES ARTIFACT (only on pushes to DEPLOY_BRANCH)
+  # - enables Pages if needed (idempotent)
+  # - uploads frontend/dist as the Pages artifact
+  # ----------------------------------------------------
   pages-prepare:
     name: Prepare GitHub Pages artifact
     runs-on: ubuntu-latest
     needs: frontend-ci
-    if: ${{ github.event_name != 'pull_request' && github.ref_name == vars.DEPLOY_BRANCH }}
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/TestMainBranch'
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure GitHub Pages (enable if needed)
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install + build (idempotent in case job runs alone)
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure Pages (enable if missing)
         uses: actions/configure-pages@v4
         with:
           enablement: true
 
-      - name: Upload Pages artifact (frontend/dist)
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist
 
-  # ==========================================
-  # BACKEND CD: deploy to Render via webhook
-  # ==========================================
+  # -------------------------------------
+  # BACKEND CD: Deploy to Render via hook
+  # -------------------------------------
   backend-deploy:
     name: Deploy Backend to Render
     runs-on: ubuntu-latest
-    needs: [backend-ci, frontend-ci]
-    if: ${{ github.event_name != 'pull_request' && github.ref_name == vars.DEPLOY_BRANCH }}
+    needs: backend-ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/TestMainBranch'
 
     steps:
-      - name: Ensure RENDER_DEPLOY_HOOK secret is set
+      - name: Ensure RENDER_DEPLOY_HOOK is set
         run: |
           if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
-            echo "::error::RENDER_DEPLOY_HOOK secret is missing. Add it in Settings → Secrets and variables → Actions."
+            echo "::error::RENDER_DEPLOY_HOOK secret is missing."
+            echo "Add it in Settings → Secrets and variables → Actions."
             exit 1
           fi
 
       - name: Trigger Render deploy hook
         run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
-  # ==========================================
-  # FRONTEND CD: publish artifact to GH Pages
-  # ==========================================
+  # -------------------------------------------
+  # FRONTEND CD: Publish Pages artifact to Pages
+  # -------------------------------------------
   frontend-deploy:
     name: Deploy Frontend to GitHub Pages
     runs-on: ubuntu-latest
     needs: pages-prepare
-    if: ${{ github.event_name != 'pull_request' && github.ref_name == vars.DEPLOY_BRANCH }}
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/TestMainBranch'
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
       - name: Deploy to Pages
-        id: deployment
+        id: deploy
         uses: actions/deploy-pages@v4
