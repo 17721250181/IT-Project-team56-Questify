@@ -1,7 +1,7 @@
 # =============================================================================
 # PROFESSIONAL CI/CD PIPELINE
 # Continuous Integration: Tests on every PR and push
-# Continuous Deployment: Deploys only on main branch pushes after CI passes
+# Continuous Deployment: Deploys only on TestMainBranch pushes after CI passes
 # =============================================================================
 
 name: 🚀 CI/CD Pipeline
@@ -11,16 +11,16 @@ on:
   pull_request:
     branches: ['**']
     types: [opened, synchronize, reopened]
-  
-  # Trigger CI + CD on pushes to main branch
+
+  # Trigger CI + CD on pushes to the deploy branch
   push:
     branches: [TestMainBranch]
-  
-  # Allow manual workflow dispatch
+
+  # Allow manual workflow dispatch (can force CD)
   workflow_dispatch:
     inputs:
       force_deploy:
-        description: 'Force deployment even on non-main branch'
+        description: 'Force deployment even on non-deploy branch'
         required: false
         default: false
         type: boolean
@@ -34,7 +34,7 @@ permissions:
   checks: write
   pull-requests: write
 
-# Prevent concurrent deployments
+# Prevent concurrent deployments (don’t cancel main-branch deployments)
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/TestMainBranch' }}
@@ -74,7 +74,8 @@ jobs:
       DATABASE_URL: postgresql://testuser:testpass123@localhost:5432/testdb
       SECRET_KEY: test-secret-key-for-ci-only
       DEBUG: false
-      DJANGO_SETTINGS_MODULE: backend.settings
+      # If your manage.py already sets this, you can remove the next line:
+      # DJANGO_SETTINGS_MODULE: backend.settings
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
@@ -95,7 +96,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
-          pip install coverage pytest-cov
+          pip install coverage pytest-cov flake8
 
       - name: 🔍 Lint Python code
         working-directory: backend
@@ -132,9 +133,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: backend-ci
-
-    outputs:
-      build-success: ${{ steps.build.outcome == 'success' }}
 
     steps:
       - name: 📥 Checkout repository
@@ -221,7 +219,7 @@ jobs:
           sarif_file: 'trivy-results.sarif'
 
   # =============================================================================
-  # CD PHASE 1: BACKEND DEPLOYMENT
+  # CD PHASE 1: BACKEND DEPLOYMENT (Render)
   # =============================================================================
   backend-cd:
     name: 🚀 Deploy Backend to Render
@@ -233,9 +231,6 @@ jobs:
       needs.frontend-ci.result == 'success' &&
       (github.ref == 'refs/heads/TestMainBranch' || inputs.force_deploy) &&
       github.event_name != 'pull_request'
-    
-    environment:
-      name: production-backend
 
     steps:
       - name: ✅ Validate deployment prerequisites
@@ -254,10 +249,10 @@ jobs:
           response=$(curl -w "\n%{http_code}" -s -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}")
           http_code=$(echo "$response" | tail -n1)
           response_body=$(echo "$response" | head -n -1)
-          
+
           echo "HTTP Status: $http_code"
           echo "Response: $response_body"
-          
+
           if [[ $http_code -ge 200 && $http_code -lt 300 ]]; then
             echo "::notice title=Deployment Success::Backend deployed successfully to Render"
             echo "status=success" >> $GITHUB_OUTPUT
@@ -275,7 +270,7 @@ jobs:
           sleep 30
 
   # =============================================================================
-  # CD PHASE 2: FRONTEND DEPLOYMENT
+  # CD PHASE 2: FRONTEND DEPLOYMENT (GitHub Pages)
   # =============================================================================
   frontend-cd:
     name: 🌐 Deploy Frontend to GitHub Pages
@@ -288,6 +283,10 @@ jobs:
       (github.ref == 'refs/heads/TestMainBranch' || inputs.force_deploy) &&
       github.event_name != 'pull_request'
 
+    # Expose the Pages URL for downstream jobs
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -296,10 +295,6 @@ jobs:
       - name: 🌐 Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          timeout: 600000
-          error_count: 10
-          reporting_interval: 5000
 
       - name: ✅ Verify deployment
         if: steps.deployment.outputs.page_url
@@ -321,17 +316,14 @@ jobs:
 
     steps:
       - name: 🏥 Health check backend
-        if: needs.backend-cd.result == 'success' && env.BACKEND_URL
-        env:
-          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+        if: needs.backend-cd.result == 'success' && secrets.BACKEND_URL
         run: |
           echo "::group::Backend Health Check"
           max_attempts=5
           attempt=1
-          
           while [[ $attempt -le $max_attempts ]]; do
             echo "Health check attempt $attempt/$max_attempts"
-            if curl -f -s --max-time 10 "${BACKEND_URL}/health/" > /dev/null; then
+            if curl -f -s --max-time 10 "${{ secrets.BACKEND_URL }}/health/" > /dev/null; then
               echo "::notice title=Backend Healthy::Backend is responding correctly"
               break
             elif [[ $attempt -eq $max_attempts ]]; then
@@ -346,14 +338,15 @@ jobs:
 
       - name: 🏥 Health check frontend
         if: needs.frontend-cd.result == 'success'
+        env:
+          FRONTEND_URL: ${{ needs.frontend-cd.outputs.page_url }}
         run: |
           echo "::group::Frontend Health Check"
           max_attempts=3
           attempt=1
-          
           while [[ $attempt -le $max_attempts ]]; do
             echo "Health check attempt $attempt/$max_attempts"
-            if curl -f -s --max-time 10 "${{ needs.frontend-cd.outputs.page_url || steps.deployment.outputs.page_url }}" > /dev/null; then
+            if curl -f -s --max-time 10 "${FRONTEND_URL}" > /dev/null; then
               echo "::notice title=Frontend Healthy::Frontend is accessible"
               break
             elif [[ $attempt -eq $max_attempts ]]; then
@@ -372,19 +365,19 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status | URL |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|-----|" >> $GITHUB_STEP_SUMMARY
-          
+
           if [[ "${{ needs.backend-cd.result }}" == "success" ]]; then
             echo "| Backend | ✅ Deployed | ${{ secrets.BACKEND_URL || 'N/A' }} |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| Backend | ❌ Failed/Skipped | N/A |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ "${{ needs.frontend-cd.result }}" == "success" ]]; then
             echo "| Frontend | ✅ Deployed | ${{ needs.frontend-cd.outputs.page_url || 'GitHub Pages' }} |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| Frontend | ❌ Failed/Skipped | N/A |" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
