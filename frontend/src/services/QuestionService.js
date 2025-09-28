@@ -28,6 +28,7 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
+/*
 // Response interceptor - unified error handling
 api.interceptors.response.use(
     (response) => response,
@@ -36,6 +37,7 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+*/
 
 // Question service API methods
 export const QuestionService = {
@@ -43,7 +45,7 @@ export const QuestionService = {
     getAllQuestions: async () => {
         try {
             console.log("withCredentials:", apiClient.defaults.withCredentials);
-            const response = await api.get('/questions/');
+            const response = await apiClient.get('/questions/');
             return response.data;
         } catch (error) {
             console.error('Failed to fetch questions:', error);
@@ -55,7 +57,7 @@ export const QuestionService = {
     searchQuestions: async (searchQuery) => {
         try {
             // Get all questions and filter client-side
-            const response = await api.get('/questions/');
+            const response = await apiClient.get('/questions/');
             const questions = response.data;
             
             // Basic filtering based on question text and creator
@@ -74,7 +76,7 @@ export const QuestionService = {
     // Get single question by ID (matches QuestionDetailView with UUID)
     getQuestionById: async (id) => {
         try {
-            const response = await api.get(`/questions/${id}/`);
+            const response = await apiClient.get(`/questions/${id}/`);
             return response.data;
         } catch (error) {
             console.error(`Failed to fetch question ${id}:`, error);
@@ -85,7 +87,7 @@ export const QuestionService = {
     // Create new question
     createQuestion: async (questionData) => {
         try {
-            const response = await api.post('/questions/create/', questionData);
+            const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
             console.error('Failed to create question:', error);
@@ -101,7 +103,7 @@ export const QuestionService = {
                 type: 'SHORT',
                 answer: answer
             };
-            const response = await api.post('/questions/create/', questionData);
+            const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
             console.error('Failed to create short answer question:', error);
@@ -122,7 +124,7 @@ export const QuestionService = {
                 option_e: options.E,
                 correct_option: correctOption
             };
-            const response = await api.post('/questions/create/', questionData);
+            const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
             console.error('Failed to create MCQ question:', error);
@@ -133,7 +135,7 @@ export const QuestionService = {
     // Submit answer for attempts (placeholder - would need attempts API)
     submitAnswer: async (questionId, answerData) => {
         try {
-            const response = await api.post('/attempts/create/', {question:questionId, answer: answerData});
+            const response = await apiClient.post('/attempts/create/', {question:questionId, answer: answerData});
             return response.data;
         } catch (error) {
             console.error('Failed to submit answer:', error);
@@ -142,4 +144,4 @@ export const QuestionService = {
     },
 };
 
-export default api;
+//export default api;
