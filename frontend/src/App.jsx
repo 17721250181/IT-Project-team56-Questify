@@ -1,12 +1,37 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+// Importing the Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const API = import.meta.env.VITE_API_BASE_URL;
+// Importing React Router components
+import { Routes, Route, Navigate } from 'react-router-dom';
 
-export default function App() {
-  const [msg, setMsg] = useState("");
-  useEffect(() => {
-    axios.get(`${API}/questions/hello/`).then(r => setMsg(r.data.msg));
-  }, []);
-  return <h1>Backend says: {msg || "..."}</h1>;
+// Importing page components
+import { QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage } from './pages';
+
+function App() {
+  return (
+    <Routes>
+      {/* Default redirect to login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      
+      {/* Login page */}
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Register page */}
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Forgot password page */}
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+      {/* Question list page */}
+      <Route path="/questions" element={<QuestionListPage />} />
+      
+      {/* Individual question page with dynamic ID */}
+      <Route path="/question/:questionId" element={<DoQuestionPage />} />
+      
+      {/* Catch all other routes and redirect to questions */}
+      <Route path="*" element={<Navigate to="/questions" replace />} />
+    </Routes>
+  );
 }
+
+export default App;

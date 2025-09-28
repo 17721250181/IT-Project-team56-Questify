@@ -1,0 +1,145 @@
+/* LoginForm Component Styles */
+
+.login-form-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Form Labels */
+.login-form .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* Form Inputs */
+.login-form .form-input {
+    font-size: 1rem !important;
+    padding: 0.75rem 1rem !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.login-form .form-input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    outline: none !important;
+}
+
+/* Primary Login Button */
+.login-form .login-btn {
+    font-weight: 600 !important;
+    padding: 0.875rem 2rem !important;
+    border-radius: 0.5rem !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease-in-out !important;
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+.login-form .login-btn:hover {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+}
+
+/* Register Button */
+.login-form .register-btn {
+    font-weight: 500 !important;
+    padding: 0.75rem 2rem !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.95rem !important;
+    border: 2px solid #6b7280 !important;
+    color: #6b7280 !important;
+    background-color: transparent !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.login-form .register-btn:hover {
+    background-color: #f9fafb !important;
+    border-color: #374151 !important;
+    color: #374151 !important;
+}
+
+/* Forgot Password Link */
+.login-form .forgot-password-link {
+    font-size: 0.875rem !important;
+    color: #6b7280 !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    padding: 0.5rem !important;
+    transition: color 0.2s ease-in-out !important;
+    border: none !important;
+    background: none !important;
+}
+
+.login-form .forgot-password-link:hover {
+    color: #3b82f6 !important;
+    text-decoration: underline !important;
+    background: none !important;
+}
+
+.login-form .forgot-password-link:focus {
+    box-shadow: none !important;
+    background: none !important;
+}
+
+/* Secondary Actions Section */
+.login-form .secondary-actions {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Alert Messages */
+.login-form .alert {
+    border-radius: 0.5rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    margin-top: 1rem;
+}
+
+.login-form .alert-success {
+    background-color: #d1fae5 !important;
+    border-color: #a7f3d0 !important;
+    color: #065f46 !important;
+}
+
+.login-form .alert-danger {
+    background-color: #fee2e2 !important;
+    border-color: #fecaca !important;
+    color: #991b1b !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-form-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .login-form .login-btn,
+    .login-form .register-btn {
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Animation for better UX */
+.login-form {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

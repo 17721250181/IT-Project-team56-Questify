@@ -1,0 +1,140 @@
+/* RegisterPage Specific Styles */
+
+/* Override page container for better proportions */
+.register-page {
+  min-height: 100vh;
+  background: #1f2937;
+}
+
+/* Left side - Introduction section */
+.register-intro-section {
+  background: #1f2937;
+  color: white;
+}
+
+/* Right side - Form section with top alignment */
+.register-form-section {
+  background: #ffffff;
+  padding: 2rem 2rem;
+  border-left: 1px solid #e5e7eb;
+  overflow-y: auto;
+}
+
+/* Wider form container for register */
+.register-form-wrapper {
+  width: 100%;
+  max-width: 500px; /* Increased from 400px */
+  padding-top: 1rem;
+}
+
+/* Stats Section */
+.stats-section {
+  margin: 2rem 0 2.5rem 0;
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f9fafb;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Registration incentive section */
+.incentive-section {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.incentive-title {
+  color: #f9fafb;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.incentive-text {
+  color: #d1d5db;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+  line-height: 1.4;
+}
+
+.incentive-highlight {
+  color: #60a5fa;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Responsive adjustments for register page */
+@media (max-width: 991px) {
+  .register-intro-section {
+    min-height: 40vh;
+  }
+
+  .register-form-section {
+    min-height: 60vh;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-page {
+    overflow: visible;
+  }
+
+  .register-form-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .register-form-wrapper {
+    max-width: 100%;
+    padding-top: 0.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stats-section {
+    margin: 1.5rem 0 2rem 0;
+    padding: 1rem 0;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
+}

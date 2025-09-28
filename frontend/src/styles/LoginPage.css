@@ -1,0 +1,232 @@
+/* LoginPage Styles */
+.login-page {
+  min-height: 100vh;
+  background: #1f2937;
+}
+
+.login-intro-section {
+  background: #1f2937;
+  color: white;
+}
+
+.intro-header {
+  padding: 2rem 2.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.brand-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white;
+}
+
+.brand-info {
+  margin-left: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #f9fafb;
+  line-height: 1.1;
+}
+
+.university-name {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  margin-top: 0.1rem;
+}
+
+.course-context {
+  text-align: right;
+}
+
+.course-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.course-code {
+  font-size: 0.8rem;
+  color: #f9fafb;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.semester-badge {
+  font-size: 0.65rem;
+  color: #6b7280;
+  font-weight: 500;
+  padding: 0.15rem 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.course-title {
+  font-size: 0.7rem;
+  color: #d1d5db;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.intro-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 2.5rem;
+}
+
+.main-content {
+  text-align: left;
+}
+
+.intro-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+  color: #f9fafb;
+}
+
+.intro-subtitle {
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 2.5rem;
+  opacity: 0.8;
+  line-height: 1.5;
+  color: #d1d5db;
+}
+
+.feature-list {
+  margin-top: 2rem;
+}
+
+.feature-item {
+  margin-bottom: 1.5rem;
+  padding: 0;
+  border-left: 3px solid #6b7280;
+  padding-left: 1rem;
+}
+
+.feature-item h5 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.feature-item p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.quote-section {
+  margin-top: 3rem;
+  padding: 1.25rem 1rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  text-align: center;
+}
+
+.intro-quote {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #e5e7eb;
+  margin: 0 0 0.4rem 0;
+  line-height: 1.4;
+  position: relative;
+}
+
+.intro-quote::before {
+  content: '"';
+  font-size: 1.3rem;
+  color: #9ca3af;
+  line-height: 1;
+}
+
+.intro-quote::after {
+  content: '"';
+  font-size: 1.3rem;
+  color: #9ca3af;
+  line-height: 1;
+}
+
+.quote-author {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.login-form-section {
+  background: #ffffff;
+  padding: 3rem 2rem;
+  border-left: 1px solid #e5e7eb;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .intro-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+
+  .intro-content {
+    padding: 1rem 1.5rem 1.5rem;
+  }
+
+  .intro-title {
+    font-size: 2rem;
+  }
+
+  .intro-subtitle {
+    font-size: 1rem;
+  }
+
+  .feature-item {
+    margin-bottom: 1.25rem;
+  }
+
+  .login-form-section {
+    padding: 1.5rem;
+  }
+}
