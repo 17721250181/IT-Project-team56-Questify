@@ -3,29 +3,47 @@ from rest_framework.response import Response
 from .models import Attempt
 from .serializers import AttemptSerializer
 from questions.models import Question
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 
 class AttemptCreateView(generics.CreateAPIView):
     queryset = Attempt.objects.all()
     serializer_class = AttemptSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny]  # Allow all for testing
 
     def create(self, request, *args, **kwargs):
+        # Simple debug output
+        print(f"User: {request.user}")
+        print(f"Is authenticated: {request.user.is_authenticated}")
+        
         question_id = request.data.get("question")
         user_answer = request.data.get("answer")
 
+        # Check if user is authenticated
+        if not request.user.is_authenticated:
+            return Response({
+                "error": "Authentication required",
+                "details": "Please login to submit answers"
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Get the question
         try:
             question = Question.objects.get(id=question_id)
         except Question.DoesNotExist:
-            return Response({"error": "Question not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                "error": "Question not found"
+            }, status=status.HTTP_404_NOT_FOUND)
 
         is_correct = None
 
-        # correctness for MCQ
+        # Check correctness for MCQ
         if hasattr(question, "mcq_detail"):
-
             correct = question.mcq_detail.correct_options
-            user_answer_list = [ans.strip().upper() for ans in user_answer]  # frontend
+            
+            # Handle different answer formats
+            if isinstance(user_answer, list):
+                user_answer_list = [str(ans).strip().upper() for ans in user_answer]
+            else:
+                user_answer_list = [str(user_answer).strip().upper()]
 
             is_correct = sorted(user_answer_list) == sorted(correct)
 
