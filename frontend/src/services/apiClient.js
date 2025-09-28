@@ -1,4 +1,5 @@
 import axios from 'axios';
+import CookieUtils from '../utils/cookieUtils.js';
 
 /**
  * Unified API Client for Questify
@@ -17,19 +18,6 @@ const apiClient = axios.create({
 });
 
 /**
- * Extract CSRF token from cookies
- * Django sets csrftoken cookie automatically
- */
-function getCsrfToken() {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; csrftoken=`);
-    if (parts.length === 2) {
-        return parts.pop().split(';').shift();
-    }
-    return null;
-}
-
-/**
  * Request interceptor
  * Automatically adds CSRF token to unsafe HTTP methods
  */
@@ -40,7 +28,7 @@ apiClient.interceptors.request.use(
 
         // Add CSRF token for unsafe methods
         if (unsafeMethods.includes(method)) {
-            const csrfToken = getCsrfToken();
+            const csrfToken = CookieUtils.getCSRFToken();
             if (csrfToken && !config.headers['X-CSRFToken']) {
                 config.headers['X-CSRFToken'] = csrfToken;
             }
