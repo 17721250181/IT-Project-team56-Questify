@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom';
 
 const DoQuestion = () => {
     const { questionId } = useParams();
-    console.log("Route param:", questionId);
     const [question, setQuestion] = useState(null);
     const [selectedAnswers, setSelectedAnswers] = useState([]);
     const [userAnswer, setUserAnswer] = useState('');
@@ -129,14 +128,15 @@ const DoQuestion = () => {
             setLoading(true);
             setError(null);
 
-            const answerData = {
-                question_id: questionId,
-                answer: question.type === 'multiple_choice' ? selectedAnswers : userAnswer,
-                type: question.type,
-            };
+            const optionLetters = ['A', 'B', 'C', 'D', 'E'];
 
             // Use API to submit answer
-            const response = await QuestionService.submitAnswer(questionId, answerData);
+            const response = await QuestionService.submitAnswer(
+                questionId,
+                question.type === 'MCQ'
+                    ? selectedAnswers.map(i => String.fromCharCode(65 + i))
+                    : userAnswer
+            );
             console.log('Answer submitted successfully:', response);
 
             setSubmitted(true);
