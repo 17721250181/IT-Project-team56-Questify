@@ -16,8 +16,8 @@ const LoginForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Get redirect destination from ProtectedRoute or default to questions
-    const redirectTo = location.state?.from?.pathname || '/questions';
+    // Get redirect to questions
+    const redirectTo = '/questions';
 
     // Handle messages passed from other pages (e.g., password reset success)
     useEffect(() => {

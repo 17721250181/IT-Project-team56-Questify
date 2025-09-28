@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthService } from '../services/authService';
+import CookieServiceAuth from '../services/cookieServiceAuth';
 
 /**
  * Authentication Context
@@ -31,22 +32,59 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     /**
+     * Update auth state and sync with cookies
+     * @param {Object|null} userData - User data or null to clear
+     */
+    const updateAuthState = (userData) => {
+        if (userData) {
+            setUser(userData);
+            setIsAuthenticated(true);
+            CookieServiceAuth.saveLogin(userData);
+        } else {
+            setUser(null);
+            setIsAuthenticated(false);
+            CookieServiceAuth.clearLogin();
+        }
+    };
+
+    /**
      * Check current authentication status
-     * Called on app initialization and when needed
+     * First check cookies, then verify with server if needed
      */
     const checkAuthStatus = async () => {
         try {
             setLoading(true);
-            const userData = await AuthService.getCurrentUser();
+            
+            // First, check if we have login cookie
+            const hasLoginCookie = CookieServiceAuth.isLoggedIn();
+            const savedUser = CookieServiceAuth.getSavedUser();
 
-            // Successfully got user data - user is authenticated
-            setUser(userData);
-            setIsAuthenticated(true);
+            if (hasLoginCookie && savedUser) {
+                // We have cookie, try to verify with server
+                try {
+                    const userData = await AuthService.getCurrentUser();
+                    updateAuthState(userData);
+                    console.log('Authentication verified with server');
+                } catch (error) {
+                    // Server says no, clear cookies
+                    console.log('Server authentication check failed:', error.message);
+                    updateAuthState(null);
+                }
+            } else {
+                // No cookies, check server anyway
+                try {
+                    const userData = await AuthService.getCurrentUser();
+                    updateAuthState(userData);
+                    console.log('Authentication found on server, saved to cookies');
+                } catch (error) {
+                    // Not authenticated anywhere
+                    console.log('User not authenticated:', error.message);
+                    updateAuthState(null);
+                }
+            }
         } catch (error) {
-            // Failed to get user data - user is not authenticated
-            console.log('User not authenticated:', error.message);
-            setUser(null);
-            setIsAuthenticated(false);
+            console.error('Auth check failed:', error);
+            updateAuthState(null);
         } finally {
             setLoading(false);
         }
@@ -63,18 +101,17 @@ export const AuthProvider = ({ children }) => {
             const response = await AuthService.login(email, password);
 
             if (response.ok && response.user) {
-                // Login successful - update state
-                setUser(response.user);
-                setIsAuthenticated(true);
+                // Login successful - update state and save to cookies
+                updateAuthState(response.user);
+                console.log('Login successful, saved to cookies');
                 return response;
             } else {
                 // Login failed - don't update state, let component handle error
                 throw new Error(response.message || 'Login failed');
             }
         } catch (error) {
-            // Login failed - ensure state is cleared
-            setUser(null);
-            setIsAuthenticated(false);
+            // Login failed - ensure state and cookies are cleared
+            updateAuthState(null);
             throw error; // Re-throw for component to handle
         }
     };
@@ -92,18 +129,17 @@ export const AuthProvider = ({ children }) => {
             const response = await AuthService.register(fullName, studentId, email, password);
 
             if (response.ok && response.user) {
-                // Registration successful - update state (auto-login)
-                setUser(response.user);
-                setIsAuthenticated(true);
+                // Registration successful - update state and save to cookies (auto-login)
+                updateAuthState(response.user);
+                console.log('Registration successful, user auto-logged in');
                 return response;
             } else {
                 // Registration failed - don't update state
                 throw new Error(response.message || 'Registration failed');
             }
         } catch (error) {
-            // Registration failed - ensure state is cleared
-            setUser(null);
-            setIsAuthenticated(false);
+            // Registration failed - ensure state and cookies are cleared
+            updateAuthState(null);
             throw error; // Re-throw for component to handle
         }
     };
@@ -115,13 +151,14 @@ export const AuthProvider = ({ children }) => {
         try {
             // Call logout API
             await AuthService.logout();
+            console.log('Server logout successful');
         } catch (error) {
             // Even if API call fails, we should clear local state
             console.error('Logout API call failed:', error);
         } finally {
-            // Always clear authentication state
-            setUser(null);
-            setIsAuthenticated(false);
+            // Always clear authentication state and cookies
+            updateAuthState(null);
+            console.log('Authentication state and cookies cleared');
         }
     };
 
@@ -130,9 +167,8 @@ export const AuthProvider = ({ children }) => {
      * Called by event listener or manually
      */
     const handleAutoLogout = () => {
-        console.log('Auto-logout triggered');
-        setUser(null);
-        setIsAuthenticated(false);
+        console.log('Auto-logout triggered - clearing authentication state and cookies');
+        updateAuthState(null);
     };
 
     // Initialize authentication state on mount
@@ -153,7 +189,36 @@ export const AuthProvider = ({ children }) => {
         return () => {
             window.removeEventListener('auth:unauthorized', handleUnauthorized);
         };
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // We want this to run only once on mount
+
+    // Cross-tab logout sync - check for cookie changes
+    useEffect(() => {
+        const checkCookieChanges = () => {
+            const cookieLoggedIn = CookieServiceAuth.isLoggedIn();
+            
+            // If cookie says logged out but we think we're logged in
+            if (!cookieLoggedIn && isAuthenticated) {
+                setUser(null);
+                setIsAuthenticated(false);
+                console.log('Detected logout in another tab');
+            }
+            // If cookie says logged in but we think we're logged out
+            else if (cookieLoggedIn && !isAuthenticated && !loading) {
+                const savedUser = CookieServiceAuth.getSavedUser();
+                if (savedUser) {
+                    setUser(savedUser);
+                    setIsAuthenticated(true);
+                    console.log('Detected login in another tab');
+                }
+            }
+        };
+
+        // Check every 3 seconds for cookie changes
+        const interval = setInterval(checkCookieChanges, 3000);
+
+        return () => clearInterval(interval);
+    }, [isAuthenticated, loading]);
 
     // Context value object
     const contextValue = {
