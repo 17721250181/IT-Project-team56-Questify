@@ -62,6 +62,9 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173"
+]
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "config.urls"
@@ -157,6 +160,11 @@ REST_FRAMEWORK = {
 # Session and CSRF security
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
+
+CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = False
 
 # Email domain restrictions for registration
 ALLOWED_EMAIL_DOMAINS = {"student.unimelb.edu.au", "unimelb.edu.au"}

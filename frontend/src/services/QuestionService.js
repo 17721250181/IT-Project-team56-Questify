@@ -1,11 +1,12 @@
 import axios from 'axios';
+import apiClient from './apiClient.js';
 
-// Create Axios instance with base configuration
-const api = axios.create({
-    baseURL: 'http://localhost:8000', // Replace with your backend API URL
-    timeout: 10000,
-    withCredentials: true, // Send cookies if needed
-});
+// // Create Axios instance with base configuration
+// const api = axios.create({
+//     baseURL: 'http://localhost:8000', // Replace with your backend API URL
+//     timeout: 10000,
+//     withCredentials: true, // Send cookies if needed
+// });
 
 // Helper function to read CSRF token from cookies
 function getCookie(name) {
@@ -14,7 +15,7 @@ function getCookie(name) {
 }
 
 // Request interceptor - automatically add CSRF Token for unsafe methods
-api.interceptors.request.use((config) => {
+apiClient.interceptors.request.use((config) => {
     const method = (config.method || 'get').toLowerCase();
     const needsCsrf = ['post', 'put', 'patch', 'delete'].includes(method);
 
@@ -41,6 +42,7 @@ export const QuestionService = {
     // Get all questions from backend (matches QuestionListView)
     getAllQuestions: async () => {
         try {
+            console.log("withCredentials:", apiClient.defaults.withCredentials);
             const response = await api.get('/questions/');
             return response.data;
         } catch (error) {
@@ -131,7 +133,7 @@ export const QuestionService = {
     // Submit answer for attempts (placeholder - would need attempts API)
     submitAnswer: async (questionId, answerData) => {
         try {
-            const response = await api.post('/attempts/create/', {question:questionId, answerData});
+            const response = await api.post('/attempts/create/', {question:questionId, answer: answerData});
             return response.data;
         } catch (error) {
             console.error('Failed to submit answer:', error);

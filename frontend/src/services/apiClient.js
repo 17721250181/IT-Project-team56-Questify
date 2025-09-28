@@ -8,7 +8,7 @@ import axios from 'axios';
 // Create axios instance with base configuration
 const apiClient = axios.create({
     // Standardize base to include /api so service paths don't need the prefix
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000',
     timeout: 10000, // 10 second timeout
     withCredentials: true, // Include cookies for Django sessions
     headers: {
