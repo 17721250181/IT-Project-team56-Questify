@@ -133,9 +133,9 @@ export const QuestionService = {
     },
 
     // Submit answer for attempts (placeholder - would need attempts API)
-    submitAnswer: async (questionId, answerData) => {
+    submitAnswer: async (questionId, answer) => {
         try {
-            const response = await apiClient.post('/attempts/create/', {question:questionId, answer: answerData});
+            const response = await apiClient.post('/attempts/create/', {question:questionId, answer: answer});
             return response.data;
         } catch (error) {
             console.error('Failed to submit answer:', error);

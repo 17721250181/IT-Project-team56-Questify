@@ -23,8 +23,11 @@ class AttemptCreateView(generics.CreateAPIView):
 
         # correctness for MCQ
         if hasattr(question, "mcq_detail"):
-            correct = question.mcq_detail.correct_option.upper()
-            is_correct = (user_answer.strip().upper() == correct)
+
+            correct = question.mcq_detail.correct_options
+            user_answer_list = [ans.strip().upper() for ans in user_answer]  # frontend
+
+            is_correct = sorted(user_answer_list) == sorted(correct)
 
         attempt = Attempt.objects.create(
             attempter=request.user,
