@@ -122,7 +122,7 @@ const QuestionList = ({
     // Local filtering function (client-side filtering)
     const filteredContent = questions.filter(
         (item) =>
-            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.week
                 .toLowerCase()
                 .replace(/\s+/g, '')
@@ -180,14 +180,14 @@ const QuestionList = ({
                         <QuestionListItem
                             key={item.id}
                             id={item.id}
-                            title={item.title}
+                            title={item.question}
                             week={item.week}
                             topic={item.topic}
                             attempted={item.attempted}
                             verified={item.verified}
-                            questionType={item.questionType}
+                            questionType={item.type}
                             rating={item.rating}
-                            numAttempts={item.numAttempts}
+                            numAttempts={item.num_attempts}
                         />
                     ))}
                 </ListGroup>

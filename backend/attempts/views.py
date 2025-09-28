@@ -3,11 +3,12 @@ from rest_framework.response import Response
 from .models import Attempt
 from .serializers import AttemptSerializer
 from questions.models import Question
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class AttemptCreateView(generics.CreateAPIView):
     queryset = Attempt.objects.all()
     serializer_class = AttemptSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         question_id = request.data.get("question")

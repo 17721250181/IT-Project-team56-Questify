@@ -157,7 +157,9 @@ npm run dev
 cd backend
 source env/bin/activate   # macOS/Linux
 env\Scripts\activate      # Windows
-python manage.py runserver 8000
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
 ```
 
 ### Frontend
