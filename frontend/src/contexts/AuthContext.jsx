@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthService } from '../services/authService';
-import CookieServiceAuth from '../services/cookieServiceAuth';
 
 /**
  * Authentication Context
@@ -32,58 +31,35 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     /**
-     * Update auth state and sync with cookies
+     * Update auth state
      * @param {Object|null} userData - User data or null to clear
      */
     const updateAuthState = (userData) => {
         if (userData) {
             setUser(userData);
             setIsAuthenticated(true);
-            CookieServiceAuth.saveLogin(userData);
+            console.log('✅ User authenticated via Django Session');
         } else {
             setUser(null);
             setIsAuthenticated(false);
-            CookieServiceAuth.clearLogin();
+            console.log('🚪 User logged out, session cleared');
         }
     };
 
     /**
-     * Check current authentication status
-     * First check cookies, then verify with server if needed
+     * Check current authentication status via Django Session
      */
     const checkAuthStatus = async () => {
         try {
             setLoading(true);
             
-            // First, check if we have login cookie
-            const hasLoginCookie = CookieServiceAuth.isLoggedIn();
-            const savedUser = CookieServiceAuth.getSavedUser();
-
-            if (hasLoginCookie && savedUser) {
-                // We have cookie, try to verify with server
-                try {
-                    const userData = await AuthService.getCurrentUser();
-                    updateAuthState(userData);
-                    console.log('Authentication verified with server');
-                } catch (error) {
-                    // Server says no, clear cookies
-                    console.log('Server authentication check failed:', error.message);
-                    updateAuthState(null);
-                }
-            } else {
-                // No cookies, check server anyway
-                try {
-                    const userData = await AuthService.getCurrentUser();
-                    updateAuthState(userData);
-                    console.log('Authentication found on server, saved to cookies');
-                } catch (error) {
-                    // Not authenticated anywhere
-                    console.log('User not authenticated:', error.message);
-                    updateAuthState(null);
-                }
-            }
+            // Get user data directly from Django Session
+            const userData = await AuthService.getCurrentUser();
+            updateAuthState(userData);
+            console.log('Django Session authenticated');
         } catch (error) {
-            console.error('Auth check failed:', error);
+            // Session invalid or expired
+            console.log('Not authenticated:', error.message);
             updateAuthState(null);
         } finally {
             setLoading(false);
@@ -192,33 +168,9 @@ export const AuthProvider = ({ children }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // We want this to run only once on mount
 
-    // Cross-tab logout sync - check for cookie changes
-    useEffect(() => {
-        const checkCookieChanges = () => {
-            const cookieLoggedIn = CookieServiceAuth.isLoggedIn();
-            
-            // If cookie says logged out but we think we're logged in
-            if (!cookieLoggedIn && isAuthenticated) {
-                setUser(null);
-                setIsAuthenticated(false);
-                console.log('Detected logout in another tab');
-            }
-            // If cookie says logged in but we think we're logged out
-            else if (cookieLoggedIn && !isAuthenticated && !loading) {
-                const savedUser = CookieServiceAuth.getSavedUser();
-                if (savedUser) {
-                    setUser(savedUser);
-                    setIsAuthenticated(true);
-                    console.log('Detected login in another tab');
-                }
-            }
-        };
-
-        // Check every 3 seconds for cookie changes
-        const interval = setInterval(checkCookieChanges, 3000);
-
-        return () => clearInterval(interval);
-    }, [isAuthenticated, loading]);
+    // Note: Cross-tab sync is handled by Django Session automatically
+    // When one tab logs out, the sessionid cookie is cleared for all tabs
+    // When another tab tries to make a request, it will get 401 and trigger logout
 
     // Context value object
     const contextValue = {

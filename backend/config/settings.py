@@ -150,11 +150,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Django REST Framework configuration
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "config.authentication.CookieAuthentication",  # Custom cookie authentication
-        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.SessionAuthentication",  # Pure Django Session Auth
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",  # Allow testing with cookie auth
+        "rest_framework.permissions.AllowAny",  # Allow testing
     ],
 }
 
