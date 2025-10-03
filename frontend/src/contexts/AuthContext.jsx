@@ -38,11 +38,11 @@ export const AuthProvider = ({ children }) => {
         if (userData) {
             setUser(userData);
             setIsAuthenticated(true);
-            console.log('✅ User authenticated via Django Session');
+            console.log('User authenticated via Django Session');
         } else {
             setUser(null);
             setIsAuthenticated(false);
-            console.log('🚪 User logged out, session cleared');
+            console.log('User logged out, session cleared');
         }
     };
 
