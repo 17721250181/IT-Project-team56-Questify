@@ -10,7 +10,7 @@ from django.conf import settings
 
 class QuestionCreateView(generics.CreateAPIView):
     serializer_class = QuestionCreateSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         type = request.data.get("type")
@@ -144,11 +144,11 @@ class QuestionListView(generics.ListAPIView):
     """Get all questions"""
     queryset = Question.objects.all().order_by('-created_at')
     serializer_class = QuestionSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class QuestionDetailView(generics.RetrieveAPIView):
     """Get specific question details"""
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]

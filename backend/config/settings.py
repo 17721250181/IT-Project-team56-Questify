@@ -158,7 +158,7 @@ REST_FRAMEWORK = {
         "config.authentication.CookieAuthentication",  # Custom cookie authentication as fallback
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",  # Allow testing with cookie auth
+        "rest_framework.permissions.IsAuthenticated",  # Require authentication by default
     ],
 }
 
