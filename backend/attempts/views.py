@@ -11,9 +11,12 @@ class AttemptCreateView(generics.CreateAPIView):
     permission_classes = [AllowAny]  # Allow all for testing
 
     def create(self, request, *args, **kwargs):
-        # Simple debug output
+        # Debug output
         print(f"User: {request.user}")
         print(f"Is authenticated: {request.user.is_authenticated}")
+        print(f"Session key: {request.session.session_key}")
+        print(f"Cookies: {request.COOKIES.keys()}")
+        print(f"CSRF token in header: {request.META.get('HTTP_X_CSRFTOKEN')}")
         
         question_id = request.data.get("question")
         user_answer = request.data.get("answer")
