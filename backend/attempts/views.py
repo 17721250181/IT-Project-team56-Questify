@@ -3,27 +3,15 @@ from rest_framework.response import Response
 from .models import Attempt
 from .serializers import AttemptSerializer
 from questions.models import Question
-from rest_framework.permissions import AllowAny
 
 class AttemptCreateView(generics.CreateAPIView):
     queryset = Attempt.objects.all()
     serializer_class = AttemptSerializer
-    permission_classes = [AllowAny]  # Allow all for testing
+    permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        # Simple debug output
-        print(f"User: {request.user}")
-        print(f"Is authenticated: {request.user.is_authenticated}")
-        
         question_id = request.data.get("question")
         user_answer = request.data.get("answer")
-
-        # Check if user is authenticated
-        if not request.user.is_authenticated:
-            return Response({
-                "error": "Authentication required",
-                "details": "Please login to submit answers"
-            }, status=status.HTTP_401_UNAUTHORIZED)
 
         # Get the question
         try:

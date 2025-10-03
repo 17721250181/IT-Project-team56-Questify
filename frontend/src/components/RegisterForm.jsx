@@ -66,8 +66,8 @@ const RegisterForm = () => {
         // Password validation
         if (!formData.password) {
             newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters';
         }
 
         // Confirm password validation
@@ -201,7 +201,7 @@ const RegisterForm = () => {
                     <Form.Control
                         type="password"
                         name="password"
-                        placeholder="Create a password (min 6 characters)"
+                        placeholder="Create a password (min 8 characters)"
                         value={formData.password}
                         onChange={handleChange}
                         className="form-input"
