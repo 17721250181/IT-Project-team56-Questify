@@ -40,5 +40,6 @@ backend/.env
 .DS_Store
 Thumbs.db
 
+# Internal documentation (do not commit)
 CLAUDE.md
-AUTHENTICATION_IMPLEMENTATION.md
+SECURITY_ISSUES.md

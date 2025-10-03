@@ -10,22 +10,8 @@ class AttemptCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        # Debug output
-        print(f"User: {request.user}")
-        print(f"Is authenticated: {request.user.is_authenticated}")
-        print(f"Session key: {request.session.session_key}")
-        print(f"Cookies: {request.COOKIES.keys()}")
-        print(f"CSRF token in header: {request.META.get('HTTP_X_CSRFTOKEN')}")
-        
         question_id = request.data.get("question")
         user_answer = request.data.get("answer")
-
-        # Check if user is authenticated
-        if not request.user.is_authenticated:
-            return Response({
-                "error": "Authentication required",
-                "details": "Please login to submit answers"
-            }, status=status.HTTP_401_UNAUTHORIZED)
 
         # Get the question
         try:
