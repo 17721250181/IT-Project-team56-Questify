@@ -1,11 +1,33 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
-import { QuestionService } from '../services/questionService.js';
+import { QuestionService } from '../services/QuestionService.js';
 
 const PostQuestionForm = () => {
+    // Week and Topic options
+    const weekTopicOptions = [
+        { value: 'Week1 - JAVA basics', week: 'Week1', topic: 'JAVA basics' },
+        { value: 'Week2 - Classes and Objects', week: 'Week2', topic: 'Classes and Objects' },
+        { value: 'Week3 - Software Tools and Bagel', week: 'Week3', topic: 'Software Tools and Bagel' },
+        { value: 'Week4 - Arrays and Strings', week: 'Week4', topic: 'Arrays and Strings' },
+        { value: 'Week4 - Input and Output', week: 'Week4', topic: 'Input and Output' },
+        { value: 'Week5 - Inheritance and Polymorphism', week: 'Week5', topic: 'Inheritance and Polymorphism' },
+        { value: 'Week6 - Interfaces and Polymorphism', week: 'Week6', topic: 'Interfaces and Polymorphism' },
+        { value: 'Week7 - Modelling Classes and Relationships', week: 'Week7', topic: 'Modelling Classes and Relationships' },
+        { value: 'Week8 - Generics', week: 'Week8', topic: 'Generics' },
+        { value: 'Week8 - Collections and Maps', week: 'Week8', topic: 'Collections and Maps' },
+        { value: 'Week9 - Design Patterns', week: 'Week9', topic: 'Design Patterns' },
+        { value: 'Week10 - Exceptions', week: 'Week10', topic: 'Exceptions' },
+        { value: 'Week10 - Software Testing and Design', week: 'Week10', topic: 'Software Testing and Design' },
+        { value: 'Week11 - Event Driven Programming', week: 'Week11', topic: 'Event Driven Programming' },
+        { value: 'Week12 - Advanced Java', week: 'Week12', topic: 'Advanced Java' }
+    ];
+
     const [formData, setFormData] = useState({
         question: '',
         type: 'SHORT',
+        weekTopic: '',
+        week: '',
+        topic: '',
         answer: '',
         option_a: '',
         option_b: '',
@@ -41,6 +63,18 @@ const PostQuestionForm = () => {
         }));
     };
 
+    const handleWeekTopicChange = (e) => {
+        const selectedValue = e.target.value;
+        const selected = weekTopicOptions.find(opt => opt.value === selectedValue);
+        
+        setFormData(prev => ({
+            ...prev,
+            weekTopic: selectedValue,
+            week: selected ? selected.week : '',
+            topic: selected ? selected.topic : ''
+        }));
+    };
+
     const handleCorrectOptionChange = (option, isChecked) => {
         setFormData(prev => ({
             ...prev,
@@ -60,7 +94,9 @@ const PostQuestionForm = () => {
             if (formData.type === 'SHORT') {
                 await QuestionService.createShortAnswerQuestion(
                     formData.question,
-                    formData.answer
+                    formData.answer,
+                    formData.week,
+                    formData.topic
                 );
             } else if (formData.type === 'MCQ') {
                 const options = {
@@ -73,7 +109,9 @@ const PostQuestionForm = () => {
                 await QuestionService.createMCQQuestion(
                     formData.question,
                     options,
-                    formData.correct_options
+                    formData.correct_options,
+                    formData.week,
+                    formData.topic
                 );
             }
 
@@ -82,6 +120,9 @@ const PostQuestionForm = () => {
             setFormData({
                 question: '',
                 type: 'SHORT',
+                weekTopic: '',
+                week: '',
+                topic: '',
                 answer: '',
                 option_a: '',
                 option_b: '',
@@ -106,9 +147,27 @@ const PostQuestionForm = () => {
             {error && <Alert variant="danger">{error}</Alert>}
 
                 <Form onSubmit={handleSubmit}>
+                    {/* Week and Topic Selection */}
+                    <Form.Group className="mb-3">
+                        <Form.Label>Week & Topic <span className="text-danger">*</span></Form.Label>
+                        <Form.Select
+                            name="weekTopic"
+                            value={formData.weekTopic}
+                            onChange={handleWeekTopicChange}
+                            required
+                        >
+                            <option value="">Select a week and topic...</option>
+                            {weekTopicOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.value}
+                                </option>
+                            ))}
+                        </Form.Select>
+                    </Form.Group>
+
                     {/* Question Text */}
                     <Form.Group className="mb-3">
-                        <Form.Label>Question</Form.Label>
+                        <Form.Label>Question <span className="text-danger">*</span></Form.Label>
                         <Form.Control
                             as="textarea"
                             rows={3}

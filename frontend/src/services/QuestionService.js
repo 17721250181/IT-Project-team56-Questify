@@ -57,12 +57,14 @@ export const QuestionService = {
     },
 
     // Create Short Answer Question
-    createShortAnswerQuestion: async (questionText, answer) => {
+    createShortAnswerQuestion: async (questionText, answer, week, topic) => {
         try {
             const questionData = {
                 question: questionText,
                 type: 'SHORT',
-                answer: answer
+                answer: answer,
+                week: week,
+                topic: topic
             };
             const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
@@ -73,7 +75,7 @@ export const QuestionService = {
     },
 
     // Create Multiple Choice Question
-    createMCQQuestion: async (questionText, options, correctOptions) => {
+    createMCQQuestion: async (questionText, options, correctOptions, week, topic) => {
         try {
             const questionData = {
                 question: questionText,
@@ -83,7 +85,9 @@ export const QuestionService = {
                 option_c: options.C,
                 option_d: options.D,
                 option_e: options.E,
-                correct_options: correctOptions
+                correct_options: correctOptions,
+                week: week,
+                topic: topic
             };
             const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
