@@ -5,35 +5,45 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Importing page components
-import { QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage, PostQuestionPage } from './pages';
+import { QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage } from './pages';
+// Auth Provider and Protected Route
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <Routes>
-      {/* Default redirect to login */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      
-      {/* Login page */}
-      <Route path="/login" element={<LoginPage />} />
+    <AuthProvider>
+      <Routes>
+        {/* Default redirect to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Register page */}
-      <Route path="/register" element={<RegisterPage />} />
+        {/* Public routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      {/* Forgot password page */}
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        {/* Protected routes */}
+        <Route
+          path="/questions"
+          element={
+            <ProtectedRoute>
+              <QuestionListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/question/:questionId"
+          element={
+            <ProtectedRoute>
+              <DoQuestionPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Question list page */}
-      <Route path="/questions" element={<QuestionListPage />} />
-      
-      {/* Post new question page */}
-      <Route path="/post-question" element={<PostQuestionPage />} />
-      
-      {/* Individual question page with dynamic ID */}
-      <Route path="/question/:questionId" element={<DoQuestionPage />} />
-      
-      {/* Catch all other routes and redirect to questions */}
-      <Route path="*" element={<Navigate to="/questions" replace />} />
-    </Routes>
+        {/* Catch all other routes and redirect to questions */}
+        <Route path="*" element={<Navigate to="/questions" replace />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 

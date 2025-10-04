@@ -117,7 +117,7 @@ source env/bin/activate
 
 # Windows
 python -m venv env
-env\Scripts\activate      
+env\Scripts\activate
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -129,7 +129,7 @@ python manage.py migrate
 python manage.py runserver 8000
 ```
 
-**API runs at:** <http://127.0.0.1:8000/api/>
+**API runs at:** <http://localhost:8000/api>
 
 ## Frontend Setup (React + Vite)
 
@@ -141,7 +141,7 @@ npm install
 npm install axios
 
 # 2. Create .env
-echo "VITE_API_BASE_URL=http://127.0.0.1:8000/api" > .env
+echo "VITE_API_BASE_URL=http://localhost:8000/api" > .env
 
 # 3. Start dev server
 npm run dev
@@ -157,7 +157,9 @@ npm run dev
 cd backend
 source env/bin/activate   # macOS/Linux
 env\Scripts\activate      # Windows
-python manage.py runserver 8000
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
 ```
 
 ### Frontend

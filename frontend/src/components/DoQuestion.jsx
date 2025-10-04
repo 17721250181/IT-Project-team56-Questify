@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Card, Row, Col, Form, Button, Alert, Spinner, Badge } from 'react-bootstrap';
-import { QuestionService } from '../services/questionService.js';
+import { QuestionService } from '../services/QuestionService.js';
+import { useParams } from 'react-router-dom';
 
-const DoQuestion = ({ questionId }) => {
+const DoQuestion = () => {
+    const { questionId } = useParams();
     const [question, setQuestion] = useState(null);
     const [selectedAnswers, setSelectedAnswers] = useState([]);
     const [userAnswer, setUserAnswer] = useState('');
@@ -69,7 +71,7 @@ const DoQuestion = ({ questionId }) => {
             },
         ];
 
-        return templates.find((q) => q.id === id) || templates[0];
+        return templates.find((q) => q.id === Number(id)) || templates[0];
     };
 
     // Fetch question data from backend
@@ -78,37 +80,28 @@ const DoQuestion = ({ questionId }) => {
             setLoading(true);
             setError(null);
 
-            // Use API to fetch question data
-            const questionData = await QuestionService.getQuestionById(questionId);
-            setQuestion(questionData);
+            const raw = await QuestionService.getQuestionById(questionId);
 
-            // Initialize answer state based on question type
-            if (questionData.type === 'multiple_choice') {
+            const mapped = {
+                id: raw.id,
+                title: raw.question, 
+                type: raw.type,
+                options: raw.mcq_detail ? Object.values(raw.mcq_detail.options) : [],
+                correctOptions: raw.mcq_detail?.correct_options ?? [],
+                answer: raw.short_detail?.answer ?? "",
+                aiAnswer: raw.short_detail?.ai_answer ?? "",
+            };
+
+            setQuestion(mapped);
+
+            if (mapped.type === "MCQ") {
                 setSelectedAnswers([]);
             } else {
                 setUserAnswer('');
             }
         } catch (err) {
-            console.error('Failed to fetch question:', err);
-            // Fallback to template data if API fails
-            const questionData = getTemplateQuestion(questionId);
-            setQuestion(questionData);
-
-            // Initialize answer state for fallback data
-            if (questionData.type === 'multiple_choice') {
-                setSelectedAnswers([]);
-            } else {
-                setUserAnswer('');
-            }
-
-            // Only set error if we couldn't get template data either
-            if (!questionData) {
-                setError('Unable to load question from server and no template available.');
-            }
-            // If we have template data, clear any previous error
-            else {
-                setError(null);
-            }
+            console.error("Failed to fetch question:", err);
+            setError("Unable to load question.");
         } finally {
             setLoading(false);
         }
@@ -135,14 +128,15 @@ const DoQuestion = ({ questionId }) => {
             setLoading(true);
             setError(null);
 
-            const answerData = {
-                question_id: questionId,
-                answer: question.type === 'multiple_choice' ? selectedAnswers : userAnswer,
-                type: question.type,
-            };
+            const optionLetters = ['A', 'B', 'C', 'D', 'E'];
 
             // Use API to submit answer
-            const response = await QuestionService.submitAnswer(answerData);
+            const response = await QuestionService.submitAnswer(
+                questionId,
+                question.type === 'MCQ'
+                    ? selectedAnswers.map(i => String.fromCharCode(65 + i))
+                    : userAnswer
+            );
             console.log('Answer submitted successfully:', response);
 
             setSubmitted(true);
@@ -151,6 +145,10 @@ const DoQuestion = ({ questionId }) => {
             console.error('Failed to submit answer:', err);
             // Only show error message, don't mark as successfully submitted
             setError('Failed to submit to server.');
+
+            //delete later
+            setSubmitted(true);
+            setShowResult(true);
         } finally {
             setLoading(false);
         }
@@ -167,7 +165,7 @@ const DoQuestion = ({ questionId }) => {
     const canSubmit = () => {
         if (submitted) return false;
 
-        if (question?.type === 'multiple_choice') {
+        if (question?.type === 'MCQ') {
             return selectedAnswers.length > 0;
         } else {
             return userAnswer.trim().length > 0;
@@ -261,8 +259,8 @@ const DoQuestion = ({ questionId }) => {
                     <h4 className="m-1">{question.title}</h4>
                 </Col>
                 <Col className='text-center text-md-end' xs={12} md={3}>
-                    <Badge bg={question.type === 'multiple_choice' ? 'success' : 'info'}>
-                        {question.type === 'multiple_choice'
+                    <Badge bg={question.type === 'MCQ' ? 'success' : 'info'}>
+                        {question.type === 'MCQ'
                             ? question.multipleAnswers
                                 ? 'Multiple Choice'
                                 : 'Single Choice'
@@ -279,15 +277,45 @@ const DoQuestion = ({ questionId }) => {
 
             {/* Answer area */}
             <Row className="mb-3 text-start">
-                <p className="text-secondary m-1">
-                    {question.type === 'multiple_choice'
-                        ? 'Please select answer:'
-                        : 'Please enter answer:'}
-                </p>
+                {question.type === 'MCQ' ? (
+                    <>
+                        <p className="text-secondary m-1">Please select answer:</p>
+                        {renderMultipleChoice()}
+                    </>
+                ) : !submitted ? (
+                    <>
+                        <p className="text-secondary m-1">Please enter answer:</p>
+                        {renderOpenQuestion()}
+                    </>
+                ) : (
+                    <div className="m-1">
+                        <p><strong>Your Answer:</strong></p>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={userAnswer}
+                            readOnly
+                            className="mb-3"
+                        />
 
-                {question.type === 'multiple_choice'
-                    ? renderMultipleChoice()
-                    : renderOpenQuestion()}
+                        <p><strong>Answer:</strong></p>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={question?.answer || "No standard answer provided."}
+                            readOnly
+                            className="mb-3"
+                        />
+
+                        <p><strong>AI Answer:</strong></p>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={question?.aiAnswer || "No AI answer available."}
+                            readOnly
+                        />
+                    </div>
+                )}
             </Row>
 
             {/* Submit result */}
@@ -299,11 +327,11 @@ const DoQuestion = ({ questionId }) => {
             )}
 
             {/* Error message */}
-            {error && (
+            {/* {error && (
                 <Alert variant="danger" className="mb-3">
                     {error}
                 </Alert>
-            )}
+            )} */}
 
             {/* Submit button */}
             <Row className="align-items-center">

@@ -1,47 +1,12 @@
-import axios from 'axios';
-
-// Create Axios instance with base configuration
-const api = axios.create({
-    baseURL: 'http://localhost:8000', // Replace with your backend API URL
-    timeout: 10000,
-    withCredentials: true, // Send cookies if needed
-});
-
-// Helper function to read CSRF token from cookies
-function getCookie(name) {
-    const m = document.cookie.match(new RegExp('(^|; )' + name + '=([^;]+)'));
-    return m ? decodeURIComponent(m[2]) : null;
-}
-
-// Request interceptor - automatically add CSRF Token for unsafe methods
-api.interceptors.request.use((config) => {
-    const method = (config.method || 'get').toLowerCase();
-    const needsCsrf = ['post', 'put', 'patch', 'delete'].includes(method);
-
-    if (needsCsrf && !config.headers?.['X-CSRFToken']) {
-        const token = getCookie('csrftoken');
-        if (token) {
-            config.headers = { ...config.headers, 'X-CSRFToken': token };
-        }
-    }
-    return config;
-});
-
-// Response interceptor - unified error handling
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        console.error('API Error:', error);
-        return Promise.reject(error);
-    }
-);
+import apiClient from './apiClient.js';
 
 // Question service API methods
 export const QuestionService = {
     // Get all questions from backend (matches QuestionListView)
     getAllQuestions: async () => {
         try {
-            const response = await api.get('/questions/');
+            console.log("withCredentials:", apiClient.defaults.withCredentials);
+            const response = await apiClient.get('/questions/');
             return response.data;
         } catch (error) {
             console.error('Failed to fetch questions:', error);
@@ -53,7 +18,7 @@ export const QuestionService = {
     searchQuestions: async (searchQuery) => {
         try {
             // Get all questions and filter client-side
-            const response = await api.get('/questions/');
+            const response = await apiClient.get('/questions/');
             const questions = response.data;
             
             // Basic filtering based on question text and creator
@@ -72,7 +37,7 @@ export const QuestionService = {
     // Get single question by ID (matches QuestionDetailView with UUID)
     getQuestionById: async (id) => {
         try {
-            const response = await api.get(`/questions/${id}/`);
+            const response = await apiClient.get(`/questions/${id}/`);
             return response.data;
         } catch (error) {
             console.error(`Failed to fetch question ${id}:`, error);
@@ -83,7 +48,7 @@ export const QuestionService = {
     // Create new question
     createQuestion: async (questionData) => {
         try {
-            const response = await api.post('/questions/create/', questionData);
+            const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
             console.error('Failed to create question:', error);
@@ -99,7 +64,7 @@ export const QuestionService = {
                 type: 'SHORT',
                 answer: answer
             };
-            const response = await api.post('/questions/create/', questionData);
+            const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
             console.error('Failed to create short answer question:', error);
@@ -120,7 +85,7 @@ export const QuestionService = {
                 option_e: options.E,
                 correct_options: correctOptions
             };
-            const response = await api.post('/questions/create/', questionData);
+            const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
             console.error('Failed to create MCQ question:', error);
@@ -128,16 +93,26 @@ export const QuestionService = {
         }
     },
 
-    // Submit answer for attempts (placeholder - would need attempts API)
-    submitAnswer: async (answerData) => {
+    // Submit answer for attempts
+    submitAnswer: async (questionId, answer) => {
         try {
-            const response = await api.post('/attempts/', answerData);
+            const response = await apiClient.post('/attempts/create/', {question:questionId, answer: answer});
             return response.data;
         } catch (error) {
             console.error('Failed to submit answer:', error);
-            throw new Error('Failed to submit answer');
+            
+            // Provide more specific error messages
+            if (error.response?.status === 401) {
+                throw new Error('Please login to submit answers');
+            } else if (error.response?.status === 404) {
+                throw new Error('Question not found');
+            } else if (error.response?.data?.error) {
+                throw new Error(error.response.data.error);
+            } else {
+                throw new Error('Failed to submit answer');
+            }
         }
     },
 };
 
-export default api;
+//export default api;

@@ -6,6 +6,8 @@ from django.middleware.csrf import get_token
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -35,6 +37,7 @@ class GetCSRFTokenView(APIView):
         return Response({"csrfToken": token}, status=status.HTTP_200_OK)
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class RegisterView(APIView):
     """User registration endpoint"""
     permission_classes = [AllowAny]
@@ -45,6 +48,9 @@ class RegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             login(request, user)
+
+            # Ensure CSRF token is set for subsequent requests
+            get_token(request)
 
             user_serializer = UserSerializer(user)
             return Response({
@@ -60,9 +66,11 @@ class RegisterView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class LoginView(APIView):
     """User login endpoint"""
     permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
 
@@ -74,6 +82,10 @@ class LoginView(APIView):
 
             if user is not None:
                 login(request, user)
+
+                # Ensure CSRF token is set for subsequent requests
+                get_token(request)
+
                 user_serializer = UserSerializer(user)
                 return Response({
                     "ok": True,

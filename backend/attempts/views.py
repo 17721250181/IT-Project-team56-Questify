@@ -13,17 +13,27 @@ class AttemptCreateView(generics.CreateAPIView):
         question_id = request.data.get("question")
         user_answer = request.data.get("answer")
 
+        # Get the question
         try:
             question = Question.objects.get(id=question_id)
         except Question.DoesNotExist:
-            return Response({"error": "Question not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({
+                "error": "Question not found"
+            }, status=status.HTTP_404_NOT_FOUND)
 
         is_correct = None
 
-        # correctness for MCQ
+        # Check correctness for MCQ
         if hasattr(question, "mcq_detail"):
-            correct = question.mcq_detail.correct_option.upper()
-            is_correct = (user_answer.strip().upper() == correct)
+            correct = question.mcq_detail.correct_options
+            
+            # Handle different answer formats
+            if isinstance(user_answer, list):
+                user_answer_list = [str(ans).strip().upper() for ans in user_answer]
+            else:
+                user_answer_list = [str(user_answer).strip().upper()]
+
+            is_correct = sorted(user_answer_list) == sorted(correct)
 
         attempt = Attempt.objects.create(
             attempter=request.user,

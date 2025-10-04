@@ -10,7 +10,7 @@ import QuestionListFilterOption from './QuestionListFilterOption.jsx';
 import QuestionListSearch from './QuestionListSearch.jsx';
 
 // Importing API service
-import { QuestionService } from '../services/questionService.js';
+import { QuestionService } from '../services/QuestionService.js';
 
 // Example content data (fallback when API fails)
 const EXAMPLE_QUESTION = [
@@ -21,7 +21,7 @@ const EXAMPLE_QUESTION = [
         topic: 'Java Basics',
         attempted: true,
         verified: true,
-        questionType: 'Multiple Choice',
+        type: 'Multiple Choice',
         rating: 4.5,
         numAttempts: 12,
     },
@@ -32,7 +32,7 @@ const EXAMPLE_QUESTION = [
         topic: 'OOP Concepts',
         attempted: false,
         verified: true,
-        questionType: 'Multiple Choice',
+        type: 'Multiple Choice',
         rating: 4.2,
         numAttempts: 8,
     },
@@ -43,7 +43,7 @@ const EXAMPLE_QUESTION = [
         topic: 'Classes and Objects',
         attempted: true,
         verified: false,
-        questionType: 'Short Answer',
+        type: 'Short Answer',
         rating: 3.8,
         numAttempts: 15,
     },
@@ -54,7 +54,7 @@ const EXAMPLE_QUESTION = [
         topic: 'Advanced OOP',
         attempted: true,
         verified: true,
-        questionType: 'Long Answer',
+        type: 'Long Answer',
         rating: 4.7,
         numAttempts: 6,
     },
@@ -65,7 +65,7 @@ const EXAMPLE_QUESTION = [
         topic: 'Error Management',
         attempted: false,
         verified: true,
-        questionType: 'Multiple Choice',
+        type: 'Multiple Choice',
         rating: 4.1,
         numAttempts: 10,
     },
@@ -76,7 +76,7 @@ const EXAMPLE_QUESTION = [
         topic: 'Data Structures',
         attempted: true,
         verified: true,
-        questionType: 'Coding Exercise',
+        type: 'Coding Exercise',
         rating: 3.9,
         numAttempts: 18,
     },
@@ -122,17 +122,17 @@ const QuestionList = ({
     // Local filtering function (client-side filtering)
     const filteredContent = questions.filter(
         (item) =>
-            item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.question?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.week
-                .toLowerCase()
+                ?.toLowerCase()
                 .replace(/\s+/g, '')
                 .includes(searchQuery.toLowerCase().replace(/\s+/g, '')) ||
             item.topic
                 ?.toLowerCase()
                 .replace(/\s+/g, '')
                 .includes(searchQuery.toLowerCase().replace(/\s+/g, '')) ||
-            item.questionType
-                .toLowerCase()
+            item.type
+                ?.toLowerCase()
                 .replace(/\s+/g, '')
                 .includes(searchQuery.toLowerCase().replace(/\s+/g, ''))
     );
@@ -180,14 +180,14 @@ const QuestionList = ({
                         <QuestionListItem
                             key={item.id}
                             id={item.id}
-                            title={item.title}
+                            title={item.question}
                             week={item.week}
                             topic={item.topic}
                             attempted={item.attempted}
                             verified={item.verified}
-                            questionType={item.questionType}
+                            questionType={item.type}
                             rating={item.rating}
-                            numAttempts={item.numAttempts}
+                            numAttempts={item.num_attempts}
                         />
                     ))}
                 </ListGroup>

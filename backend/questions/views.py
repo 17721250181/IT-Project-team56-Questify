@@ -13,7 +13,7 @@ class QuestionCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        q_type = request.data.get("type")
+        type = request.data.get("type")
 
         user = request.user
 
@@ -22,9 +22,12 @@ class QuestionCreateView(generics.CreateAPIView):
             question=request.data["question"],
             source="STUDENT",
             creator=user,
+            week = request.data["week"],
+            topic = request.data["topic"],
+            type=type
         )
 
-        if q_type == "SHORT":
+        if type == "SHORT":
             answer = request.data.get("answer", "")
 
             # create ai explanation using openai api
@@ -44,16 +47,16 @@ class QuestionCreateView(generics.CreateAPIView):
                 "ai_answer": ai_answer
             }, status=status.HTTP_201_CREATED)
 
-        elif q_type == "MCQ":
+        elif type == "MCQ":
             option_a = request.data.get("option_a")
             option_b = request.data.get("option_b")
             option_c = request.data.get("option_c")
             option_d = request.data.get("option_d")
             option_e = request.data.get("option_e")
-            correct_option = request.data.get("correct_option")
+            correct_options = request.data.get("correct_options")
 
             # assume must have 5 options
-            if not all([option_a, option_b, option_c, option_d, option_e, correct_option]):
+            if not all([option_a, option_b, option_c, option_d, option_e, correct_options]):
                 return Response({"error": "MCQ must include 5 options and a correct_option"},
                                 status=status.HTTP_400_BAD_REQUEST)
 
@@ -64,7 +67,7 @@ class QuestionCreateView(generics.CreateAPIView):
                 option_c=option_c,
                 option_d=option_d,
                 option_e=option_e,
-                correct_option=correct_option,
+                correct_options=correct_options,
             )
 
             return Response({
@@ -79,8 +82,8 @@ class QuestionCreateView(generics.CreateAPIView):
                     "D": mcq_q.option_d,
                     "E": mcq_q.option_e,
                 },
-                "correct_option": mcq_q.correct_option,
-                "explanation": mcq_q.explanation,
+                "correct_options": mcq_q.correct_options,
+                # "explanation": mcq_q.explanation,
             }, status=status.HTTP_201_CREATED)
 
         else:
