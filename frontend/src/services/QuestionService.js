@@ -1,4 +1,5 @@
 import apiClient from './apiClient.js';
+import { AttemptService } from './attemptService.js';
 
 // Question service API methods
 export const QuestionService = {
@@ -96,8 +97,9 @@ export const QuestionService = {
     // Submit answer for attempts
     submitAnswer: async (questionId, answer) => {
         try {
-            const response = await apiClient.post('/attempts/create/', {question:questionId, answer: answer});
-            return response.data;
+            // Use AttemptService for consistency
+            const response = await AttemptService.createAttempt(questionId, answer);
+            return response;
         } catch (error) {
             console.error('Failed to submit answer:', error);
             
