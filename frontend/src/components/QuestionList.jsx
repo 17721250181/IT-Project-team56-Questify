@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // Importing the React-Bootstrap components
-import { ListGroup, Alert, Spinner } from 'react-bootstrap';
+import { ListGroup, Alert, Spinner, Pagination } from 'react-bootstrap';
 
 // Importing custom components
 import QuestionListItem from './QuestionListItem.jsx';
@@ -91,6 +91,10 @@ const QuestionList = ({
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 20;
 
     // Fetch questions from API on component mount
     useEffect(() => {
@@ -140,6 +144,90 @@ const QuestionList = ({
     // Handle search from child component (local filtering only)
     const handleSearch = (query) => {
         setSearchQuery(query);
+        setCurrentPage(1); // Reset to first page when searching
+    };
+
+    // Calculate pagination values
+    const totalPages = Math.ceil(filteredContent.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentItems = filteredContent.slice(startIndex, endIndex);
+
+    // Handle page change
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Generate pagination items
+    const getPaginationItems = () => {
+        const items = [];
+        const maxVisiblePages = 5;
+
+        if (totalPages <= maxVisiblePages) {
+            // Show all pages if total is small
+            for (let number = 1; number <= totalPages; number++) {
+                items.push(
+                    <Pagination.Item
+                        key={number}
+                        active={number === currentPage}
+                        onClick={() => handlePageChange(number)}
+                    >
+                        {number}
+                    </Pagination.Item>
+                );
+            }
+        } else {
+            // Show first page
+            items.push(
+                <Pagination.Item
+                    key={1}
+                    active={1 === currentPage}
+                    onClick={() => handlePageChange(1)}
+                >
+                    1
+                </Pagination.Item>
+            );
+
+            // Show ellipsis if needed
+            if (currentPage > 3) {
+                items.push(<Pagination.Ellipsis key="ellipsis-start" disabled />);
+            }
+
+            // Show pages around current page
+            const start = Math.max(2, currentPage - 1);
+            const end = Math.min(totalPages - 1, currentPage + 1);
+
+            for (let number = start; number <= end; number++) {
+                items.push(
+                    <Pagination.Item
+                        key={number}
+                        active={number === currentPage}
+                        onClick={() => handlePageChange(number)}
+                    >
+                        {number}
+                    </Pagination.Item>
+                );
+            }
+
+            // Show ellipsis if needed
+            if (currentPage < totalPages - 2) {
+                items.push(<Pagination.Ellipsis key="ellipsis-end" disabled />);
+            }
+
+            // Show last page
+            items.push(
+                <Pagination.Item
+                    key={totalPages}
+                    active={totalPages === currentPage}
+                    onClick={() => handlePageChange(totalPages)}
+                >
+                    {totalPages}
+                </Pagination.Item>
+            );
+        }
+
+        return items;
     };
 
     return (
@@ -176,7 +264,7 @@ const QuestionList = ({
 
                 {/* Questions list */}
                 <ListGroup variant="flush" className="bg-body-secondary">
-                    {filteredContent.map((item) => (
+                    {currentItems.map((item) => (
                         <QuestionListItem
                             key={item.id}
                             id={item.id}
@@ -197,6 +285,38 @@ const QuestionList = ({
                     <Alert variant="info" className="text-center">
                         {searchQuery ? 'No questions found matching your search.' : 'No questions available.'}
                     </Alert>
+                )}
+
+                {/* Pagination */}
+                {!loading && filteredContent.length > 0 && totalPages > 1 && (
+                    <div className="d-flex justify-content-center mt-4 mb-3">
+                        <Pagination>
+                            <Pagination.First
+                                onClick={() => handlePageChange(1)}
+                                disabled={currentPage === 1}
+                            />
+                            <Pagination.Prev
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                            />
+                            {getPaginationItems()}
+                            <Pagination.Next
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                            />
+                            <Pagination.Last
+                                onClick={() => handlePageChange(totalPages)}
+                                disabled={currentPage === totalPages}
+                            />
+                        </Pagination>
+                    </div>
+                )}
+
+                {/* Page info */}
+                {!loading && filteredContent.length > 0 && (
+                    <div className="text-center text-muted small mb-2">
+                        Showing {startIndex + 1} - {Math.min(endIndex, filteredContent.length)} of {filteredContent.length} questions
+                    </div>
                 )}
             </div>
         </div>
