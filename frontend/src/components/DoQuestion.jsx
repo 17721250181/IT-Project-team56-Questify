@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Card, Row, Col, Form, Button, Alert, Spinner, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Button, Alert, Spinner, Badge } from 'react-bootstrap';
 import { QuestionService } from '../services/QuestionService.js';
 import { useParams } from 'react-router-dom';
+import DoQuestionMCQ from './DoQuestionMCQ';
+import DoQuestionShort from './DoQuestionShort';
 
 const DoQuestion = () => {
     const { questionId } = useParams();
@@ -124,46 +126,6 @@ const DoQuestion = () => {
         }
     };
 
-    // Render multiple choice options
-    const renderMultipleChoice = () => {
-        return (
-            <Form className='m-1'>
-                {question.options?.map((option, index) => (
-                    <Form.Check
-                        key={index}
-                        type={question.multipleAnswers ? 'checkbox' : 'radio'}
-                        id={`option-${index}`}
-                        name="question-options"
-                        label={option}
-                        checked={selectedAnswers.includes(index)}
-                        onChange={(e) => handleOptionChange(index, e.target.checked)}
-                        disabled={submitted}
-                        className="mb-2"
-                    />
-                ))}
-            </Form>
-        );
-    };
-
-    // Render open-ended question
-    const renderOpenQuestion = () => {
-        return (
-            <Form className='m-1'>
-                <Form.Group className="m-1">
-                    <Form.Label>Your Answer:</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        rows={4}
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        disabled={submitted}
-                        placeholder="Please enter your answer here..."
-                    />
-                </Form.Group>
-            </Form>
-        );
-    };
-
     // Loading state
     if (loading) {
         return (
@@ -230,70 +192,19 @@ const DoQuestion = () => {
             {/* Answer area */}
             <Row className="mb-3 text-start">
                 {question.type === 'MCQ' ? (
-                    <>
-                        <p className="text-secondary m-1">Please select answer:</p>
-                        {renderMultipleChoice()}
-                        
-                        {/* Show correct answers after submission */}
-                        {submitted && (
-                            <div className="m-1 mt-4 pt-3 border-top">
-                                <p className="mb-2"><strong>Correct Answer:</strong></p>
-                                <div>
-                                    {question.correctOptions && question.correctOptions.length > 0
-                                        ? question.correctOptions
-                                            .sort()
-                                            .map(letter => {
-                                                const index = letter.charCodeAt(0) - 65;
-                                                return (
-                                                    <div key={letter} className="mb-1">
-                                                        <Badge bg="info" className="me-2">
-                                                            {letter}
-                                                        </Badge>
-                                                        <span className="">
-                                                            {question.options[index]}
-                                                        </span>
-                                                    </div>
-                                                );
-                                            })
-                                        : <span className="text-muted">Not available</span>
-                                    }
-                                </div>
-                            </div>
-                        )}
-                    </>
-                ) : !submitted ? (
-                    <>
-                        <p className="text-secondary m-1">Please enter answer:</p>
-                        {renderOpenQuestion()}
-                    </>
+                    <DoQuestionMCQ
+                        question={question}
+                        selectedAnswers={selectedAnswers}
+                        onAnswerChange={handleOptionChange}
+                        submitted={submitted}
+                    />
                 ) : (
-                    <div className="m-1">
-                        <p><strong>Your Answer:</strong></p>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            value={userAnswer}
-                            readOnly
-                            className="mb-3"
-                        />
-
-                        <p><strong>Answer:</strong></p>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            value={question?.answer || "No standard answer provided."}
-                            readOnly
-                            className="mb-3"
-                        />
-
-                        <p><strong>AI Answer:</strong></p>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            value={question?.aiAnswer || "No AI answer available."}
-                            readOnly
-                        />
-                    </div>
+                    <DoQuestionShort
+                        question={question}
+                        userAnswer={userAnswer}
+                        onAnswerChange={setUserAnswer}
+                        submitted={submitted}
+                    />
                 )}
             </Row>
 
