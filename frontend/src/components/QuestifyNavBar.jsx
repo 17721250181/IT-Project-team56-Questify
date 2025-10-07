@@ -12,7 +12,8 @@ const QuestifyNavBar = () => {
     try {
       await logout();
     } finally {
-      navigate('/login', { replace: true });
+      // Clear any saved redirect state and go to login
+      navigate('/login', { replace: true, state: null });
     }
   };
 
