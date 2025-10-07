@@ -152,3 +152,12 @@ class QuestionDetailView(generics.RetrieveAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class UserQuestionsView(generics.ListAPIView):
+    """Get all questions created by the current user"""
+    serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Question.objects.filter(creator=self.request.user).order_by('-created_at')

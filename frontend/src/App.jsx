@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Importing page components
-import { QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage } from './pages';
+import { QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage, UserProfilePage } from './pages';
 // Auth Provider and Protected Route
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -36,6 +36,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DoQuestionPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
             </ProtectedRoute>
           }
         />

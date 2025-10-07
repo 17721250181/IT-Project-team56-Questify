@@ -1,10 +1,10 @@
 import React from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container, Row, Col, Card, Tabs, Tab } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext';
 import QuestifyNavBar from '../components/QuestifyNavBar';
 import UserProfileHeader from '../components/UserProfileHeader';
 import ActivityHeatmap from '../components/ActivityHeatmap';
-import AttemptedQuestions from '../components/AttemptedQuestions';
+import QuestionGrid from '../components/questionList/QuestionGrid';
 
 /**
  * User Profile Page
@@ -31,13 +31,40 @@ const UserProfilePage = () => {
                     </Col>
                 </Row>
 
-                {/* Attempted Questions Section */}
+                {/* Questions Section with Tabs */}
                 <Row>
                     <Col>
                         <Card className="shadow-sm">
                             <Card.Body>
-                                <h4 className="mb-3">Attempted Questions:</h4>
-                                <AttemptedQuestions userId={user?.id} />
+                                <Tabs
+                                    defaultActiveKey="attempted"
+                                    id="questions-tabs"
+                                    className="mb-3"
+                                    fill
+                                >
+                                    <Tab 
+                                        eventKey="attempted" 
+                                        title={
+                                            <span>
+                                                <i className="bi bi-pencil-square me-2"></i>
+                                                Attempted Questions
+                                            </span>
+                                        }
+                                    >
+                                        <QuestionGrid type="attempted" />
+                                    </Tab>
+                                    <Tab 
+                                        eventKey="posted" 
+                                        title={
+                                            <span>
+                                                <i className="bi bi-upload me-2"></i>
+                                                Posted Questions
+                                            </span>
+                                        }
+                                    >
+                                        <QuestionGrid type="posted" />
+                                    </Tab>
+                                </Tabs>
                             </Card.Body>
                         </Card>
                     </Col>

@@ -115,6 +115,17 @@ export const QuestionService = {
             }
         }
     },
+
+    // Get questions created by current user
+    getUserQuestions: async () => {
+        try {
+            const response = await apiClient.get('/questions/user/');
+            return response.data;
+        } catch (error) {
+            console.error('Failed to fetch user questions:', error);
+            throw new Error('Failed to fetch user questions');
+        }
+    },
 };
 
 //export default api;
