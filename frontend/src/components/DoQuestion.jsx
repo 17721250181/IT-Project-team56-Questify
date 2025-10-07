@@ -12,67 +12,7 @@ const DoQuestion = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showResult, setShowResult] = useState(false);
-    // const [isUsingTemplate, setIsUsingTemplate] = useState(false); // Currently always using template data
-
-    // Template question data
-    const getTemplateQuestion = (id) => {
-        const templates = [
-            {
-                id: 1,
-                title: 'Java Variables and Data Types',
-                content: 'Which of the following are primitive data types in Java?',
-                type: 'multiple_choice',
-                multipleAnswers: true,
-                options: ['int', 'String', 'boolean', 'double', 'ArrayList'],
-            },
-            {
-                id: 2,
-                title: 'Object-Oriented Design Principles',
-                content:
-                    'Which of the following are core principles of Object-Oriented Programming?',
-                type: 'multiple_choice',
-                multipleAnswers: true,
-                options: [
-                    'Encapsulation',
-                    'Inheritance',
-                    'Polymorphism',
-                    'Abstraction',
-                    'Compilation',
-                ],
-            },
-            {
-                id: 3,
-                title: 'Java Class Constructors',
-                content:
-                    'Explain what a constructor is in Java and write a simple example of a class with a constructor.',
-                type: 'open_question',
-            },
-            {
-                id: 4,
-                title: 'Inheritance and Polymorphism',
-                content:
-                    'Describe the relationship between inheritance and polymorphism in Java. Provide a code example demonstrating both concepts.',
-                type: 'open_question',
-            },
-            {
-                id: 5,
-                title: 'Exception Handling in Java',
-                content: 'Which keywords are used for exception handling in Java?',
-                type: 'multiple_choice',
-                multipleAnswers: true,
-                options: ['try', 'catch', 'finally', 'throw', 'handle'],
-            },
-            {
-                id: 6,
-                title: 'Array and ArrayList Operations',
-                content:
-                    'What is the main difference between arrays and ArrayLists in Java? Write a simple code example showing how to create and add elements to an ArrayList.',
-                type: 'open_question',
-            },
-        ];
-
-        return templates.find((q) => q.id === Number(id)) || templates[0];
-    };
+    const [isCorrect, setIsCorrect] = useState(null);
 
     // Fetch question data from backend
     const fetchQuestion = useCallback(async () => {
@@ -88,6 +28,7 @@ const DoQuestion = () => {
                 type: raw.type,
                 options: raw.mcq_detail ? Object.values(raw.mcq_detail.options) : [],
                 correctOptions: raw.mcq_detail?.correct_options ?? [],
+                multipleAnswers: raw.mcq_detail ? raw.mcq_detail.correct_options.length > 1 : false,
                 answer: raw.short_detail?.answer ?? "",
                 aiAnswer: raw.short_detail?.ai_answer ?? "",
             };
@@ -128,8 +69,6 @@ const DoQuestion = () => {
             setLoading(true);
             setError(null);
 
-            const optionLetters = ['A', 'B', 'C', 'D', 'E'];
-
             // Use API to submit answer
             const response = await QuestionService.submitAnswer(
                 questionId,
@@ -138,6 +77,19 @@ const DoQuestion = () => {
                     : userAnswer
             );
             console.log('Answer submitted successfully:', response);
+
+            // Check if answer is correct (for MCQ only)
+            if (question.type === 'MCQ') {
+                const userAnswerLetters = selectedAnswers
+                    .map(i => String.fromCharCode(65 + i))
+                    .sort();
+                const correctAnswerLetters = [...question.correctOptions].sort();
+                
+                const correct = JSON.stringify(userAnswerLetters) === JSON.stringify(correctAnswerLetters);
+                setIsCorrect(correct);
+            } else {
+                setIsCorrect(null); // No auto-checking for short answer
+            }
 
             setSubmitted(true);
             setShowResult(true);
@@ -281,6 +233,33 @@ const DoQuestion = () => {
                     <>
                         <p className="text-secondary m-1">Please select answer:</p>
                         {renderMultipleChoice()}
+                        
+                        {/* Show correct answers after submission */}
+                        {submitted && (
+                            <div className="m-1 mt-4 pt-3 border-top">
+                                <p className="mb-2"><strong>Correct Answer:</strong></p>
+                                <div>
+                                    {question.correctOptions && question.correctOptions.length > 0
+                                        ? question.correctOptions
+                                            .sort()
+                                            .map(letter => {
+                                                const index = letter.charCodeAt(0) - 65;
+                                                return (
+                                                    <div key={letter} className="mb-1">
+                                                        <Badge bg="info" className="me-2">
+                                                            {letter}
+                                                        </Badge>
+                                                        <span className="">
+                                                            {question.options[index]}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })
+                                        : <span className="text-muted">Not available</span>
+                                    }
+                                </div>
+                            </div>
+                        )}
                     </>
                 ) : !submitted ? (
                     <>
@@ -320,9 +299,23 @@ const DoQuestion = () => {
 
             {/* Submit result */}
             {showResult && submitted && (
-                <Alert variant="success">
-                    <Alert.Heading>Submitted Successfully!</Alert.Heading>
-                    <p>Your answer has been submitted successfully.</p>
+                <Alert variant={
+                    question.type === 'MCQ' 
+                        ? (isCorrect ? 'success' : 'danger')
+                        : 'info'
+                }>
+                    <Alert.Heading>
+                        {question.type === 'MCQ' 
+                            ? (isCorrect ? 'Correct!' : 'Incorrect')
+                            : 'Submitted Successfully!'}
+                    </Alert.Heading>
+                    <p>
+                        {question.type === 'MCQ' 
+                            ? (isCorrect 
+                                ? 'Great job! Your answer is correct.' 
+                                : "Your answer doesn't match the correct answer.")
+                            : 'Your answer has been submitted successfully.'}
+                    </p>
                 </Alert>
             )}
 
