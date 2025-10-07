@@ -68,6 +68,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/post-question"
+          element={
+            <ProtectedRoute>
+              <PostQuestionPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Catch all other routes and redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
