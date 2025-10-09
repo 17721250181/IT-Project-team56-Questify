@@ -3,14 +3,15 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
- * Protected Route Component
- * Renders children only if user is authenticated, otherwise redirects to login
+ * Public Route Component
+ * Redirects authenticated users away from public pages (login, register)
+ * Renders children only if user is NOT authenticated
  *
  * @param {Object} props - Component props
- * @param {React.ReactNode} props.children - Content to render if authenticated
- * @returns {React.ReactElement} Protected content, loading state, or redirect
+ * @param {React.ReactNode} props.children - Content to render if not authenticated
+ * @returns {React.ReactElement} Public content, loading state, or redirect
  */
-const ProtectedRoute = ({ children }) => {
+const PublicRoute = ({ children }) => {
     const { isAuthenticated, loading } = useAuth();
 
     // Show loading spinner while authentication status is being checked
@@ -29,13 +30,13 @@ const ProtectedRoute = ({ children }) => {
         );
     }
 
-    // If not authenticated, redirect to login page
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
+    // If already authenticated, redirect to home page
+    if (isAuthenticated) {
+        return <Navigate to="/" replace />;
     }
 
-    // User is authenticated - render the protected content
+    // User is not authenticated - render the public content
     return children;
 };
 
-export default ProtectedRoute;
+export default PublicRoute;

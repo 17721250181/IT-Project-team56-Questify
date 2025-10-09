@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Card, Row, Col, Form, Button, Alert, Spinner, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Button, Alert, Spinner, Badge } from 'react-bootstrap';
 import { QuestionService } from '../services/QuestionService.js';
 import { useParams } from 'react-router-dom';
+import DoQuestionMCQ from './DoQuestionMCQ';
+import DoQuestionShort from './DoQuestionShort';
 
 const DoQuestion = () => {
     const { questionId } = useParams();
@@ -12,67 +14,7 @@ const DoQuestion = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showResult, setShowResult] = useState(false);
-    // const [isUsingTemplate, setIsUsingTemplate] = useState(false); // Currently always using template data
-
-    // Template question data
-    const getTemplateQuestion = (id) => {
-        const templates = [
-            {
-                id: 1,
-                title: 'Java Variables and Data Types',
-                content: 'Which of the following are primitive data types in Java?',
-                type: 'multiple_choice',
-                multipleAnswers: true,
-                options: ['int', 'String', 'boolean', 'double', 'ArrayList'],
-            },
-            {
-                id: 2,
-                title: 'Object-Oriented Design Principles',
-                content:
-                    'Which of the following are core principles of Object-Oriented Programming?',
-                type: 'multiple_choice',
-                multipleAnswers: true,
-                options: [
-                    'Encapsulation',
-                    'Inheritance',
-                    'Polymorphism',
-                    'Abstraction',
-                    'Compilation',
-                ],
-            },
-            {
-                id: 3,
-                title: 'Java Class Constructors',
-                content:
-                    'Explain what a constructor is in Java and write a simple example of a class with a constructor.',
-                type: 'open_question',
-            },
-            {
-                id: 4,
-                title: 'Inheritance and Polymorphism',
-                content:
-                    'Describe the relationship between inheritance and polymorphism in Java. Provide a code example demonstrating both concepts.',
-                type: 'open_question',
-            },
-            {
-                id: 5,
-                title: 'Exception Handling in Java',
-                content: 'Which keywords are used for exception handling in Java?',
-                type: 'multiple_choice',
-                multipleAnswers: true,
-                options: ['try', 'catch', 'finally', 'throw', 'handle'],
-            },
-            {
-                id: 6,
-                title: 'Array and ArrayList Operations',
-                content:
-                    'What is the main difference between arrays and ArrayLists in Java? Write a simple code example showing how to create and add elements to an ArrayList.',
-                type: 'open_question',
-            },
-        ];
-
-        return templates.find((q) => q.id === Number(id)) || templates[0];
-    };
+    const [isCorrect, setIsCorrect] = useState(null);
 
     // Fetch question data from backend
     const fetchQuestion = useCallback(async () => {
@@ -88,6 +30,7 @@ const DoQuestion = () => {
                 type: raw.type,
                 options: raw.mcq_detail ? Object.values(raw.mcq_detail.options) : [],
                 correctOptions: raw.mcq_detail?.correct_options ?? [],
+                multipleAnswers: raw.mcq_detail ? raw.mcq_detail.correct_options.length > 1 : false,
                 answer: raw.short_detail?.answer ?? "",
                 aiAnswer: raw.short_detail?.ai_answer ?? "",
             };
@@ -128,8 +71,6 @@ const DoQuestion = () => {
             setLoading(true);
             setError(null);
 
-            const optionLetters = ['A', 'B', 'C', 'D', 'E'];
-
             // Use API to submit answer
             const response = await QuestionService.submitAnswer(
                 questionId,
@@ -138,6 +79,19 @@ const DoQuestion = () => {
                     : userAnswer
             );
             console.log('Answer submitted successfully:', response);
+
+            // Check if answer is correct (for MCQ only)
+            if (question.type === 'MCQ') {
+                const userAnswerLetters = selectedAnswers
+                    .map(i => String.fromCharCode(65 + i))
+                    .sort();
+                const correctAnswerLetters = [...question.correctOptions].sort();
+                
+                const correct = JSON.stringify(userAnswerLetters) === JSON.stringify(correctAnswerLetters);
+                setIsCorrect(correct);
+            } else {
+                setIsCorrect(null); // No auto-checking for short answer
+            }
 
             setSubmitted(true);
             setShowResult(true);
@@ -170,46 +124,6 @@ const DoQuestion = () => {
         } else {
             return userAnswer.trim().length > 0;
         }
-    };
-
-    // Render multiple choice options
-    const renderMultipleChoice = () => {
-        return (
-            <Form className='m-1'>
-                {question.options?.map((option, index) => (
-                    <Form.Check
-                        key={index}
-                        type={question.multipleAnswers ? 'checkbox' : 'radio'}
-                        id={`option-${index}`}
-                        name="question-options"
-                        label={option}
-                        checked={selectedAnswers.includes(index)}
-                        onChange={(e) => handleOptionChange(index, e.target.checked)}
-                        disabled={submitted}
-                        className="mb-2"
-                    />
-                ))}
-            </Form>
-        );
-    };
-
-    // Render open-ended question
-    const renderOpenQuestion = () => {
-        return (
-            <Form className='m-1'>
-                <Form.Group className="m-1">
-                    <Form.Label>Your Answer:</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        rows={4}
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        disabled={submitted}
-                        placeholder="Please enter your answer here..."
-                    />
-                </Form.Group>
-            </Form>
-        );
     };
 
     // Loading state
@@ -278,51 +192,41 @@ const DoQuestion = () => {
             {/* Answer area */}
             <Row className="mb-3 text-start">
                 {question.type === 'MCQ' ? (
-                    <>
-                        <p className="text-secondary m-1">Please select answer:</p>
-                        {renderMultipleChoice()}
-                    </>
-                ) : !submitted ? (
-                    <>
-                        <p className="text-secondary m-1">Please enter answer:</p>
-                        {renderOpenQuestion()}
-                    </>
+                    <DoQuestionMCQ
+                        question={question}
+                        selectedAnswers={selectedAnswers}
+                        onAnswerChange={handleOptionChange}
+                        submitted={submitted}
+                    />
                 ) : (
-                    <div className="m-1">
-                        <p><strong>Your Answer:</strong></p>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            value={userAnswer}
-                            readOnly
-                            className="mb-3"
-                        />
-
-                        <p><strong>Answer:</strong></p>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            value={question?.answer || "No standard answer provided."}
-                            readOnly
-                            className="mb-3"
-                        />
-
-                        <p><strong>AI Answer:</strong></p>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            value={question?.aiAnswer || "No AI answer available."}
-                            readOnly
-                        />
-                    </div>
+                    <DoQuestionShort
+                        question={question}
+                        userAnswer={userAnswer}
+                        onAnswerChange={setUserAnswer}
+                        submitted={submitted}
+                    />
                 )}
             </Row>
 
             {/* Submit result */}
             {showResult && submitted && (
-                <Alert variant="success">
-                    <Alert.Heading>Submitted Successfully!</Alert.Heading>
-                    <p>Your answer has been submitted successfully.</p>
+                <Alert variant={
+                    question.type === 'MCQ' 
+                        ? (isCorrect ? 'success' : 'danger')
+                        : 'info'
+                }>
+                    <Alert.Heading>
+                        {question.type === 'MCQ' 
+                            ? (isCorrect ? 'Correct!' : 'Incorrect')
+                            : 'Submitted Successfully!'}
+                    </Alert.Heading>
+                    <p>
+                        {question.type === 'MCQ' 
+                            ? (isCorrect 
+                                ? 'Great job! Your answer is correct.' 
+                                : "Your answer doesn't match the correct answer.")
+                            : 'Your answer has been submitted successfully.'}
+                    </p>
                 </Alert>
             )}
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const LoginForm = () => {
@@ -13,11 +13,7 @@ const LoginForm = () => {
 
     // Hooks for authentication and navigation
     const { login } = useAuth();
-    const navigate = useNavigate();
     const location = useLocation();
-
-    // Get redirect to questions
-    const redirectTo = '/questions';
 
     // Handle messages passed from other pages (e.g., password reset success)
     useEffect(() => {
@@ -43,15 +39,11 @@ const LoginForm = () => {
             console.log('Attempting login for:', email);
 
             // Use AuthContext login method
-            const response = await login(email, password);
+            await login(email, password);
 
-            console.log('Login successful:', response);
-            setMessage('Login successful! Redirecting...');
-
-            // Redirect after short delay for user feedback
-            setTimeout(() => {
-                navigate(redirectTo, { replace: true });
-            }, 1000);
+            console.log('Login successful');
+            // Note: PublicRoute will automatically redirect to home page
+            // once isAuthenticated becomes true, so no manual navigation needed
 
         } catch (error) {
             console.error('Login error:', error);
