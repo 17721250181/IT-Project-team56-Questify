@@ -8,7 +8,7 @@ import QuestionDisplay from './QuestionDisplay';
  * @param {string} title - Title to display above the list
  */
 const QuestionList = ({ title = 'Question List' }) => {
-    return <QuestionDisplay mode="list" type="all" showSearch={true} usePagination={false} title={title} />;
+    return <QuestionDisplay mode="list" type="all" showSearch={true} usePagination={true} title={title} />;
 };
 
 export default QuestionList;

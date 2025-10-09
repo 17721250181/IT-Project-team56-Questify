@@ -1,5 +1,7 @@
 // Importing the Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
+// Importing Bootstrap Icons CSS
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // Importing React Router components
 import { Routes, Route, Navigate } from 'react-router-dom';

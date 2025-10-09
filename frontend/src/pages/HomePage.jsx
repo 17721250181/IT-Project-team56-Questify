@@ -57,7 +57,7 @@ const HomePage = () => {
                                         </Card.Text>
                                         <Button
                                             as={Link}
-                                            to="/profile"
+                                            to="/user-profile"
                                             variant="outline-primary"
                                             className="mt-auto"
                                         >

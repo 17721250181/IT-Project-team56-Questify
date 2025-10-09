@@ -126,97 +126,105 @@ const QuestionDisplay = ({
         return 'border-secondary';
     };
 
-    // Render grid mode (card layout)
-    const renderGridMode = () => (
-        <div>
-            {/* Questions Grid */}
-            <div className="row g-3 mb-4">
-                {currentItems.map((item) => {
-                    const questionId = isAttempted ? item.question : item.id;
-                    const questionText = isAttempted ? item.question_text : item.question;
-                    
-                    return (
-                        <QGridCard
-                            key={item.id}
-                            id={questionId}
-                            title={questionText}
-                            type={item.type}
-                            week={item.week}
-                            topic={item.topic}
-                            verifyStatus={item.verify_status}
-                            isCorrect={item.is_correct}
-                            date={isAttempted ? item.submitted_at : item.created_at}
-                            numAttempts={item.num_attempts}
-                            displayMode={type}
-                            onClick={handleQuestionClick}
-                            borderClass={getBorderClass(item)}
-                        />
-                    );
-                })}
-            </div>
-
-            {/* Pagination */}
-            {shouldUsePagination && (
-                <QuestionPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
+    // Render questions in specified mode
+    const renderQuestions = (displayMode) => {
+        const isGridMode = displayMode === 'grid';
+        
+        // Generate question items
+        const questionItems = currentItems.map((item) => {
+            const questionId = isAttempted ? item.question : item.id;
+            const questionText = isAttempted ? item.question_text : item.question;
+            
+            return isGridMode ? (
+                <QGridCard
+                    key={item.id}
+                    id={questionId}
+                    title={questionText}
+                    type={item.type}
+                    week={item.week}
+                    topic={item.topic}
+                    verifyStatus={item.verify_status}
+                    isCorrect={item.is_correct}
+                    date={isAttempted ? item.submitted_at : item.created_at}
+                    numAttempts={item.num_attempts}
+                    displayMode={type}
+                    onClick={handleQuestionClick}
+                    borderClass={getBorderClass(item)}
                 />
-            )}
+            ) : (
+                <QListItem
+                    key={item.id}
+                    id={questionId}
+                    title={questionText}
+                    week={item.week}
+                    topic={item.topic}
+                    attempted={isAttempted ? true : item.attempted}
+                    verified={item.verify_status === 'APPROVED' || item.verified}
+                    questionType={item.type}
+                    rating={item.rating}
+                    numAttempts={item.num_attempts}
+                />
+            );
+        });
 
-            {/* Page info */}
-            {shouldUsePagination && filteredItems.length > 0 && (
-                <div className="text-center text-muted small">
-                    Showing {startIndex + 1} - {Math.min(endIndex, filteredItems.length)} of {filteredItems.length} questions
+        // Generate pagination component
+        const paginationComponent = shouldUsePagination && (
+            <QuestionPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+            />
+        );
+
+        // Generate page info
+        const pageInfo = shouldUsePagination && filteredItems.length > 0 && (
+            <div className="text-center text-muted small">
+                Showing {startIndex + 1} - {Math.min(endIndex, filteredItems.length)} of{' '}
+                {filteredItems.length} questions
+            </div>
+        );
+
+        // Return appropriate layout
+        if (isGridMode) {
+            return (
+                <div>
+                    {/* Questions Grid */}
+                    <div className="row g-3 mb-4">
+                        {questionItems}
+                    </div>
+                    {paginationComponent}
+                    {pageInfo}
                 </div>
-            )}
-        </div>
-    );
+            );
+        } else {
+            return (
+                <div>
+                    {/* Questions List */}
+                    <ListGroup variant="flush" className="bg-body-secondary">
+                        {questionItems}
+                    </ListGroup>
 
-    // Render list mode (ListGroup layout)
-    const renderListMode = () => (
-        <div>
-            <ListGroup variant="flush" className="bg-body-secondary">
-                {currentItems.map((item) => {
-                    const questionId = isAttempted ? item.question : item.id;
-                    const questionText = isAttempted ? item.question_text : item.question;
-                    
-                    return (
-                        <QListItem
-                            key={item.id}
-                            id={questionId}
-                            title={questionText}
-                            week={item.week}
-                            topic={item.topic}
-                            attempted={isAttempted ? true : item.attempted}
-                            verified={item.verify_status === 'APPROVED' || item.verified}
-                            questionType={item.type}
-                            rating={item.rating}
-                            numAttempts={item.num_attempts}
-                        />
-                    );
-                })}
-            </ListGroup>
+                    {/* No results message */}
+                    {currentItems.length === 0 && !loading && (
+                        <Alert variant="info" className="text-center mt-3">
+                            {searchQuery
+                                ? 'No questions found matching your search.'
+                                : 'No questions available.'}
+                        </Alert>
+                    )}
 
-            {/* No results message */}
-            {currentItems.length === 0 && !loading && (
-                <Alert variant="info" className="text-center mt-3">
-                    {searchQuery ? 'No questions found matching your search.' : 'No questions available.'}
-                </Alert>
-            )}
+                    {/* Pagination */}
+                    {shouldUsePagination && (
+                        <div className="mt-3">
+                            {paginationComponent}
+                        </div>
+                    )}
 
-            {/* Pagination */}
-            {shouldUsePagination && (
-                <div className="mt-3">
-                    <QuestionPagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                    />
+                    {pageInfo}
                 </div>
-            )}
-        </div>
-    );
+            );
+        }
+    };
 
     // Loading state
     if (loading) {
@@ -246,18 +254,21 @@ const QuestionDisplay = ({
     if (items.length === 0) {
         return (
             <Alert variant="info" className="text-center">
-                <i className="bi bi-info-circle me-2" style={{ fontSize: '24px' }}></i>
-                <div className="mt-2">
+                <div>
+                    <i className="bi bi-info-circle me-2" style={{ fontSize: '18px' }}></i>
                     <strong>
-                        {isAttempted ? 'No Attempts Yet' : isPosted ? 'No Questions Posted Yet' : 'No Questions Available'}
+                        {isAttempted
+                            ? 'No Attempts Yet'
+                            : isPosted
+                            ? 'No Questions Posted Yet'
+                            : 'No Questions Available'}
                     </strong>
                     <p className="mb-0 mt-2">
-                        {isAttempted 
+                        {isAttempted
                             ? "You haven't attempted any questions yet. Start practicing to see your history here!"
                             : isPosted
                             ? "You haven't created any questions yet. Start contributing by uploading questions!"
-                            : "No questions are currently available."
-                        }
+                            : 'No questions are currently available.'}
                     </p>
                 </div>
             </Alert>
@@ -287,7 +298,7 @@ const QuestionDisplay = ({
                 </div>
             )}
 
-            {mode === 'list' ? renderListMode() : renderGridMode()}
+            {renderQuestions(mode)}
         </div>
     );
 };
