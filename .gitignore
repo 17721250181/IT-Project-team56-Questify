@@ -40,4 +40,6 @@ backend/.env
 .DS_Store
 Thumbs.db
 
+# Internal documentation (do not commit)
 CLAUDE.md
+SECURITY_ISSUES.md

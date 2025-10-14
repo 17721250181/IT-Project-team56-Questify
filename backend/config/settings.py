@@ -66,10 +66,18 @@ MIDDLEWARE = [
 ]
 
 # Frontend origins allowed by CORS
-CORS_ALLOWED_ORIGINS = [o for o in [
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    o for o in [
     "http://localhost:5173",
     os.getenv("FRONTEND_URL", "").strip(),
-] if o]
+] if o
+]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+]
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "config.urls"
@@ -159,13 +167,17 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+        "rest_framework.permissions.IsAuthenticated",  # Require authentication by default
     ],
 }
 
 # Session and CSRF security
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = False
 
 # Email domain restrictions for registration
 ALLOWED_EMAIL_DOMAINS = {"student.unimelb.edu.au", "unimelb.edu.au"}

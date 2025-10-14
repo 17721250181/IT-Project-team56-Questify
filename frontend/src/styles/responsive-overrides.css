@@ -1,0 +1,33 @@
+/*
+ * Custom Bootstrap Breakpoint Override
+ * Redefine xxl breakpoint to 2000px instead of default 1400px
+ * This ensures most desktop screens (including Mac) use xl breakpoint (7-5 layout)
+ * Only truly massive screens (2000px+) will use xxl breakpoint (6-6 layout)
+ */
+
+/* Override Bootstrap's xxl breakpoint media queries */
+@media (min-width: 1400px) and (max-width: 1999.98px) {
+    /* Force these screens to use xl layout instead of xxl */
+    .login-intro-section.col-xxl-6 {
+        flex: 0 0 auto;
+        width: 58.33333333%; /* equivalent to col-7 */
+    }
+
+    .login-form-section.col-xxl-6 {
+        flex: 0 0 auto;
+        width: 41.66666667%; /* equivalent to col-5 */
+    }
+}
+
+/* Only apply xxl-6 (50-50) layout for screens 2000px and above */
+@media (min-width: 2000px) {
+    .login-intro-section.col-xxl-6 {
+        flex: 0 0 auto;
+        width: 50%; /* col-6 */
+    }
+
+    .login-form-section.col-xxl-6 {
+        flex: 0 0 auto;
+        width: 50%; /* col-6 */
+    }
+}
