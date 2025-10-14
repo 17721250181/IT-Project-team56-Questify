@@ -69,11 +69,13 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+] + [
     o for o in [
-    "http://localhost:5173",
-    os.getenv("FRONTEND_URL", "").strip(),
-] if o
+        "http://localhost:5173",
+        os.getenv("FRONTEND_URL", "").strip(),
+    ] if o
 ]
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173"
