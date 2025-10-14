@@ -1,113 +1,200 @@
-# -------------------------------------------------------------
-# CI (Backend + Frontend) and CD (Render + GitHub Pages)
-# -------------------------------------------------------------
-name: CI (Backend + Frontend + E2E)
+# ============================================================
+# CI (tests on PRs and pushes) + CD (staging/production deployments)
+# Staging branch: TestMainBranch
+# Production branch: main
+# ============================================================
+
+name: CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main ]        # deploys only on main
-  pull_request:               # PRs: run tests/build only
+  pull_request: # CI for all PRs
+    branches: ["**"]
+  push: # CI + CD on specified branches
+    branches: [TestMainBranch, main]
+  workflow_dispatch:
 
+# Permissions required by Pages
 permissions:
   contents: read
-  pages: write                # required by deploy-pages
-  id-token: write             # required by deploy-pages
+  pages: write
+  id-token: write
 
-concurrency:
-  group: "pages"              # avoid overlapping Pages publishes
-  cancel-in-progress: true
+env:
+  STAGING_BRANCH: TestMainBranch
+  PRODUCTION_BRANCH: main
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
 
 jobs:
-  backend-test:
-    name: Backend (Django + pytest on Postgres)
+  # -----------------------------
+  # BACKEND CI: Django + Postgres
+  # -----------------------------
+  backend-ci:
+    name: Backend CI (Django + PostgreSQL)
     runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: appdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
         ports: ["5432:5432"]
         options: >-
-          --health-cmd="pg_isready -U postgres -d appdb"
+          --health-cmd="pg_isready -U testuser -d testdb"
           --health-interval=10s --health-timeout=5s --health-retries=5
+
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/appdb
+      DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
       SECRET_KEY: test-secret
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
       - name: Install backend deps
         working-directory: backend
         run: |
           python -m pip install -U pip
           pip install -r requirements.txt
-      - name: Django migrate
+
+      - name: Migrate
         working-directory: backend
         run: python manage.py migrate --noinput
+
       - name: Run backend tests
         working-directory: backend
-        run: pytest -s -v
+        run: pytest -q
 
-  frontend-test-build:
-    name: Frontend (tests + build)
+  # ------------------------------------
+  # FRONTEND CI: tests + production build
+  # ------------------------------------
+  frontend-ci:
+    name: Frontend CI (tests + build)
     runs-on: ubuntu-latest
-    needs: backend-test
+    needs: backend-ci
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: "20" }
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
       - name: Install frontend deps
         working-directory: frontend
         run: npm ci
-      - name: Run frontend tests
+
+      - name: Run frontend tests (vitest)
         working-directory: frontend
-        run: npm run test
+        run: npm run test -- --run
+
       - name: Build frontend (Vite)
         working-directory: frontend
-        run: npm -s run build
-      # === IMPORTANT: upload the site as a Pages artifact ===
-      - name: Configure Pages
-        if: github.ref == 'refs/heads/main'
+        run: npm run build
+
+  # ----------------------------------------------------
+  # PREPARE PAGES ARTIFACT (only on pushes to production branch)
+  # - enables Pages if needed (idempotent)
+  # - uploads frontend/dist as the Pages artifact
+  # ----------------------------------------------------
+  pages-prepare:
+    name: Prepare GitHub Pages artifact
+    runs-on: ubuntu-latest
+    needs: frontend-ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install + build (idempotent in case job runs alone)
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure Pages (enable if missing)
         uses: actions/configure-pages@v4
-      - name: Upload artifact for Pages
-        if: github.ref == 'refs/heads/main'
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist
 
-  backend-deploy:
-    name: Deploy Backend to Render
-    needs: backend-test
-    if: github.ref == 'refs/heads/main'
+  # -------------------------------------
+  # BACKEND STAGING: Deploy to Render Staging
+  # -------------------------------------
+  backend-deploy-staging:
+    name: Deploy Backend to Render (Staging)
     runs-on: ubuntu-latest
+    needs: backend-ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/TestMainBranch'
+
     steps:
-      - name: Precheck secret exists
+      - name: Ensure RENDER_STAGING_DEPLOY_HOOK is set
         run: |
-          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
-            echo "RENDER_DEPLOY_HOOK secret is missing. Add it in Repo → Settings → Secrets → Actions."
+          if [ -z "${{ secrets.RENDER_STAGING_DEPLOY_HOOK }}" ]; then
+            echo "::error::RENDER_STAGING_DEPLOY_HOOK secret is missing."
+            echo "Add it in Settings → Secrets and variables → Actions."
             exit 1
           fi
-      - name: Trigger Render Deploy (show HTTP status)
-        run: |
-          set -e
-          curl -i -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
-          # remove -f so you can see 4xx/5xx responses during setup;
-          # once working, you may switch to: curl -fsS -X POST "..."
-          echo "Triggered Render deploy hook."
 
-  frontend-deploy:
-    name: Deploy Frontend to GitHub Pages
-    needs: frontend-test-build
-    if: github.ref == 'refs/heads/main'
+      - name: Trigger Render staging deploy hook
+        run: curl -fsS -X POST "${{ secrets.RENDER_STAGING_DEPLOY_HOOK }}"
+
+  # -------------------------------------
+  # BACKEND PRODUCTION: Deploy to Render Production
+  # -------------------------------------
+  backend-deploy-production:
+    name: Deploy Backend to Render (Production)
     runs-on: ubuntu-latest
+    needs: backend-ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Ensure RENDER_PRODUCTION_DEPLOY_HOOK is set
+        run: |
+          if [ -z "${{ secrets.RENDER_PRODUCTION_DEPLOY_HOOK }}" ]; then
+            echo "::error::RENDER_PRODUCTION_DEPLOY_HOOK secret is missing."
+            echo "Add it in Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Trigger Render production deploy hook
+        run: curl -fsS -X POST "${{ secrets.RENDER_PRODUCTION_DEPLOY_HOOK }}"
+
+  # -------------------------------------------
+  # FRONTEND PRODUCTION: Publish Pages artifact to Pages
+  # -------------------------------------------
+  frontend-deploy:
+    name: Deploy Frontend to GitHub Pages (Production)
+    runs-on: ubuntu-latest
+    needs: pages-prepare
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url }}
+
     steps:
       - name: Deploy to Pages
-        id: deployment
+        id: deploy
         uses: actions/deploy-pages@v4

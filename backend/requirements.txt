@@ -10,3 +10,4 @@ pytest-django
 python-dotenv
 openai>=1.0.0
 requests
+gunicorn>=21.2.0
