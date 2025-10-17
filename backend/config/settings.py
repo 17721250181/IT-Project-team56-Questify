@@ -85,11 +85,11 @@ CORS_ALLOWED_ORIGINS = list(
 )
 
 _default_cors_regexes = [
-    r"^https://.*\\.onrender\\.com$",
-    r"^http://localhost(:\\d+)?$",
-    r"^http://127\\.0\\.0\\.1(:\\d+)?$",
-    r"^http://0\\.0\\.0\\.0(:\\d+)?$",
-    r"^http://(10|172\\.(1[6-9]|2[0-9]|3[01])|192\\.168)\\..+(:\\d+)?$",
+    r"^https://.*\.onrender\.com$",
+    r"^http://localhost(:\d+)?$",
+    r"^http://127\.0\.0\.1(:\d+)?$",
+    r"^http://0\.0\.0\.0(:\d+)?$",
+    r"^http://(10|172\.(1[6-9]|2[0-9]|3[01])|192\.168)\..+(:\d+)?$",
 ]
 _additional_cors_regexes = [
     pattern.strip()
