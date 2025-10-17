@@ -21,33 +21,27 @@ services:
       - key: ALLOWED_HOSTS
         value: questify-backend.onrender.com
       - key: FRONTEND_URL
-        fromService:
-          name: questify-frontend
-          type: static_site
-          property: url
+        value: https://questify-frontend.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
-        fromService:
-          name: questify-frontend
-          type: static_site
-          property: url
+        value: https://questify-frontend.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: questify-db
           property: connectionString
-
-  - type: static_site
-    name: questify-frontend
-    buildCommand: |
-      cd frontend
-      npm install
-      npm run build
-    publishDir: frontend/dist
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: https://questify-backend.onrender.com/api
 
 databases:
   - name: questify-db
     databaseName: questify
     user: questify_user
     plan: starter
+
+staticSites:
+  - name: questify-frontend
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://questify-backend.onrender.com/api
