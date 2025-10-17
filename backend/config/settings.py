@@ -65,22 +65,33 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Frontend origins allowed by CORS
-CORS_ALLOWED_ORIGINS = [
+# Frontend origins allowed by CORS/CSRF
+_default_frontend_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-] + [
-    o for o in [
-        "http://localhost:5173",
-        os.getenv("FRONTEND_URL", "").strip(),
-    ] if o
+]
+_frontend_url = os.getenv("FRONTEND_URL", "").strip()
+if _frontend_url:
+    _default_frontend_origins.append(_frontend_url)
+
+_additional_cors_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ADDITIONAL_ORIGINS", "").split(",")
+    if origin.strip()
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173"
-]
+CORS_ALLOWED_ORIGINS = list(
+    dict.fromkeys(_default_frontend_origins + _additional_cors_origins)
+)
 CORS_ALLOW_CREDENTIALS = True
+
+_csrf_env = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
+if _csrf_env:
+    CSRF_TRUSTED_ORIGINS = [
+        origin.strip() for origin in _csrf_env.split(",") if origin.strip()
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = _default_frontend_origins.copy()
 
 ROOT_URLCONF = "config.urls"
 
@@ -193,9 +204,4 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # For developm
 # EMAIL_HOST_USER = "your-email@gmail.com"
 # EMAIL_HOST_PASSWORD = "your-app-password"
 DEFAULT_FROM_EMAIL = "noreply@questify.com"
-
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS",
-    ""                     # set in Render env
-).split(",") if os.getenv("CSRF_TRUSTED_ORIGINS") else []
 
