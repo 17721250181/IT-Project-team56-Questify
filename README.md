@@ -169,6 +169,28 @@ cd frontend
 npm run dev
 ```
 
+## Deploying to Render
+
+The repository now ships with a multi-service `render.yaml` that provisions:
+
+- a Django web service (`questify-backend`) backed by PostgreSQL, and
+- a static Vite build (`questify-frontend`) that serves the React UI.
+
+Follow these steps to spin up the hosted preview while the project is still in progress:
+
+1. Commit and push the latest code to the branch you want to deploy (e.g. `main`).  
+2. In Render, create a new **Blueprint** pointing to this repository and select the branch. Render will detect `render.yaml` and provision both services plus the shared database.  
+3. Allow the backend deploy to finish first. The blueprint seeds a generated `SECRET_KEY`, applies migrations, and runs collectstatic automatically.  
+4. Once the frontend deploy finishes, Render will publish `questify-frontend` and the backend will automatically receive its public URL through the `FRONTEND_URL` / `CSRF_TRUSTED_ORIGINS` environment variables.  
+5. Confirm that the frontend build picked up `VITE_API_BASE_URL=https://questify-backend.onrender.com/api` (adjust in Render if you rename the backend service or attach a custom domain).  
+6. Run `python manage.py createsuperuser` from the Render shell if you need an admin user.
+
+### Transitioning to full production later
+
+- Toggle `autoDeploy` or point the blueprint at the production branch when you are ready for the final release.  
+- Update `ALLOWED_HOSTS`, `FRONTEND_URL`, `VITE_API_BASE_URL`, and any third-party keys to match the production domains.  
+- Consider switching email settings, enabling HTTPS-only cookies, and attaching custom domains once the feature set is complete.
+
 ## Common Pitfalls
 
 - **Wrong Node version** → use Node 20.19+
