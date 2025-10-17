@@ -83,6 +83,23 @@ _additional_cors_origins = [
 CORS_ALLOWED_ORIGINS = list(
     dict.fromkeys(_default_frontend_origins + _additional_cors_origins)
 )
+
+_default_cors_regexes = [
+    r"^https://.*\\.onrender\\.com$",
+    r"^http://localhost(:\\d+)?$",
+    r"^http://127\\.0\\.0\\.1(:\\d+)?$",
+    r"^http://0\\.0\\.0\\.0(:\\d+)?$",
+    r"^http://(10|172\\.(1[6-9]|2[0-9]|3[01])|192\\.168)\\..+(:\\d+)?$",
+]
+_additional_cors_regexes = [
+    pattern.strip()
+    for pattern in os.getenv("CORS_ALLOWED_ORIGIN_REGEXES", "").split(",")
+    if pattern.strip()
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = list(
+    dict.fromkeys(_default_cors_regexes + _additional_cors_regexes)
+)
 CORS_ALLOW_CREDENTIALS = True
 
 _csrf_env = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
