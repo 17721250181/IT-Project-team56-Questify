@@ -1,11 +1,13 @@
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status, permissions, viewsets
 from rest_framework.response import Response
-from .models import Question, ShortAnswerQuestion, MCQQuestion
-from .serializers import QuestionCreateSerializer, QuestionSerializer
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import Question, ShortAnswerQuestion, MCQQuestion, Comment
+from .serializers import QuestionCreateSerializer, QuestionSerializer, CommentSerializer, ReplySerializer
 import os
 import requests
 from django.conf import settings
-
+from django.shortcuts import get_object_or_404
 
 
 class QuestionCreateView(generics.CreateAPIView):
@@ -161,3 +163,54 @@ class UserQuestionsView(generics.ListAPIView):
 
     def get_queryset(self):
         return Question.objects.filter(creator=self.request.user).order_by('-created_at')
+    
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        question_id = self.kwargs.get("question_id") or self.request.query_params.get("question_id")
+        if question_id:
+            return Comment.objects.filter(
+                question_id=question_id,
+                parent__isnull=True
+            ).prefetch_related('replies__author', 'replies__likes', 'likes')
+        return Comment.objects.filter(parent__isnull=True).prefetch_related('replies__author', 'replies__likes', 'likes')
+
+    def perform_create(self, serializer):
+        question_id = self.kwargs.get("question_id")
+        question = get_object_or_404(Question, pk=question_id)
+        serializer.save(author=self.request.user, question=question)
+
+    @action(detail=True, methods=['post'])
+    def reply(self, request, pk=None):
+        parent_comment = self.get_object()
+        content = request.data.get('content')
+        if not content:
+            return Response({'error': 'Content is required'}, status=400)
+
+        reply = Comment.objects.create(
+            question=parent_comment.question,
+            author=request.user,
+            parent=parent_comment,
+            content=content
+        )
+        serializer = ReplySerializer(reply, context=self.get_serializer_context())
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['post'])
+    def like(self, request, pk=None):
+        comment = self.get_object()
+        user = request.user
+        comment.likes.add(user)
+        return Response({'like_count': comment.likes.count()})
+
+    @action(detail=True, methods=['post'])
+    def unlike(self, request, pk=None):
+        comment = self.get_object()
+        user = request.user
+        comment.likes.remove(user)
+        return Response({'like_count': comment.likes.count()})

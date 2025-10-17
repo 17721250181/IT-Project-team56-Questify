@@ -82,10 +82,14 @@ class UserRegistrationSerializer(serializers.Serializer):
         user.save()
 
         # Create user profile with student_id
-        UserProfile.objects.create(
+        profile, created = UserProfile.objects.get_or_create(
             user=user,
-            student_id=student_id
+            defaults={"student_id": student_id}
         )
+
+        if not created:
+            profile.student_id = student_id
+            profile.save(update_fields=["student_id"])
 
         return user
 
@@ -121,11 +125,6 @@ class CSRFTokenSerializer(serializers.Serializer):
     # Serializer for CSRF token response
     csrfToken = serializers.CharField(read_only=True)
 
-
-    # apps/accounts/serializers.py
-from django.conf import settings
-from rest_framework import serializers
-from .models import UserProfile
 
 class ProfilePictureSerializer(serializers.ModelSerializer):
     profile_picture_url = serializers.SerializerMethodField(read_only=True)

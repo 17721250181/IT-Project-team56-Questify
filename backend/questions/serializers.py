@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Question, MCQQuestion, ShortAnswerQuestion
+from .models import Question, MCQQuestion, ShortAnswerQuestion, Comment
 from attempts.models import Attempt
+from user.models import UserProfile
 
 
 class MCQQuestionSerializer(serializers.ModelSerializer):
@@ -102,3 +103,54 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
             "correct_option",
         ]
         read_only_fields = ["creator", "created_at", "updated_at"]
+
+
+class AuthorSerializer(serializers.Serializer):
+    id = serializers.IntegerField(source='author.id', read_only=True)
+    name = serializers.CharField(source='author.username', read_only=True)
+    profile_image = serializers.SerializerMethodField()
+
+    def get_profile_image(self, obj):
+        profile = getattr(obj.author, 'profile', None)
+        if not profile or not profile.profile_picture:
+            return None
+        request = self.context.get('request')
+        url = profile.profile_picture.url
+        return request.build_absolute_uri(url) if request else url
+
+class ReplySerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(source='*', read_only=True)
+    like_count = serializers.IntegerField(read_only=True)
+    is_liked_by_user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'author', 'content', 'created_at', 'like_count', 'is_liked_by_user']
+
+    def get_is_liked_by_user(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return False
+        user = request.user
+        return user.is_authenticated and obj.likes.filter(id=user.id).exists()
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(source='*', read_only=True)
+    like_count = serializers.IntegerField(read_only=True)
+    is_liked_by_user = serializers.SerializerMethodField()
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'author', 'content', 'created_at', 'like_count', 'is_liked_by_user', 'replies']
+
+    def get_replies(self, obj):
+        serializer = ReplySerializer(obj.replies.all(), many=True, context=self.context)
+        return serializer.data
+
+    def get_is_liked_by_user(self, obj):
+        request = self.context.get('request')
+        if not request:
+            return False
+        user = request.user
+        return user.is_authenticated and obj.likes.filter(id=user.id).exists()
