@@ -24,6 +24,8 @@ services:
         value: https://questify-frontend.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
         value: https://questify-frontend.onrender.com
+      - key: COOKIE_SECURE
+        value: "true"
 
   - type: web
     name: questify-frontend

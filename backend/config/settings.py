@@ -187,10 +187,19 @@ REST_FRAMEWORK = {
 # Session and CSRF security
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = False
+
+_secure_cookies_enabled = os.getenv("COOKIE_SECURE", "False").lower() == "true"
+if _secure_cookies_enabled:
+    # Required for cross-site requests from hosted frontend over HTTPS
+    CSRF_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+else:
+    CSRF_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
 
 # Email domain restrictions for registration
 ALLOWED_EMAIL_DOMAINS = {"student.unimelb.edu.au", "unimelb.edu.au"}
