@@ -1,7 +1,7 @@
 services:
   - type: web
     name: questify-backend
-    runtime: python3
+    runtime: python
     buildCommand: |
       cd backend
       pip install -r requirements.txt
@@ -21,15 +21,9 @@ services:
       - key: ALLOWED_HOSTS
         value: questify-backend.onrender.com
       - key: FRONTEND_URL
-        fromService:
-          name: questify-frontend
-          type: web
-          property: url
+        value: https://questify-frontend.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
-        fromService:
-          name: questify-frontend
-          type: web
-          property: url
+        value: https://questify-frontend.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: questify-db
