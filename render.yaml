@@ -40,4 +40,4 @@ services:
     plan: free
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://questify-backend.onrender.com/api
+        value: https://questify-backend-wv3e.onrender.com/api
