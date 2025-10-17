@@ -124,6 +124,29 @@ export const AuthService = {
         }
     },
 
+    getProfilePict: async () => {
+        try {
+            const response = await apiClient.get("/me/profile-picture/");
+            return response.data;
+        } catch (error) {
+            console.error("API error:", error);
+            throw new Error("Failed to fetch profile picture");
+        }
+    },
+
+    setProfilePict: async (formData) => {
+        try {
+            const res = await apiClient.patch("me/profile-picture/", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            return res.data;
+        } catch (error) {
+            console.error("API error:", error);
+            throw new Error("Failed to set profile picture");
+
+        }
+    },
+
     /**
      * User Logout
      * @returns {Promise<Object>} Logout response

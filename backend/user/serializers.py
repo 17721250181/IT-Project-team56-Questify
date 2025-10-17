@@ -120,3 +120,45 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 class CSRFTokenSerializer(serializers.Serializer):
     # Serializer for CSRF token response
     csrfToken = serializers.CharField(read_only=True)
+
+
+    # apps/accounts/serializers.py
+from django.conf import settings
+from rest_framework import serializers
+from .models import UserProfile
+
+class ProfilePictureSerializer(serializers.ModelSerializer):
+    profile_picture_url = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ["user", "student_id", "profile_picture", "profile_picture_url", "updated_at"]
+        extra_kwargs = {"profile_picture": {"write_only": True, "required": True}}
+
+    def validate_profile_picture(self, file):
+        allowed = {"image/jpeg", "image/png", "image/webp"}
+        if getattr(file, "content_type", None) not in allowed:
+            raise serializers.ValidationError("Unsupported image type")
+        max_mb = getattr(settings, "PROFILE_PIC_MAX_MB", 5)
+        if file.size > max_mb * 1024 * 1024:
+            raise serializers.ValidationError("File too large")
+        return file
+
+    def get_profile_picture_url(self, obj):
+        request = self.context.get("request")
+        if not obj.profile_picture:
+            return None
+        url = obj.profile_picture.url
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
+    def update(self, instance, validated_data):
+        # Handle old profile picture deletion
+        new_picture = validated_data.get("profile_picture", None)
+        if new_picture and instance.profile_picture and instance.profile_picture.name:
+            try:
+                instance.profile_picture.delete(save=False)
+            except Exception:
+                pass
+        return super().update(instance, validated_data)

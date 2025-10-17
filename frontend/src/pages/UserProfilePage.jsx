@@ -13,6 +13,8 @@ import QuestionGrid from '../components/questionList/QuestionGrid';
 const UserProfilePage = () => {
     const { user } = useAuth();
 
+    
+
     return (
         <>
             <QuestifyNavBar />

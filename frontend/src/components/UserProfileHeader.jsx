@@ -1,11 +1,15 @@
-import React from 'react';
-import { Row, Col, Image, Badge } from 'react-bootstrap';
+import React, {useState, useEffect} from 'react';
+import { Row, Col, Image, Badge, Form } from 'react-bootstrap';
+import { AuthService } from '../services/authService';
 
 /**
  * User Profile Header Component
  * Displays user avatar, username, and statistics
  */
 const UserProfileHeader = ({ user }) => {
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
+
     // Extract user data with fallbacks
     const username = user?.name || user?.full_name || user?.email || 'User';
     const points = user?.points ?? 'N/A';
@@ -13,20 +17,54 @@ const UserProfileHeader = ({ user }) => {
     const attemptedQuestions = user?.attempted_questions ?? 'N/A';
     const email = user?.email || 'Not available';
     const studentId = user?.student_id || 'N/A';
+    
+    useEffect(() => {
+        const fetchProfile = async () => {
+        try {
+            const data = await AuthService.getProfilePict();
+            setAvatarUrl(data.profile_picture_url);
+            console.log(data.profile_picture_url);
+        } catch (err) {
+            }
+        };
+            fetchProfile();
+        }, []);
+
+        const handleFileChange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            setIsUploading(true);
+
+            const formData = new FormData();
+            formData.append("profile_picture", file);
+
+            try {
+                const data = await AuthService.setProfilePict(formData);
+                setAvatarUrl(`${data.profile_picture_url}?t=${Date.now()}`);
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                setIsUploading(false);
+            }
+        };
 
     return (
         <div className="bg-light border rounded-3 p-4 shadow-sm">
             <Row className="align-items-center">
                 {/* User Avatar */}
                 <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                    {user?.avatar ? (
+                    {avatarUrl ? (
                         <Image
-                            src={user.avatar}
+                            src={avatarUrl}
                             roundedCircle
                             width={150}
                             height={150}
                             alt={username}
-                            className="border border-3 border-primary"
+                            className="border border-3 border-primary object-cover"
+                            style={{
+                                objectFit: "cover",
+                                objectPosition: "center 10%",
+                             }}
                         />
                     ) : (
                         <i 
@@ -34,6 +72,22 @@ const UserProfileHeader = ({ user }) => {
                             style={{ fontSize: '150px' }}
                         />
                     )}
+                    {/* Change picture button */}
+                    <Form.Group controlId="formFile" className="d-flex justify-content-center mt-3">
+                        <Form.Label
+                            className="btn btn-outline-primary btn-sm m-0"
+                            style={{ cursor: isUploading ? "not-allowed" : "pointer" }}
+                        >
+                            {isUploading ? "Uploading..." : "Change Picture"}
+                            <Form.Control
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            hidden
+                            disabled={isUploading}
+                            />
+                        </Form.Label>
+                    </Form.Group>
                 </Col>
 
                 {/* User Information */}

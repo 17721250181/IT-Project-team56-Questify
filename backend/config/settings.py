@@ -169,6 +169,10 @@ CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = False
 
+# Position for user profile pictures
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Email domain restrictions for registration
 ALLOWED_EMAIL_DOMAINS = {"student.unimelb.edu.au", "unimelb.edu.au"}
 
