@@ -19,7 +19,7 @@ services:
       - key: DEBUG
         value: false
       - key: ALLOWED_HOSTS
-        value: questify-backend.onrender.com
+        value: .onrender.com
       - key: FRONTEND_URL
         value: https://questify-frontend.onrender.com
       - key: CSRF_TRUSTED_ORIGINS
