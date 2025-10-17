@@ -29,19 +29,19 @@ services:
           name: questify-db
           property: connectionString
 
+  - type: static
+    name: questify-frontend
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    publishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://questify-backend.onrender.com/api
+
 databases:
   - name: questify-db
     databaseName: questify
     user: questify_user
     plan: starter
-
-staticSites:
-  - name: questify-frontend
-    buildCommand: |
-      cd frontend
-      npm install
-      npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: https://questify-backend.onrender.com/api
