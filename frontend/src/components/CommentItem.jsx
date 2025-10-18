@@ -3,10 +3,15 @@ import { Card, Button, Form, Image } from 'react-bootstrap';
 import { CommentService } from '../services/commentService';
 
 /**
- * CommentItem Component
- * Displays a single comment with replies, likes, and reply functionality
+ * SingleComment Component (Reusable comment/reply display component)
+ * Displays a single comment or reply with likes and reply functionality
+ * 
+ * @param {Object} comment - Comment or reply data object
+ * @param {Function} onCommentUpdate - Callback function to refresh comments
+ * @param {boolean} isReply - Whether this is a reply (affects styling)
+ * @param {number} parentCommentId - Parent comment ID (the root comment ID for nested replies)
  */
-const CommentItem = ({ comment, onCommentUpdate }) => {
+const SingleComment = ({ comment, onCommentUpdate, isReply = false, parentCommentId = null }) => {
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [replyContent, setReplyContent] = useState('');
     const [isSubmittingReply, setIsSubmittingReply] = useState(false);
@@ -49,14 +54,23 @@ const CommentItem = ({ comment, onCommentUpdate }) => {
         }
     };
 
-    // Handle reply submission
+    // Handle reply submission (for both main comments and replies)
     const handleReplySubmit = async (e) => {
         e.preventDefault();
         if (!replyContent.trim() || isSubmittingReply) return;
 
         setIsSubmittingReply(true);
         try {
-            await CommentService.replyToComment(comment.id, replyContent);
+            // For nested replies, use the parent comment ID (root comment)
+            // For main comments, use the comment's own ID
+            const targetId = parentCommentId || comment.id;
+            
+            // Add @mention prefix when replying to a reply
+            const finalContent = isReply 
+                ? `@${comment.author.name}: ${replyContent}`
+                : replyContent;
+            
+            await CommentService.replyToComment(targetId, finalContent);
             setReplyContent('');
             setShowReplyForm(false);
             onCommentUpdate(); // Refresh comments
@@ -68,145 +82,143 @@ const CommentItem = ({ comment, onCommentUpdate }) => {
         }
     };
 
+    // Determine styles based on whether this is a reply
+    const cardClassName = isReply ? 'border-0 bg-light' : 'border-0 shadow-sm';
+    const bodyClassName = isReply ? 'py-2' : '';
+    const avatarSize = isReply ? 35 : 40;
+    const nameClassName = isReply ? 'fw-bold small' : 'fw-bold';
+    const dateClassName = isReply ? 'text-muted' : 'text-muted';
+    const dateStyle = isReply ? { fontSize: '0.75rem' } : {};
+    const contentClassName = isReply ? 'small mb-1' : 'mb-2';
+    const actionSizeClass = isReply ? 'small' : '';
+
+    return (
+        <Card className={cardClassName}>
+            <Card.Body className={bodyClassName}>
+                {/* Comment/Reply Header */}
+                <div className="d-flex align-items-center mb-2">
+                    {comment.author.profile_image ? (
+                        <Image
+                            src={comment.author.profile_image}
+                            roundedCircle
+                            width={avatarSize}
+                            height={avatarSize}
+                            className="me-2"
+                        />
+                    ) : (
+                        <i 
+                            className="bi bi-person-circle text-secondary me-2" 
+                            style={{ fontSize: `${avatarSize}px` }} 
+                        />
+                    )}
+                    <div>
+                        <div className={nameClassName}>{comment.author.name}</div>
+                        <small className={dateClassName} style={dateStyle}>
+                            {formatDate(comment.created_at)}
+                        </small>
+                    </div>
+                </div>
+
+                {/* Comment/Reply Content */}
+                <Card.Text className={contentClassName}>{comment.content}</Card.Text>
+
+                {/* Comment/Reply Actions */}
+                <div className="d-flex gap-3 align-items-center">
+                    <Button
+                        variant="link"
+                        size="sm"
+                        className={`p-0 text-decoration-none ${actionSizeClass}`}
+                        onClick={handleLikeToggle}
+                        disabled={isLiking}
+                    >
+                        <i className={`bi ${comment.is_liked_by_user ? 'bi-heart-fill text-danger' : 'bi-heart'}`}></i>
+                        {comment.like_count > 0 && <span className="ms-1">{comment.like_count}</span>}
+                    </Button>
+                    
+                    {/* Reply button */}
+                    <Button
+                        variant="link"
+                        size="sm"
+                        className={`p-0 text-decoration-none ${actionSizeClass}`}
+                        onClick={() => setShowReplyForm(!showReplyForm)}
+                    >
+                        <i className="bi bi-reply"></i> Reply
+                    </Button>
+                </div>
+
+                {/* Reply Form */}
+                {showReplyForm && (
+                    <Form onSubmit={handleReplySubmit} className="mt-3">
+                        <Form.Group>
+                            <Form.Control
+                                as="textarea"
+                                rows={2}
+                                placeholder={isReply 
+                                    ? `Reply to ${comment.author.name}...` 
+                                    : "Write a reply..."}
+                                value={replyContent}
+                                onChange={(e) => setReplyContent(e.target.value)}
+                                disabled={isSubmittingReply}
+                            />
+                        </Form.Group>
+                        <div className="d-flex gap-2 mt-2">
+                            <Button
+                                type="submit"
+                                size="sm"
+                                variant="primary"
+                                disabled={!replyContent.trim() || isSubmittingReply}
+                            >
+                                {isSubmittingReply ? 'Posting...' : 'Post Reply'}
+                            </Button>
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant="outline-secondary"
+                                onClick={() => {
+                                    setShowReplyForm(false);
+                                    setReplyContent('');
+                                }}
+                                disabled={isSubmittingReply}
+                            >
+                                Cancel
+                            </Button>
+                        </div>
+                    </Form>
+                )}
+
+                {/* Replies (only main comments display reply list) */}
+                {!isReply && comment.replies && comment.replies.length > 0 && (
+                    <div className="mt-3 ms-4">
+                        {comment.replies.map((reply) => (
+                            <div key={reply.id} className="mb-2">
+                                <SingleComment
+                                    comment={reply}
+                                    onCommentUpdate={onCommentUpdate}
+                                    isReply={true}
+                                    parentCommentId={comment.id}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </Card.Body>
+        </Card>
+    );
+};
+
+/**
+ * CommentItem Component (Main comment container component)
+ * Wrapper component for displaying a top-level comment with its replies
+ */
+const CommentItem = ({ comment, onCommentUpdate }) => {
+
     return (
         <div className="mb-3">
-            <Card className="border-0 shadow-sm">
-                <Card.Body>
-                    {/* Comment Header */}
-                    <div className="d-flex align-items-center mb-2">
-                        {comment.author.profile_image ? (
-                            <Image
-                                src={comment.author.profile_image}
-                                roundedCircle
-                                width={40}
-                                height={40}
-                                className="me-2"
-                            />
-                        ) : (
-                            <i className="bi bi-person-circle text-secondary me-2" style={{ fontSize: '40px' }} />
-                        )}
-                        <div>
-                            <div className="fw-bold">{comment.author.name}</div>
-                            <small className="text-muted">{formatDate(comment.created_at)}</small>
-                        </div>
-                    </div>
-
-                    {/* Comment Content */}
-                    <Card.Text className="mb-2">{comment.content}</Card.Text>
-
-                    {/* Comment Actions */}
-                    <div className="d-flex gap-3 align-items-center">
-                        <Button
-                            variant="link"
-                            size="sm"
-                            className="p-0 text-decoration-none"
-                            onClick={handleLikeToggle}
-                            disabled={isLiking}
-                        >
-                            <i className={`bi ${comment.is_liked_by_user ? 'bi-heart-fill text-danger' : 'bi-heart'}`}></i>
-                            {comment.like_count > 0 && <span className="ms-1">{comment.like_count}</span>}
-                        </Button>
-                        <Button
-                            variant="link"
-                            size="sm"
-                            className="p-0 text-decoration-none"
-                            onClick={() => setShowReplyForm(!showReplyForm)}
-                        >
-                            <i className="bi bi-reply"></i> Reply
-                        </Button>
-                    </div>
-
-                    {/* Reply Form */}
-                    {showReplyForm && (
-                        <Form onSubmit={handleReplySubmit} className="mt-3">
-                            <Form.Group>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={2}
-                                    placeholder="Write a reply..."
-                                    value={replyContent}
-                                    onChange={(e) => setReplyContent(e.target.value)}
-                                    disabled={isSubmittingReply}
-                                />
-                            </Form.Group>
-                            <div className="d-flex gap-2 mt-2">
-                                <Button
-                                    type="submit"
-                                    size="sm"
-                                    variant="primary"
-                                    disabled={!replyContent.trim() || isSubmittingReply}
-                                >
-                                    {isSubmittingReply ? 'Posting...' : 'Post Reply'}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="outline-secondary"
-                                    onClick={() => {
-                                        setShowReplyForm(false);
-                                        setReplyContent('');
-                                    }}
-                                    disabled={isSubmittingReply}
-                                >
-                                    Cancel
-                                </Button>
-                            </div>
-                        </Form>
-                    )}
-
-                    {/* Replies */}
-                    {comment.replies && comment.replies.length > 0 && (
-                        <div className="mt-3 ms-4">
-                            {comment.replies.map((reply) => (
-                                <Card key={reply.id} className="mb-2 border-0 bg-light">
-                                    <Card.Body className="py-2">
-                                        <div className="d-flex align-items-center mb-1">
-                                            {reply.author.profile_image ? (
-                                                <Image
-                                                    src={reply.author.profile_image}
-                                                    roundedCircle
-                                                    width={35}
-                                                    height={35}
-                                                    className="me-2"
-                                                />
-                                            ) : (
-                                                <i className="bi bi-person-circle text-secondary me-2" style={{ fontSize: '35px' }} />
-                                            )}
-                                            <div>
-                                                <div className="fw-bold small">{reply.author.name}</div>
-                                                <small className="text-muted" style={{ fontSize: '0.75rem' }}>
-                                                    {formatDate(reply.created_at)}
-                                                </small>
-                                            </div>
-                                        </div>
-                                        <Card.Text className="small mb-1">{reply.content}</Card.Text>
-                                        <Button
-                                            variant="link"
-                                            size="sm"
-                                            className="p-0 text-decoration-none small"
-                                            onClick={async () => {
-                                                try {
-                                                    if (reply.is_liked_by_user) {
-                                                        await CommentService.unlikeComment(reply.id);
-                                                    } else {
-                                                        await CommentService.likeComment(reply.id);
-                                                    }
-                                                    onCommentUpdate();
-                                                } catch (error) {
-                                                    console.error('Failed to toggle like:', error);
-                                                }
-                                            }}
-                                        >
-                                            <i className={`bi ${reply.is_liked_by_user ? 'bi-heart-fill text-danger' : 'bi-heart'}`}></i>
-                                            {reply.like_count > 0 && <span className="ms-1">{reply.like_count}</span>}
-                                        </Button>
-                                    </Card.Body>
-                                </Card>
-                            ))}
-                        </div>
-                    )}
-                </Card.Body>
-            </Card>
+            <SingleComment 
+                comment={comment} 
+                onCommentUpdate={onCommentUpdate} 
+                isReply={false}
+            />
         </div>
     );
 };
