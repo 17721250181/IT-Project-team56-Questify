@@ -25,7 +25,8 @@ const UserProfileHeader = ({ user }) => {
             setAvatarUrl(data.profile_picture_url);
             console.log(data.profile_picture_url);
         } catch (err) {
-            }
+            console.error('Failed to load profile picture:', err);
+        }
         };
             fetchProfile();
         }, []);
