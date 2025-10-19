@@ -14,7 +14,9 @@ export const AttemptService = {
             const response = await apiClient.get('/attempts/user/');
             return response.data;
         } catch (error) {
-            console.error('Failed to fetch user attempts:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch user attempts:', error);
+            }
             throw error;
         }
     },
@@ -29,7 +31,9 @@ export const AttemptService = {
             const response = await apiClient.get(`/attempts/question/${questionId}/`);
             return response.data;
         } catch (error) {
-            console.error(`Failed to fetch attempts for question ${questionId}:`, error);
+            if (import.meta.env.DEV) {
+                console.error(`Failed to fetch attempts for question ${questionId}:`, error);
+            }
             throw error;
         }
     },
@@ -48,7 +52,9 @@ export const AttemptService = {
             });
             return response.data;
         } catch (error) {
-            console.error('Failed to create attempt:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to create attempt:', error);
+            }
             throw error;
         }
     },
@@ -59,12 +65,18 @@ export const AttemptService = {
      */
     getUserActivityHeatmap: async () => {
         try {
-            console.log('Fetching user activity heatmap data...');
+            if (import.meta.env.DEV) {
+                console.log('Fetching user activity heatmap data...');
+            }
             const response = await apiClient.get('/attempts/user/activity/');
-            console.log('Activity heatmap data fetched');
+            if (import.meta.env.DEV) {
+                console.log('Activity heatmap data fetched');
+            }
             return response.data;
         } catch (error) {
-            console.error('Failed to fetch activity heatmap:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch activity heatmap:', error);
+            }
             throw new Error('Failed to fetch activity data');
         }
     }

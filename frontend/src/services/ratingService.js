@@ -1,7 +1,16 @@
 import apiClient from './apiClient.js';
 
-/**
- * Rating Service
+/**    clearRating: async (questionId) => {
+        try {
+            await apiClient.delete(`/questions/${questionId}/rating/`);
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error(`Failed to remove rating for question ${questionId}:`, error);
+            }
+            throw error;
+        }
+    }
+};g Service
  * Handles all question rating-related API calls
  */
 export const RatingService = {
@@ -15,7 +24,9 @@ export const RatingService = {
             const response = await apiClient.get(`/questions/${questionId}/rating/`);
             return response.data;
         } catch (error) {
-            console.error(`Failed to fetch rating for question ${questionId}:`, error);
+            if (import.meta.env.DEV) {
+                console.error(`Failed to fetch rating for question ${questionId}:`, error);
+            }
             throw error;
         }
     },
@@ -31,7 +42,9 @@ export const RatingService = {
             const response = await apiClient.post(`/questions/${questionId}/rating/`, { score });
             return response.data;
         } catch (error) {
-            console.error(`Failed to rate question ${questionId}:`, error);
+            if (import.meta.env.DEV) {
+                console.error(`Failed to rate question ${questionId}:`, error);
+            }
             throw error;
         }
     },

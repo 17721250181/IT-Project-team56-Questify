@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import LoadingSpinner from './LoadingSpinner';
 
 /**
  * Protected Route Component
@@ -17,14 +18,7 @@ const ProtectedRoute = ({ children }) => {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '50vh' }}>
-                <div className="text-center">
-                    <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                    <div className="mt-3">
-                        <p className="text-muted">Checking authentication...</p>
-                    </div>
-                </div>
+                <LoadingSpinner size="lg" text="Checking authentication..." />
             </div>
         );
     }

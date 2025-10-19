@@ -15,7 +15,9 @@ export const CommentService = {
             const response = await apiClient.get(`/questions/${questionId}/comments/`);
             return response.data;
         } catch (error) {
-            console.error(`Failed to fetch comments for question ${questionId}:`, error);
+            if (import.meta.env.DEV) {
+                console.error(`Failed to fetch comments for question ${questionId}:`, error);
+            }
             throw error;
         }
     },
@@ -33,7 +35,9 @@ export const CommentService = {
             });
             return response.data;
         } catch (error) {
-            console.error('Failed to create comment:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to create comment:', error);
+            }
             throw error;
         }
     },
@@ -51,7 +55,9 @@ export const CommentService = {
             });
             return response.data;
         } catch (error) {
-            console.error('Failed to reply to comment:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to reply to comment:', error);
+            }
             throw error;
         }
     },
@@ -66,7 +72,9 @@ export const CommentService = {
             const response = await apiClient.post(`/questions/comments/${commentId}/like/`);
             return response.data;
         } catch (error) {
-            console.error('Failed to like comment:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to like comment:', error);
+            }
             throw error;
         }
     },
@@ -81,7 +89,9 @@ export const CommentService = {
             const response = await apiClient.post(`/questions/comments/${commentId}/unlike/`);
             return response.data;
         } catch (error) {
-            console.error('Failed to unlike comment:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to unlike comment:', error);
+            }
             throw error;
         }
     }

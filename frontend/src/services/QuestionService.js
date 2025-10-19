@@ -45,7 +45,9 @@ export const QuestionService = {
             const response = await apiClient.get('/questions/', { params });
             return response.data;
         } catch (error) {
-            console.error('Failed to fetch questions:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch questions:', error);
+            }
             throw new Error('Failed to fetch questions');
         }
     },
@@ -65,7 +67,9 @@ export const QuestionService = {
             
             return filteredQuestions;
         } catch (error) {
-            console.error('Failed to search questions:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to search questions:', error);
+            }
             throw new Error('Failed to search questions');
         }
     },
@@ -76,7 +80,9 @@ export const QuestionService = {
             const response = await apiClient.get(`/questions/${id}/`);
             return response.data;
         } catch (error) {
-            console.error(`Failed to fetch question ${id}:`, error);
+            if (import.meta.env.DEV) {
+                console.error(`Failed to fetch question ${id}:`, error);
+            }
             throw new Error(`Failed to fetch question with id ${id}`);
         }
     },
@@ -87,7 +93,9 @@ export const QuestionService = {
             const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
-            console.error('Failed to create question:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to create question:', error);
+            }
             throw new Error('Failed to create question');
         }
     },
@@ -105,7 +113,9 @@ export const QuestionService = {
             const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
-            console.error('Failed to create short answer question:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to create short answer question:', error);
+            }
             throw new Error('Failed to create short answer question');
         }
     },
@@ -128,7 +138,9 @@ export const QuestionService = {
             const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
-            console.error('Failed to create MCQ question:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to create MCQ question:', error);
+            }
             throw new Error('Failed to create multiple choice question');
         }
     },
@@ -140,7 +152,9 @@ export const QuestionService = {
             const response = await AttemptService.createAttempt(questionId, answer);
             return response;
         } catch (error) {
-            console.error('Failed to submit answer:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to submit answer:', error);
+            }
             
             // Provide more specific error messages
             if (error.response?.status === 401) {
@@ -161,7 +175,9 @@ export const QuestionService = {
             const response = await apiClient.get('/questions/user/');
             return response.data;
         } catch (error) {
-            console.error('Failed to fetch user questions:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch user questions:', error);
+            }
             throw new Error('Failed to fetch user questions');
         }
     },
@@ -183,7 +199,9 @@ export const QuestionService = {
             const response = await apiClient.get('/questions/metadata/');
             return response.data;
         } catch (error) {
-            console.error('Failed to fetch question metadata:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch question metadata:', error);
+            }
             throw new Error('Failed to fetch question metadata');
         }
     },

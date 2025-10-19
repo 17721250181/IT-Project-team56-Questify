@@ -12,11 +12,13 @@ import { HomePage, QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Routes>
         {/* Home page - protected route */}
         <Route
           path="/"
@@ -97,8 +99,9 @@ function App() {
 
         {/* Catch all other routes and redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AuthProvider>
+        </Routes>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -129,7 +129,9 @@ export const AuthService = {
             const response = await apiClient.get("/me/profile-picture/");
             return response.data;
         } catch (error) {
-            console.error("API error:", error);
+            if (import.meta.env.DEV) {
+                console.error("API error:", error);
+            }
             throw new Error("Failed to fetch profile picture");
         }
     },
@@ -154,7 +156,9 @@ export const AuthService = {
             });
             return res.data;
         } catch (error) {
-            console.error("API error:", error);
+            if (import.meta.env.DEV) {
+                console.error("API error:", error);
+            }
             throw new Error("Failed to set profile picture");
 
         }
@@ -183,7 +187,9 @@ export const AuthService = {
         } catch (error) {
             // For logout, we should succeed even if the server call fails
             // This ensures the user can always log out locally
-            console.error('Logout API call failed:', error);
+            if (import.meta.env.DEV) {
+                console.error('Logout API call failed:', error);
+            }
 
             return {
                 ok: true,
