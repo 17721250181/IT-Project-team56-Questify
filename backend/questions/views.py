@@ -357,14 +357,24 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
-        comment = self.get_object()
+        # Get comment/reply directly without queryset filtering
+        try:
+            comment = Comment.objects.get(pk=pk)
+        except Comment.DoesNotExist:
+            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+        
         user = request.user
         comment.likes.add(user)
         return Response({'like_count': comment.likes.count()})
 
     @action(detail=True, methods=['post'])
     def unlike(self, request, pk=None):
-        comment = self.get_object()
+        # Get comment/reply directly without queryset filtering
+        try:
+            comment = Comment.objects.get(pk=pk)
+        except Comment.DoesNotExist:
+            return Response({'error': 'Comment not found'}, status=status.HTTP_404_NOT_FOUND)
+        
         user = request.user
         comment.likes.remove(user)
         return Response({'like_count': comment.likes.count()})
