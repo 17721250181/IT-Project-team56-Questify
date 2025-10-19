@@ -172,8 +172,8 @@ const QuestionDisplay = ({
                 const meta = await QuestionService.getQuestionMetadata();
                 if (!active) return;
                 setFilterOptions({
-                    weeks: mergeWeekOptions(meta?.weeks),
-                    topics: mergeTopicOptions(meta?.topics),
+                    weeks: DEFAULT_WEEK_OPTIONS,
+                    topics: DEFAULT_TOPIC_OPTIONS,
                     types: mergeSimpleOptions(DEFAULT_TYPE_OPTIONS, meta?.types),
                     sources: mergeSimpleOptions(DEFAULT_SOURCE_OPTIONS, meta?.sources),
                 });
