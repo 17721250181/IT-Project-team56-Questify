@@ -6,7 +6,8 @@ import { QuestionService } from '../../services/QuestionService';
 import QListItem from './QListItem';
 import QGridCard from './QGridCard';
 import QSortingOption from './QSortingOption';
-import QFilterOption, { QUESTION_FILTER_DEFAULTS } from './QFilterOption';
+import QFilterOption from './QFilterOption';
+import { QUESTION_FILTER_DEFAULTS } from './filterConstants';
 import QListSearch from './QListSearch';
 import QuestionPagination from './QuestionPagination';
 

@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
-
-export const QUESTION_FILTER_DEFAULTS = {
-    week: '',
-    topic: '',
-    type: '',
-    source: '',
-    verified: false,
-    minRating: 0,
-    maxRating: 0,
-};
+import { QUESTION_FILTER_DEFAULTS } from './filterConstants';
 
 const QFilterOption = ({ filters = QUESTION_FILTER_DEFAULTS, onApply, onClear, options }) => {
     const [show, setShow] = useState(false);
