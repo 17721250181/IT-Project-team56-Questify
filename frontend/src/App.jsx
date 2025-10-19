@@ -8,6 +8,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Importing page components
 import { HomePage, QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage, PostQuestionPage, UserProfilePage } from './pages';
+import LeaderboardPage from './pages/LeaderboardPage';
 // Auth Provider and Route Guards
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -93,6 +94,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PostQuestionPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <LeaderboardPage />
             </ProtectedRoute>
           }
         />

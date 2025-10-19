@@ -1,0 +1,331 @@
+/* Leaderboard Page Styles */
+
+.leaderboard-page {
+    padding-bottom: 3rem;
+}
+
+/* Your Position Card */
+.your-position-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.your-position-card .rank-badge {
+    font-size: 2rem;
+}
+
+.your-position-card .score-display {
+    text-align: center;
+}
+
+.your-position-card .score-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.your-position-card .score-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.your-position-card .stats-row {
+    display: flex;
+    justify-content: space-around;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.your-position-card .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.your-position-card .stat-item i {
+    font-size: 1.2rem;
+}
+
+/* Top 3 Section */
+.top-3-section {
+    padding: 2rem 0;
+}
+
+.top-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.top-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.top-card.rank-1 {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    transform: scale(1.05);
+    margin-top: 0;
+}
+
+.top-card.rank-1:hover {
+    transform: scale(1.08) translateY(-5px);
+}
+
+.top-card.rank-2 {
+    background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+    margin-top: 20px;
+}
+
+.top-card.rank-3 {
+    background: linear-gradient(135deg, #CD7F32 0%, #B8732A 100%);
+    margin-top: 20px;
+}
+
+.top-card .rank-medal {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.top-card .user-avatar {
+    font-size: 3rem;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.top-card h5 {
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.85);
+    margin-bottom: 0.25rem;
+}
+
+.top-card .score-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.75);
+    margin: 0;
+}
+
+/* Tabs */
+.leaderboard-tabs {
+    border-bottom: 2px solid #dee2e6;
+}
+
+.leaderboard-tabs .nav-link {
+    color: #6c757d;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-tabs .nav-link:hover {
+    color: #495057;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-bottom-color: #adb5bd;
+}
+
+.leaderboard-tabs .nav-link.active {
+    color: #667eea;
+    background-color: transparent;
+    border-bottom-color: #667eea;
+}
+
+/* Leaderboard List Card */
+.leaderboard-list-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.leaderboard-list-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: none;
+}
+
+/* Leaderboard List Items */
+.leaderboard-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+.leaderboard-item:hover {
+    background-color: #f8f9fa;
+}
+
+.leaderboard-item:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-item.current-user {
+    background-color: #e7f3ff;
+    border-left: 4px solid #667eea;
+}
+
+.leaderboard-item.current-user:hover {
+    background-color: #d6ebff;
+}
+
+.leaderboard-item .rank-column {
+    min-width: 60px;
+    text-align: center;
+}
+
+.leaderboard-item .rank-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #495057;
+}
+
+.leaderboard-item .user-column {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.leaderboard-item .user-avatar-sm {
+    font-size: 2.5rem;
+    color: #6c757d;
+    line-height: 1;
+}
+
+.leaderboard-item .user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.leaderboard-item .username {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #212529;
+}
+
+.leaderboard-item .user-stats {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.leaderboard-item .user-stats .stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.leaderboard-item .score-column {
+    text-align: right;
+    min-width: 80px;
+}
+
+.leaderboard-item .score-column .score-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #667eea;
+    line-height: 1;
+}
+
+.leaderboard-item .score-column .score-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+}
+
+/* Position Details */
+.position-details {
+    display: flex;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .top-card.rank-1,
+    .top-card.rank-2,
+    .top-card.rank-3 {
+        margin-top: 0;
+        transform: scale(1);
+    }
+
+    .top-card.rank-1:hover {
+        transform: translateY(-5px);
+    }
+
+    .your-position-card .score-display {
+        margin-top: 1rem;
+    }
+
+    .your-position-card .stats-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .leaderboard-tabs .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .leaderboard-item {
+        padding: 0.75rem 1rem;
+    }
+
+    .leaderboard-item .rank-column {
+        min-width: 50px;
+    }
+
+    .leaderboard-item .rank-number {
+        font-size: 1.25rem;
+    }
+
+    .leaderboard-item .user-avatar-sm {
+        font-size: 2rem;
+    }
+
+    .leaderboard-item .username {
+        font-size: 1rem;
+    }
+
+    .leaderboard-item .score-column .score-value {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .top-card .rank-medal {
+        font-size: 2rem;
+    }
+
+    .top-card .user-avatar {
+        font-size: 2rem;
+    }
+
+    .top-card h5 {
+        font-size: 1rem;
+    }
+
+    .top-card .score-text {
+        font-size: 1rem;
+    }
+}

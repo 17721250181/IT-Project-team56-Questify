@@ -187,18 +187,17 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # For developm
 DEFAULT_FROM_EMAIL = "noreply@questify.com"
 
 # Leaderboard points
-LEADERBOARD_POINTS_PER_ATTEMPT = 1     # 시도 1회
-LEADERBOARD_POINTS_BONUS_CORRECT = 2   # 정답 1회 추가(정답=시도+보너스)
+LEADERBOARD_POINTS_PER_ATTEMPT = 1     # Points per attempt
+LEADERBOARD_POINTS_BONUS_CORRECT = 2   # Bonus points for correct answer
 
-# 새 활동 가중치(없으면 0점 처리됨)
-LEADERBOARD_POINTS_PER_COMMENT = 2     # 댓글 1개
-LEADERBOARD_POINTS_PER_RATING  = 1     # 평가(별점) 1개
-LEADERBOARD_POINTS_PER_LIKE    = 1
+# Activity points (set to 0 if not used)
+LEADERBOARD_POINTS_PER_COMMENT = 2     # Points per comment
+LEADERBOARD_POINTS_PER_RATING  = 1     # Points per rating
+# LEADERBOARD_POINTS_PER_LIKE = 0      # Disabled: M2M relationship not directly supported
 
 LEADERBOARD_ACTIVITY_MODELS = {
-    # "앱레이블.모델명": {"user_field": "필드명"}
-    "questions.Comment": {"user_field": "user"},   # 댓글 모델(없으면 무시)
-    "questions.Rating":  {"user_field": "user"},   # 별점/평가 모델(없으면 무시)
-    "questions.Like":    {"user_field": "user"},   # 좋아요 모델(없으면 무시)
-    # 필요하면 원하는 모델을 더 추가 가능
+    # "app_label.ModelName": {"user_field": "field_name"}
+    "questions.Comment": {"user_field": "author"},       # Fixed: field is 'author' not 'user'
+    "questions.QuestionRating": {"user_field": "user"},  # Fixed: model is 'QuestionRating' not 'Rating'
+    # Note: "questions.Like" removed - it's a M2M field, not a separate model
 }
