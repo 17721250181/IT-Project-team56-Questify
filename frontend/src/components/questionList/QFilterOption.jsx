@@ -74,8 +74,8 @@ const QFilterOption = ({ filters = QUESTION_FILTER_DEFAULTS, onApply, onClear, o
                                         onChange={handleChange}
                                     >
                                         <option value="">All weeks</option>
-                                        {weekOptions.map((week) => (
-                                            <option key={week} value={week}>
+                                        {weekOptions.map((week, index) => (
+                                            <option key={`week-${index}-${week}`} value={week}>
                                                 {week}
                                             </option>
                                         ))}
@@ -91,8 +91,8 @@ const QFilterOption = ({ filters = QUESTION_FILTER_DEFAULTS, onApply, onClear, o
                                         onChange={handleChange}
                                     >
                                         <option value="">All topics</option>
-                                        {topicOptions.map((topic) => (
-                                            <option key={topic} value={topic}>
+                                        {topicOptions.map((topic, index) => (
+                                            <option key={`topic-${index}-${topic}`} value={topic}>
                                                 {topic}
                                             </option>
                                         ))}
@@ -108,8 +108,8 @@ const QFilterOption = ({ filters = QUESTION_FILTER_DEFAULTS, onApply, onClear, o
                                         onChange={handleChange}
                                     >
                                         <option value="">All types</option>
-                                        {typeOptions.map((type) => (
-                                            <option key={type} value={type}>
+                                        {typeOptions.map((type, index) => (
+                                            <option key={`type-${index}-${type}`} value={type}>
                                                 {type}
                                             </option>
                                         ))}
@@ -125,8 +125,8 @@ const QFilterOption = ({ filters = QUESTION_FILTER_DEFAULTS, onApply, onClear, o
                                         onChange={handleChange}
                                     >
                                         <option value="">All sources</option>
-                                        {sourceOptions.map((source) => (
-                                            <option key={source} value={source}>
+                                        {sourceOptions.map((source, index) => (
+                                            <option key={`source-${index}-${source}`} value={source}>
                                                 {source}
                                             </option>
                                         ))}

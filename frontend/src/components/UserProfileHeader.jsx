@@ -79,7 +79,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
             return;
         }
 
-        if (trimmed === username) {
+        if (trimmed === displayName) {
             setIsEditingName(false);
             return;
         }

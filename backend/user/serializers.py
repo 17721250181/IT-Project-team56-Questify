@@ -29,8 +29,18 @@ class UserUpdateSerializer(serializers.Serializer):
         return instance
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    User serializer with profile information.
+    
+    Fields:
+    - display_name: User's preferred display name (from profile.display_name)
+    - name: Alias for display_name
+    - username: Login username (returns email)
+    - email: User's email address (also used as login username)
+    """
     display_name = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
     student_id = serializers.SerializerMethodField()
     profile_picture_url = serializers.SerializerMethodField()
     attempted_questions = serializers.SerializerMethodField()
@@ -43,6 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'email',
+            'username',
             'display_name',
             'name',
             'student_id',
@@ -57,13 +68,20 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     def get_display_name(self, obj):
+        """Get user's display name from profile, fallback to email"""
         profile = getattr(obj, "profile", None)
         if profile and profile.display_name:
             return profile.display_name
-        return (obj.get_full_name() or obj.username or obj.email).strip()
+        # Fallback to email (which is the login username)
+        return obj.email or obj.username or "User"
 
     def get_name(self, obj):
+        """Alias for display_name for backward compatibility"""
         return self.get_display_name(obj)
+
+    def get_username(self, obj):
+        """Get username (returns email as that's the login username)"""
+        return obj.email or obj.username or "User"
 
     def get_student_id(self, obj):
         profile = getattr(obj, "profile", None)

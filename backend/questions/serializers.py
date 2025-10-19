@@ -59,10 +59,12 @@ class QuestionSerializer(serializers.ModelSerializer):
         ]
 
     def get_creator(self, obj):
+        """Get creator's display name from profile, fallback to email"""
         profile = getattr(obj.creator, 'profile', None)
         if profile and profile.display_name:
             return profile.display_name
-        return obj.creator.get_full_name() or obj.creator.username or obj.creator.email
+        # Fallback to email (which is the login username)
+        return obj.creator.email or obj.creator.username or "User"
 
     def get_attempted(self, obj):
         user = self.context["request"].user
@@ -132,10 +134,12 @@ class AuthorSerializer(serializers.Serializer):
     profile_image = serializers.SerializerMethodField()
 
     def _get_display_name(self, author):
+        """Get author's display name from profile, fallback to email"""
         profile = getattr(author, 'profile', None)
         if profile and profile.display_name:
             return profile.display_name
-        return author.get_full_name() or author.username or author.email
+        # Fallback to email (which is the login username)
+        return author.email or author.username or "User"
 
     def get_name(self, obj):
         return self._get_display_name(obj.author)

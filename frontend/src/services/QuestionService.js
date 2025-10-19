@@ -188,34 +188,8 @@ export const QuestionService = {
         }
     },
 
-    getQuestionRating: async (questionId) => {
-        try {
-            const response = await apiClient.get(`/questions/${questionId}/rating/`);
-            return response.data;
-        } catch (error) {
-            console.error(`Failed to fetch rating for question ${questionId}:`, error);
-            throw error;
-        }
-    },
-
-    rateQuestion: async (questionId, score) => {
-        try {
-            const response = await apiClient.post(`/questions/${questionId}/rating/`, { score });
-            return response.data;
-        } catch (error) {
-            console.error(`Failed to rate question ${questionId}:`, error);
-            throw error;
-        }
-    },
-
-    clearRating: async (questionId) => {
-        try {
-            await apiClient.delete(`/questions/${questionId}/rating/`);
-        } catch (error) {
-            console.error(`Failed to remove rating for question ${questionId}:`, error);
-            throw error;
-        }
-    },
+    // Note: Rating functions moved to ratingService.js
+    // Use RatingService.getQuestionRating, RatingService.rateQuestion, RatingService.clearRating
 };
 
 //export default api;

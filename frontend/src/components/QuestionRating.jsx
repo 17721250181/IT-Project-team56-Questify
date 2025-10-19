@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button } from 'react-bootstrap';
-import { QuestionService } from '../services/QuestionService';
+import { RatingService } from '../services/ratingService';
 
 /**
  * QuestionRating Component
@@ -21,7 +21,7 @@ const QuestionRating = ({ questionId }) => {
 
     const loadQuestionRating = async () => {
         try {
-            const data = await QuestionService.getQuestionRating(questionId);
+            const data = await RatingService.getQuestionRating(questionId);
             setAverageRating(data?.average || 0);
             setRatingCount(data?.count || 0);
             setUserRating(data?.userRating ?? null);
@@ -39,7 +39,7 @@ const QuestionRating = ({ questionId }) => {
         setUserRating(value);
         setIsSubmitting(true);
         try {
-            const data = await QuestionService.rateQuestion(questionId, value);
+            const data = await RatingService.rateQuestion(questionId, value);
             setAverageRating(data?.average || value);
             setRatingCount(data?.count || 1);
             setUserRating(data?.userRating ?? value);
@@ -58,7 +58,7 @@ const QuestionRating = ({ questionId }) => {
         const previousRating = userRating;
         setIsSubmitting(true);
         try {
-            await QuestionService.clearRating(questionId);
+            await RatingService.clearRating(questionId);
             await loadQuestionRating();
         } catch (err) {
             console.error('Failed to clear rating:', err);
