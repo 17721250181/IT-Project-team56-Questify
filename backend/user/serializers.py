@@ -8,24 +8,28 @@ from .models import UserProfile
 
 
 class UserUpdateSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False, allow_blank=False, max_length=150)
+    display_name = serializers.CharField(required=False, allow_blank=False, max_length=150)
 
-    def validate_name(self, value):
+    def validate_display_name(self, value):
         cleaned = value.strip()
         if not cleaned:
-            raise serializers.ValidationError("Name cannot be empty.")
+            raise serializers.ValidationError("Display name cannot be empty.")
         return cleaned
 
     def update(self, instance, validated_data):
-        name = validated_data.get("name")
-        if name is not None:
-            parts = name.split(" ", 1)
-            instance.first_name = parts[0]
-            instance.last_name = parts[1] if len(parts) > 1 else ""
+        display_name = validated_data.get("display_name")
+        if display_name is not None:
+            display_name = display_name.strip()
+            profile, _ = UserProfile.objects.get_or_create(user=instance)
+            profile.display_name = display_name
+            profile.save(update_fields=["display_name"])
+            instance.first_name = display_name
+            instance.last_name = ""
             instance.save(update_fields=["first_name", "last_name"])
         return instance
 
 class UserSerializer(serializers.ModelSerializer):
+    display_name = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     student_id = serializers.SerializerMethodField()
     profile_picture_url = serializers.SerializerMethodField()
@@ -39,6 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'email',
+            'display_name',
             'name',
             'student_id',
             'profile_picture_url',
@@ -51,8 +56,14 @@ class UserSerializer(serializers.ModelSerializer):
             'last_login',
         ]
 
-    def get_name(self, obj):
+    def get_display_name(self, obj):
+        profile = getattr(obj, "profile", None)
+        if profile and profile.display_name:
+            return profile.display_name
         return (obj.get_full_name() or obj.username or obj.email).strip()
+
+    def get_name(self, obj):
+        return self.get_display_name(obj)
 
     def get_student_id(self, obj):
         profile = getattr(obj, "profile", None)
@@ -84,7 +95,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserRegistrationSerializer(serializers.Serializer):
     # Serializer for user registration with secure password handling
-    name = serializers.CharField(max_length=150, required=True)
+    display_name = serializers.CharField(max_length=150, required=True)
     student_id = serializers.CharField(max_length=20, required=True)
     email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True)
@@ -124,7 +135,7 @@ class UserRegistrationSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data['email']
         password = validated_data['password']
-        name = validated_data['name']
+        display_name = validated_data['display_name']
         student_id = validated_data['student_id']
 
         user = User.objects.create_user(
@@ -133,22 +144,22 @@ class UserRegistrationSerializer(serializers.Serializer):
             password=password
         )
 
-        # Set first and last name
-        name_parts = name.split(" ", 1)
-        user.first_name = name_parts[0]
-        if len(name_parts) > 1:
-            user.last_name = name_parts[1]
+        # Store display name on user for compatibility
+        user.first_name = display_name
+        user.last_name = ""
         user.save()
 
         # Create user profile with student_id
         profile, created = UserProfile.objects.get_or_create(
             user=user,
-            defaults={"student_id": student_id}
+            defaults={"student_id": student_id, "display_name": display_name}
         )
 
         if not created:
             profile.student_id = student_id
-            profile.save(update_fields=["student_id"])
+            if not profile.display_name:
+                profile.display_name = display_name
+            profile.save(update_fields=["student_id", "display_name"])
 
         return user
 

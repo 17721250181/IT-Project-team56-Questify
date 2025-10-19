@@ -38,16 +38,16 @@ export const AuthService = {
 
     /**
      * User Registration
-     * @param {string} fullName - User's full name
+     * @param {string} displayName - Preferred display name
      * @param {string} studentId - Student ID
      * @param {string} email - User email address
      * @param {string} password - User password
      * @returns {Promise<Object>} Registration response with user data
      */
-    register: async (fullName, studentId, email, password) => {
+    register: async (displayName, studentId, email, password) => {
         try {
             const response = await apiClient.post('/auth/register/', {
-                name: fullName.trim(),                    // Frontend 'fullName' → Backend 'name'
+                display_name: displayName.trim(),         // Frontend 'displayName' → Backend field
                 student_id: studentId.trim(),             // Frontend 'studentId' → Backend 'student_id'
                 email: email.trim().toLowerCase(),
                 password: password

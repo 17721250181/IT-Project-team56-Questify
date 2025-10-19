@@ -14,8 +14,8 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
     const [nameInput, setNameInput] = useState('');
     const [feedback, setFeedback] = useState(null);
 
-    const username = useMemo(() => {
-        return user?.name || user?.full_name || user?.email || 'User';
+    const displayName = useMemo(() => {
+        return user?.display_name || user?.name || user?.full_name || user?.email || 'User';
     }, [user]);
 
     const email = user?.email || 'Not available';
@@ -26,10 +26,10 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
     const postedQuestions = user?.posted_questions ?? 'N/A';
 
     useEffect(() => {
-        setNameInput(username);
+        setNameInput(displayName);
         setAvatarUrl(user?.profile_picture_url || null);
         setFeedback(null);
-    }, [user, username]);
+    }, [user, displayName]);
 
     useEffect(() => {
         if (!isEditable) return;
@@ -75,7 +75,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         event.preventDefault();
         const trimmed = nameInput.trim();
         if (!trimmed) {
-            setFeedback({ type: 'warning', message: 'Name cannot be empty.' });
+            setFeedback({ type: 'warning', message: 'Display name cannot be empty.' });
             return;
         }
 
@@ -87,7 +87,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         setIsSavingName(true);
         setFeedback(null);
         try {
-            const updatedUser = await AuthService.updateProfile({ name: trimmed });
+            const updatedUser = await AuthService.updateProfile({ display_name: trimmed });
             onProfileUpdated?.(updatedUser);
             setIsEditingName(false);
         } catch (err) {
@@ -107,7 +107,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
                             roundedCircle
                             width={150}
                             height={150}
-                            alt={username}
+                            alt={"profile image"}
                             className="border border-3 border-primary object-cover"
                             style={{
                                 objectFit: 'cover',
@@ -165,7 +165,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
                                             type="button"
                                             variant="outline-secondary"
                                             onClick={() => {
-                                                setNameInput(username);
+                                                setNameInput(displayName);
                                                 setIsEditingName(false);
                                                 setFeedback(null);
                                             }}
@@ -177,7 +177,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
                                 </Form>
                             ) : (
                                 <div className="d-flex align-items-center gap-3 flex-wrap">
-                                    <h2 className="mb-0">{username}</h2>
+                                    <h2 className="mb-0">{displayName}</h2>
                                     {isEditable && (
                                         <Button
                                             variant="outline-primary"

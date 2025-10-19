@@ -30,7 +30,7 @@ class ShortAnswerQuestionSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     mcq_detail = MCQQuestionSerializer(read_only=True)
     short_detail = ShortAnswerQuestionSerializer(read_only=True)
-    creator = serializers.CharField(source="creator.username", read_only=True)
+    creator = serializers.SerializerMethodField()
     attempted = serializers.SerializerMethodField()
     numAttempts = serializers.IntegerField(source="num_attempts", read_only=True)
     ratingCount = serializers.IntegerField(source="rating_count", read_only=True)
@@ -57,6 +57,12 @@ class QuestionSerializer(serializers.ModelSerializer):
             "mcq_detail",
             "short_detail",
         ]
+
+    def get_creator(self, obj):
+        profile = getattr(obj.creator, 'profile', None)
+        if profile and profile.display_name:
+            return profile.display_name
+        return obj.creator.get_full_name() or obj.creator.username or obj.creator.email
 
     def get_attempted(self, obj):
         user = self.context["request"].user
@@ -121,8 +127,21 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
 
 class AuthorSerializer(serializers.Serializer):
     id = serializers.IntegerField(source='author.id', read_only=True)
-    name = serializers.CharField(source='author.username', read_only=True)
+    name = serializers.SerializerMethodField()
+    display_name = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
+
+    def _get_display_name(self, author):
+        profile = getattr(author, 'profile', None)
+        if profile and profile.display_name:
+            return profile.display_name
+        return author.get_full_name() or author.username or author.email
+
+    def get_name(self, obj):
+        return self._get_display_name(obj.author)
+
+    def get_display_name(self, obj):
+        return self._get_display_name(obj.author)
 
     def get_profile_image(self, obj):
         profile = getattr(obj.author, 'profile', None)

@@ -68,7 +68,7 @@ const SingleComment = ({ comment, onCommentUpdate, isReply = false, parentCommen
             
             // Add @mention prefix when replying to a reply
             const finalContent = isReply 
-                ? `@${comment.author.name}: ${replyContent}`
+                ? `@${authorDisplayName}: ${replyContent}`
                 : replyContent;
             
             await CommentService.replyToComment(targetId, finalContent);
@@ -94,6 +94,7 @@ const SingleComment = ({ comment, onCommentUpdate, isReply = false, parentCommen
     const actionSizeClass = isReply ? 'small' : '';
 
     const author = comment.author || {};
+    const authorDisplayName = author.display_name || author.name || 'User';
     const profileHref = author.id ? `/users/${author.id}` : null;
 
     const renderAuthorHeader = () => {
@@ -114,7 +115,7 @@ const SingleComment = ({ comment, onCommentUpdate, isReply = false, parentCommen
 
         const nameBlock = (
             <div>
-                <div className={nameClassName}>{author.name}</div>
+                <div className={nameClassName}>{authorDisplayName}</div>
                 <small className={dateClassName} style={dateStyle}>
                     {formatDate(comment.created_at)}
                 </small>
@@ -184,7 +185,7 @@ const SingleComment = ({ comment, onCommentUpdate, isReply = false, parentCommen
                                 as="textarea"
                                 rows={2}
                                 placeholder={isReply 
-                                    ? `Reply to ${comment.author.name}...` 
+                                    ? `Reply to ${authorDisplayName}...` 
                                     : "Write a reply..."}
                                 value={replyContent}
                                 onChange={(e) => setReplyContent(e.target.value)}

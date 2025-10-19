@@ -22,7 +22,7 @@ const HomePage = () => {
                             <h1 className="display-4 mb-3">Welcome to Questify!</h1>
                             {user && (
                                 <p className="lead text-muted">
-                                    Hello, <strong>{user.name || user.email}</strong>
+                                    Hello, <strong>{user.display_name || user.email}</strong>
                                 </p>
                             )}
                         </div>
