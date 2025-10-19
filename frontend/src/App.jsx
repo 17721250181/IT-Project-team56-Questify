@@ -11,9 +11,7 @@ import { HomePage, QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage
 import LeaderboardPage from './pages/LeaderboardPage';
 // Auth Provider and Route Guards
 import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import PublicRoute from './components/PublicRoute';
-import ErrorBoundary from './components/ErrorBoundary';
+import { ProtectedRoute, PublicRoute, ErrorBoundary } from './components/common';
 
 function App() {
   return (

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Alert } from 'react-bootstrap';
-import QuestifyNavBar from '../components/QuestifyNavBar';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { QuestifyNavBar, LoadingSpinner } from '../components/common';
 import YourPositionCard from '../components/leaderboard/YourPositionCard';
 import Top3Podium from '../components/leaderboard/Top3Podium';
 import LeaderboardTabs from '../components/leaderboard/LeaderboardTabs';

@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Row, Col, Card, Tabs, Tab, Spinner, Alert } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import QuestifyNavBar from '../components/QuestifyNavBar';
-import UserProfileHeader from '../components/UserProfileHeader';
-import ActivityHeatmap from '../components/ActivityHeatmap';
+import { QuestifyNavBar } from '../components/common';
+import { UserProfileHeader, ActivityHeatmap } from '../components/profile';
 import QuestionGrid from '../components/questionList/QuestionGrid';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthService } from '../services/authService';

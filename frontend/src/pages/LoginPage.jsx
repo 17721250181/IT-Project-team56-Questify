@@ -4,8 +4,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 // Importing custom components
-import Logo from '../components/Logo';
-import LoginForm from '../components/LoginForm';
+import { Logo } from '../components/common';
+import { LoginForm } from '../components/auth';
 import '../styles/LoginPage.css';
 import '../styles/responsive-overrides.css';
 

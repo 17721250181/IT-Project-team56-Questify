@@ -5,10 +5,9 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 // Importing custom components
-import QuestifyNavBar from '../components/QuestifyNavBar.jsx';
-import DoQuestion from '../components/DoQuestion.jsx';
-import CommentForm from '../components/CommentForm.jsx';
-import CommentList from '../components/CommentList.jsx';
+import { QuestifyNavBar } from '../components/common';
+import DoQuestion from '../components/doQuestion/DoQuestion';
+import { CommentForm, CommentList } from '../components/comments';
 import QuestionRating from '../components/QuestionRating.jsx';
 
 const DoQuestionPage = () => {
