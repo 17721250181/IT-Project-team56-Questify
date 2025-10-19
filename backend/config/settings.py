@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework", "corsheaders", "questions", "user", "attempts",
+    "rest_framework", "corsheaders", "questions", "user", "attempts", "leaderboard"
 ]
 
 MIDDLEWARE = [
@@ -185,3 +185,20 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # For developm
 # EMAIL_HOST_USER = "your-email@gmail.com"
 # EMAIL_HOST_PASSWORD = "your-app-password"
 DEFAULT_FROM_EMAIL = "noreply@questify.com"
+
+# Leaderboard points
+LEADERBOARD_POINTS_PER_ATTEMPT = 1     # 시도 1회
+LEADERBOARD_POINTS_BONUS_CORRECT = 2   # 정답 1회 추가(정답=시도+보너스)
+
+# 새 활동 가중치(없으면 0점 처리됨)
+LEADERBOARD_POINTS_PER_COMMENT = 2     # 댓글 1개
+LEADERBOARD_POINTS_PER_RATING  = 1     # 평가(별점) 1개
+LEADERBOARD_POINTS_PER_LIKE    = 1
+
+LEADERBOARD_ACTIVITY_MODELS = {
+    # "앱레이블.모델명": {"user_field": "필드명"}
+    "questions.Comment": {"user_field": "user"},   # 댓글 모델(없으면 무시)
+    "questions.Rating":  {"user_field": "user"},   # 별점/평가 모델(없으면 무시)
+    "questions.Like":    {"user_field": "user"},   # 좋아요 모델(없으면 무시)
+    # 필요하면 원하는 모델을 더 추가 가능
+}
