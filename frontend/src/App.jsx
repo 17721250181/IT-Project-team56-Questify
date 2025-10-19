@@ -79,6 +79,14 @@ function App() {
           }
         />
         <Route
+          path="/users/:userId"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/post-question"
           element={
             <ProtectedRoute>

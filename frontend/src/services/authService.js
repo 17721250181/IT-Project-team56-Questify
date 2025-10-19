@@ -134,6 +134,19 @@ export const AuthService = {
         }
     },
 
+    updateProfile: async (payload) => {
+        try {
+            const response = await apiClient.patch('/me/', payload);
+            return response.data;
+        } catch (error) {
+            if (error.response?.data) {
+                const message = error.response.data.message || 'Failed to update profile';
+                throw new Error(message);
+            }
+            throw new Error('Failed to update profile');
+        }
+    },
+
     setProfilePict: async (formData) => {
         try {
             const res = await apiClient.patch("me/profile-picture/", formData, {
@@ -144,6 +157,18 @@ export const AuthService = {
             console.error("API error:", error);
             throw new Error("Failed to set profile picture");
 
+        }
+    },
+
+    getUserById: async (userId) => {
+        try {
+            const response = await apiClient.get(`/users/${userId}/`);
+            return response.data;
+        } catch (error) {
+            if (error.response?.status === 404) {
+                throw new Error('User not found');
+            }
+            throw new Error('Failed to load user profile');
         }
     },
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Question, MCQQuestion, ShortAnswerQuestion, Comment
+from .models import Question, MCQQuestion, ShortAnswerQuestion, Comment, QuestionRating
 from attempts.models import Attempt
 from user.models import UserProfile
 
@@ -33,6 +33,8 @@ class QuestionSerializer(serializers.ModelSerializer):
     creator = serializers.CharField(source="creator.username", read_only=True)
     attempted = serializers.SerializerMethodField()
     numAttempts = serializers.IntegerField(source="num_attempts", read_only=True)
+    ratingCount = serializers.IntegerField(source="rating_count", read_only=True)
+    userRating = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
@@ -43,6 +45,8 @@ class QuestionSerializer(serializers.ModelSerializer):
             "question",
             "type",
             "rating",
+            "ratingCount",
+            "userRating",
             "numAttempts",
             "attempted",
             "source",
@@ -62,6 +66,16 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def get_verified(self, obj):
         return obj.verify_status == Question.VerifyStatus.APPROVED
+
+    def get_userRating(self, obj):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            return None
+        prefetch_result = getattr(obj, "user_rating_for_requester", None)
+        if prefetch_result:
+            return prefetch_result[0].score
+        rating = obj.ratings.filter(user=user).first()
+        return rating.score if rating else None
 
 
 # Serializer for creating questions

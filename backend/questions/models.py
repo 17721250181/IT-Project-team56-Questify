@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Avg, Count
 
 
 class Question(models.Model):
@@ -33,10 +34,19 @@ class Question(models.Model):
     topic = models.CharField(max_length=100, blank=True, null=True)
     type = models.CharField(max_length=50, choices=Type.choices, null=True)
     rating = models.FloatField(default=0.0)
+    rating_count = models.PositiveIntegerField(default=0)
     num_attempts = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.question[:40]
+
+    def recalculate_rating(self):
+        aggregate = self.ratings.aggregate(avg=Avg("score"), count=Count("id"))
+        average = aggregate.get("avg") or 0.0
+        count = aggregate.get("count") or 0
+        self.rating = round(float(average), 2) if average else 0.0
+        self.rating_count = count
+        self.save(update_fields=["rating", "rating_count", "updated_at"])
 
 
 class MCQQuestion(models.Model):
@@ -73,3 +83,20 @@ class Comment(models.Model):
     @property
     def like_count(self):
         return self.likes.count()
+
+
+class QuestionRating(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="ratings")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="question_ratings")
+    score = models.PositiveSmallIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("question", "user")
+        constraints = [
+            models.CheckConstraint(check=models.Q(score__gte=1) & models.Q(score__lte=5), name="rating_score_range"),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} → {self.question_id}: {self.score}"

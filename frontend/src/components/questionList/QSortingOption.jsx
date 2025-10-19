@@ -1,25 +1,43 @@
-import { React, useState, useRef } from 'react';
-import { Button, Overlay, Tooltip } from 'react-bootstrap';
+import React from 'react';
+import { Dropdown, DropdownButton } from 'react-bootstrap';
 
-const QSortingOption = () => {
+const SORT_OPTIONS = [
+    { value: 'newest', label: 'Newest first' },
+    { value: 'oldest', label: 'Oldest first' },
+    { value: 'rating_desc', label: 'Highest rating' },
+    { value: 'rating_asc', label: 'Lowest rating' },
+    { value: 'attempts_desc', label: 'Most attempts' },
+    { value: 'attempts_asc', label: 'Fewest attempts' },
+    { value: 'author_asc', label: 'Author A → Z' },
+    { value: 'author_desc', label: 'Author Z → A' },
+];
 
-    const [show, setShow] = useState(false);
-    const target = useRef(null);
+const QSortingOption = ({ sortOption = 'newest', onChange }) => {
+    const activeLabel = SORT_OPTIONS.find((option) => option.value === sortOption)?.label || 'Sort';
+
+    const handleSelect = (value) => {
+        onChange?.(value);
+    };
 
     return (
-        <>
-            <Button className='m-1' ref={target} onClick={() => setShow(!show)}>
-                Sort
-            </Button>
-            <Overlay target={target.current} show={show} placement="right">
-                {(props) => (
-                <Tooltip id="overlay-example" {...props}>
-                    Implement Sort here
-                </Tooltip>
-                )}
-            </Overlay>
-        </>
+        <DropdownButton
+            id="question-sort-dropdown"
+            title={activeLabel}
+            variant="secondary"
+            className="m-1"
+            onSelect={handleSelect}
+        >
+            {SORT_OPTIONS.map((option) => (
+                <Dropdown.Item
+                    key={option.value}
+                    eventKey={option.value}
+                    active={option.value === sortOption}
+                >
+                    {option.label}
+                </Dropdown.Item>
+            ))}
+        </DropdownButton>
     );
-}
+};
 
-export default QSortingOption
+export default QSortingOption;

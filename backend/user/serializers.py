@@ -3,25 +3,84 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from attempts.models import Attempt
 from .models import UserProfile
 
+
+class UserUpdateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=False, allow_blank=False, max_length=150)
+
+    def validate_name(self, value):
+        cleaned = value.strip()
+        if not cleaned:
+            raise serializers.ValidationError("Name cannot be empty.")
+        return cleaned
+
+    def update(self, instance, validated_data):
+        name = validated_data.get("name")
+        if name is not None:
+            parts = name.split(" ", 1)
+            instance.first_name = parts[0]
+            instance.last_name = parts[1] if len(parts) > 1 else ""
+            instance.save(update_fields=["first_name", "last_name"])
+        return instance
+
 class UserSerializer(serializers.ModelSerializer):
-    # User serializer which excludes password field for security
     name = serializers.SerializerMethodField()
     student_id = serializers.SerializerMethodField()
+    profile_picture_url = serializers.SerializerMethodField()
+    attempted_questions = serializers.SerializerMethodField()
+    posted_questions = serializers.SerializerMethodField()
+    points = serializers.SerializerMethodField()
+    ranking = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'student_id', 'is_staff', 'date_joined', 'last_login']
+        fields = [
+            'id',
+            'email',
+            'name',
+            'student_id',
+            'profile_picture_url',
+            'attempted_questions',
+            'posted_questions',
+            'points',
+            'ranking',
+            'is_staff',
+            'date_joined',
+            'last_login',
+        ]
 
     def get_name(self, obj):
-        return obj.get_full_name() or obj.username
+        return (obj.get_full_name() or obj.username or obj.email).strip()
 
     def get_student_id(self, obj):
-        try:
-            return obj.profile.student_id
-        except UserProfile.DoesNotExist:
+        profile = getattr(obj, "profile", None)
+        return getattr(profile, "student_id", None)
+
+    def get_profile_picture_url(self, obj):
+        profile = getattr(obj, "profile", None)
+        if not profile or not profile.profile_picture:
             return None
+        request = self.context.get("request")
+        url = profile.profile_picture.url
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
+    def get_attempted_questions(self, obj):
+        return Attempt.objects.filter(attempter=obj).count()
+
+    def get_posted_questions(self, obj):
+        return obj.questions.count()
+
+    def get_points(self, obj):
+        # Placeholder until a scoring system is implemented
+        return 0
+
+    def get_ranking(self, obj):
+        # Placeholder ranking logic
+        return None
 
 class UserRegistrationSerializer(serializers.Serializer):
     # Serializer for user registration with secure password handling

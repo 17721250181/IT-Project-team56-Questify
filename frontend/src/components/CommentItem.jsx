@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Button, Form, Image } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { CommentService } from '../services/commentService';
 
 /**
@@ -92,31 +93,60 @@ const SingleComment = ({ comment, onCommentUpdate, isReply = false, parentCommen
     const contentClassName = isReply ? 'small mb-1' : 'mb-2';
     const actionSizeClass = isReply ? 'small' : '';
 
+    const author = comment.author || {};
+    const profileHref = author.id ? `/users/${author.id}` : null;
+
+    const renderAuthorHeader = () => {
+        const avatarElement = author.profile_image ? (
+            <Image
+                src={author.profile_image}
+                roundedCircle
+                width={avatarSize}
+                height={avatarSize}
+                className="me-2"
+            />
+        ) : (
+            <i
+                className="bi bi-person-circle text-secondary me-2"
+                style={{ fontSize: `${avatarSize}px` }}
+            />
+        );
+
+        const nameBlock = (
+            <div>
+                <div className={nameClassName}>{author.name}</div>
+                <small className={dateClassName} style={dateStyle}>
+                    {formatDate(comment.created_at)}
+                </small>
+            </div>
+        );
+
+        if (!profileHref) {
+            return (
+                <div className="d-flex align-items-center">
+                    {avatarElement}
+                    {nameBlock}
+                </div>
+            );
+        }
+
+        return (
+            <Link
+                to={profileHref}
+                className="d-flex align-items-center text-decoration-none text-reset"
+            >
+                {avatarElement}
+                {nameBlock}
+            </Link>
+        );
+    };
+
     return (
         <Card className={cardClassName}>
             <Card.Body className={bodyClassName}>
                 {/* Comment/Reply Header */}
                 <div className="d-flex align-items-center mb-2">
-                    {comment.author.profile_image ? (
-                        <Image
-                            src={comment.author.profile_image}
-                            roundedCircle
-                            width={avatarSize}
-                            height={avatarSize}
-                            className="me-2"
-                        />
-                    ) : (
-                        <i 
-                            className="bi bi-person-circle text-secondary me-2" 
-                            style={{ fontSize: `${avatarSize}px` }} 
-                        />
-                    )}
-                    <div>
-                        <div className={nameClassName}>{comment.author.name}</div>
-                        <small className={dateClassName} style={dateStyle}>
-                            {formatDate(comment.created_at)}
-                        </small>
-                    </div>
+                    {renderAuthorHeader()}
                 </div>
 
                 {/* Comment/Reply Content */}

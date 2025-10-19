@@ -4,10 +4,45 @@ import { AttemptService } from './attemptService.js';
 // Question service API methods
 export const QuestionService = {
     // Get all questions from backend (matches QuestionListView)
-    getAllQuestions: async () => {
+    getAllQuestions: async (options = {}) => {
         try {
-            console.log("withCredentials:", apiClient.defaults.withCredentials);
-            const response = await apiClient.get('/questions/');
+            const params = {};
+
+            if (options.search?.trim()) {
+                params.search = options.search.trim();
+            }
+
+            const filters = options.filters || {};
+            if (filters.week) {
+                params.week = filters.week;
+            }
+            if (filters.topic) {
+                params.topic = filters.topic;
+            }
+            if (filters.type) {
+                params.type = filters.type;
+            }
+            if (filters.source) {
+                params.source = filters.source;
+            }
+            if (filters.creator) {
+                params.creator = filters.creator;
+            }
+            if (filters.verified) {
+                params.verified = 'true';
+            }
+            if (typeof filters.minRating === 'number' && filters.minRating > 0) {
+                params.min_rating = filters.minRating;
+            }
+            if (typeof filters.maxRating === 'number' && filters.maxRating > 0) {
+                params.max_rating = filters.maxRating;
+            }
+
+            if (options.sort) {
+                params.ordering = options.sort;
+            }
+
+            const response = await apiClient.get('/questions/', { params });
             return response.data;
         } catch (error) {
             console.error('Failed to fetch questions:', error);
@@ -128,6 +163,57 @@ export const QuestionService = {
         } catch (error) {
             console.error('Failed to fetch user questions:', error);
             throw new Error('Failed to fetch user questions');
+        }
+    },
+
+    // Get questions created by specific user (public)
+    getQuestionsByCreator: async (creatorId, options = {}) => {
+        const mergedFilters = {
+            ...(options.filters || {}),
+            creator: creatorId,
+        };
+        return QuestionService.getAllQuestions({
+            ...options,
+            filters: mergedFilters,
+        });
+    },
+
+    getQuestionMetadata: async () => {
+        try {
+            const response = await apiClient.get('/questions/metadata/');
+            return response.data;
+        } catch (error) {
+            console.error('Failed to fetch question metadata:', error);
+            throw new Error('Failed to fetch question metadata');
+        }
+    },
+
+    getQuestionRating: async (questionId) => {
+        try {
+            const response = await apiClient.get(`/questions/${questionId}/rating/`);
+            return response.data;
+        } catch (error) {
+            console.error(`Failed to fetch rating for question ${questionId}:`, error);
+            throw error;
+        }
+    },
+
+    rateQuestion: async (questionId, score) => {
+        try {
+            const response = await apiClient.post(`/questions/${questionId}/rating/`, { score });
+            return response.data;
+        } catch (error) {
+            console.error(`Failed to rate question ${questionId}:`, error);
+            throw error;
+        }
+    },
+
+    clearRating: async (questionId) => {
+        try {
+            await apiClient.delete(`/questions/${questionId}/rating/`);
+        } catch (error) {
+            console.error(`Failed to remove rating for question ${questionId}:`, error);
+            throw error;
         }
     },
 };

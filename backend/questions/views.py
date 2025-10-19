@@ -2,12 +2,70 @@ from rest_framework import generics, status, permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .models import Question, ShortAnswerQuestion, MCQQuestion, Comment
+from rest_framework.views import APIView
+from django.db.models import Q, Prefetch
+from .models import Question, ShortAnswerQuestion, MCQQuestion, Comment, QuestionRating
 from .serializers import QuestionCreateSerializer, QuestionSerializer, CommentSerializer, ReplySerializer
 import os
+import re
 import requests
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+
+
+DEFAULT_WEEK_OPTIONS = [
+    "Week1",
+    "Week2",
+    "Week3",
+    "Week4",
+    "Week5",
+    "Week6",
+    "Week7",
+    "Week8",
+    "Week9",
+    "Week10",
+    "Week11",
+    "Week12",
+]
+
+DEFAULT_TOPIC_OPTIONS = [
+    "JAVA basics",
+    "Classes and Objects",
+    "Software Tools and Bagel",
+    "Arrays and Strings",
+    "Input and Output",
+    "Inheritance and Polymorphism",
+    "Interfaces and Polymorphism",
+    "Modelling Classes and Relationships",
+    "Generics",
+    "Collections and Maps",
+    "Design Patterns",
+    "Exceptions",
+    "Software Testing and Design",
+    "Event Driven Programming",
+    "Advanced Java",
+]
+
+
+def merge_with_defaults(defaults, extras, extra_sort_key=None):
+    seen = set()
+    merged = []
+
+    for value in defaults:
+        if value and value not in seen:
+            merged.append(value)
+            seen.add(value)
+
+    filtered_extras = [value for value in extras if value and value not in seen]
+    if extra_sort_key:
+        filtered_extras.sort(key=extra_sort_key)
+    merged.extend(filtered_extras)
+    return merged
+
+
+def week_sort_key(value):
+    match = re.search(r"\d+", value or "")
+    return (int(match.group()) if match else float("inf"), value or "")
 
 
 class QuestionCreateView(generics.CreateAPIView):
@@ -144,9 +202,93 @@ class QuestionCreateView(generics.CreateAPIView):
 
 class QuestionListView(generics.ListAPIView):
     """Get all questions"""
-    queryset = Question.objects.all().order_by('-created_at')
     serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Question.objects.all().select_related("creator")
+
+        params = self.request.query_params
+        search = params.get("search")
+        if search:
+            search = search.strip()
+            if search:
+                queryset = queryset.filter(
+                    Q(question__icontains=search) |
+                    Q(topic__icontains=search) |
+                    Q(week__icontains=search) |
+                    Q(creator__username__icontains=search)
+                )
+
+        weeks = params.getlist("week")
+        if weeks:
+            queryset = queryset.filter(week__in=weeks)
+
+        topics = params.getlist("topic")
+        if topics:
+            queryset = queryset.filter(topic__in=topics)
+
+        types = params.getlist("type")
+        if types:
+            normalized_types = [t.upper() for t in types if t]
+            queryset = queryset.filter(type__in=normalized_types)
+
+        sources = params.getlist("source")
+        if sources:
+            queryset = queryset.filter(source__in=sources)
+
+        verified = params.get("verified")
+        if verified in {"true", "1", "yes"}:
+            queryset = queryset.filter(verify_status=Question.VerifyStatus.APPROVED)
+
+        min_rating = params.get("min_rating")
+        if min_rating:
+            try:
+                queryset = queryset.filter(rating__gte=float(min_rating))
+            except ValueError:
+                pass
+
+        max_rating = params.get("max_rating")
+        if max_rating:
+            try:
+                queryset = queryset.filter(rating__lte=float(max_rating))
+            except ValueError:
+                pass
+
+        creator_id = params.get("creator")
+        if creator_id:
+            queryset = queryset.filter(creator_id=creator_id)
+
+        ordering_param = params.get("ordering", "newest")
+        ordering_map = {
+            "newest": "-created_at",
+            "oldest": "created_at",
+            "rating_desc": "-rating",
+            "rating": "-rating",
+            "rating_asc": "rating",
+            "attempts_desc": "-num_attempts",
+            "attempts": "-num_attempts",
+            "attempts_asc": "num_attempts",
+            "author_asc": "creator__username",
+            "author_desc": "-creator__username",
+        }
+        order_by = ordering_map.get(ordering_param, "-created_at")
+        if isinstance(order_by, str):
+            order_by = [order_by]
+        if "-created_at" not in order_by:
+            order_by.append("-created_at")
+        queryset = queryset.order_by(*order_by)
+
+        user = self.request.user
+        if user.is_authenticated:
+            queryset = queryset.prefetch_related(
+                Prefetch(
+                    "ratings",
+                    queryset=QuestionRating.objects.filter(user=user),
+                    to_attr="user_rating_for_requester",
+                )
+            )
+        return queryset.prefetch_related("mcq_detail", "short_detail")
 
 
 class QuestionDetailView(generics.RetrieveAPIView):
@@ -177,13 +319,25 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Comment.objects.filter(
                 question_id=question_id,
                 parent__isnull=True
-            ).prefetch_related('replies__author', 'replies__likes', 'likes')
-        return Comment.objects.filter(parent__isnull=True).prefetch_related('replies__author', 'replies__likes', 'likes')
+            ).select_related("author", "author__profile").prefetch_related(
+                "likes",
+                "replies__author",
+                "replies__author__profile",
+                "replies__likes",
+            )
+        return Comment.objects.filter(parent__isnull=True).select_related(
+            "author", "author__profile"
+        ).prefetch_related("likes", "replies__author", "replies__author__profile", "replies__likes")
 
     def perform_create(self, serializer):
         question_id = self.kwargs.get("question_id")
         question = get_object_or_404(Question, pk=question_id)
         serializer.save(author=self.request.user, question=question)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
 
     @action(detail=True, methods=['post'])
     def reply(self, request, pk=None):
@@ -214,3 +368,76 @@ class CommentViewSet(viewsets.ModelViewSet):
         user = request.user
         comment.likes.remove(user)
         return Response({'like_count': comment.likes.count()})
+
+
+class QuestionMetadataView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        queryset = Question.objects.all()
+        week_values = list(filter(None, queryset.values_list("week", flat=True)))
+        topic_values = list(filter(None, queryset.values_list("topic", flat=True)))
+
+        weeks = merge_with_defaults(
+            DEFAULT_WEEK_OPTIONS,
+            week_values,
+            extra_sort_key=week_sort_key,
+        )
+        topics = merge_with_defaults(
+            DEFAULT_TOPIC_OPTIONS,
+            topic_values,
+            extra_sort_key=lambda value: value.lower(),
+        )
+
+        return Response({
+            "weeks": weeks,
+            "topics": topics,
+            "types": [choice[0] for choice in Question.Type.choices],
+            "sources": [choice[0] for choice in Question.Source.choices],
+            "verifyStatuses": [choice[0] for choice in Question.VerifyStatus.choices],
+        })
+
+
+class QuestionRatingView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, question_id):
+        question = get_object_or_404(Question, pk=question_id)
+        user_rating = question.ratings.filter(user=request.user).first()
+        return Response({
+            "questionId": str(question.id),
+            "average": question.rating,
+            "count": question.rating_count,
+            "userRating": user_rating.score if user_rating else None,
+        })
+
+    def post(self, request, question_id):
+        score = request.data.get("score")
+        try:
+            score = int(score)
+        except (TypeError, ValueError):
+            return Response({"error": "Score must be an integer between 1 and 5."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if score < 1 or score > 5:
+            return Response({"error": "Score must be between 1 and 5."}, status=status.HTTP_400_BAD_REQUEST)
+
+        question = get_object_or_404(Question, pk=question_id)
+        rating, _created = QuestionRating.objects.update_or_create(
+            question=question,
+            user=request.user,
+            defaults={"score": score},
+        )
+        question.recalculate_rating()
+        return Response({
+            "questionId": str(question.id),
+            "average": question.rating,
+            "count": question.rating_count,
+            "userRating": rating.score,
+        }, status=status.HTTP_200_OK)
+
+    def delete(self, request, question_id):
+        question = get_object_or_404(Question, pk=question_id)
+        deleted = question.ratings.filter(user=request.user).delete()
+        if deleted[0]:
+            question.recalculate_rating()
+        return Response(status=status.HTTP_204_NO_CONTENT)

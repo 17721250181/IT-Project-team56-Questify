@@ -13,5 +13,6 @@ urlpatterns = [
     path("auth/password-reset-confirm/", views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("me/", views.MeView.as_view(), name="me"),
     path("csrf/", views.GetCSRFTokenView.as_view(), name="get_csrf_token"),
+    path("users/<int:user_id>/", views.UserDetailView.as_view(), name="user-detail"),
     path("me/profile-picture/", MeProfilePictureView.as_view(), name="me-profile-picture"),
 ]
