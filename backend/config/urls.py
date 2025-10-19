@@ -25,12 +25,5 @@ urlpatterns = [
     path("api/", include("user.urls")),
     path("api/attempts/", include("attempts.urls")),
     path("api/questions/", include("questions.urls")),
-<<<<<<< Updated upstream
+    path("api/leaderboard/", include("leaderboard.urls")),   
 ]
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-=======
-    path("api/leaderboard/", include("leaderboard.urls")),
-    
-]
->>>>>>> Stashed changes
