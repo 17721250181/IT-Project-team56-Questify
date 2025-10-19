@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Spinner } from 'react-bootstrap';
-import { CommentService } from '../services/commentService';
+import { CommentService } from '../../services/commentService';
 
 /**
  * CommentForm Component

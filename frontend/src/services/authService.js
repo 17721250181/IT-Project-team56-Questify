@@ -64,7 +64,7 @@ export const AuthService = {
                     const errorMessages = [];
 
                     // Extract all error messages from different fields
-                    Object.entries(errorData.errors).forEach(([field, messages]) => {
+                    Object.entries(errorData.errors).forEach(([, messages]) => {
                         if (Array.isArray(messages)) {
                             errorMessages.push(...messages);
                         } else if (typeof messages === 'string') {
@@ -133,6 +133,32 @@ export const AuthService = {
                 console.error("API error:", error);
             }
             throw new Error("Failed to fetch profile picture");
+        }
+    },
+
+    /**
+     * Get user statistics including points and ranking from leaderboard
+     * @returns {Promise<Object>} User statistics with points and ranking
+     */
+    getUserStats: async () => {
+        try {
+            const response = await apiClient.get('/leaderboard/me/');
+            // API now returns flat structure: { points, rank, total_users, ... }
+            return {
+                points: response.data.points ?? 0,
+                ranking: response.data.rank ?? null,
+                total_users: response.data.total_users ?? 0
+            };
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch user stats:', error);
+            }
+            // Return default values if stats unavailable
+            return {
+                points: 0,
+                ranking: null,
+                total_users: 0
+            };
         }
     },
 

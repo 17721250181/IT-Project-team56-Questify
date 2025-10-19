@@ -8,6 +8,7 @@ class LeaderboardRowSerializer(serializers.Serializer):
     points = serializers.IntegerField()
     last_activity = serializers.DateTimeField(allow_null=True)
     rank = serializers.IntegerField()
+    total_users = serializers.IntegerField(required=False)
 
 class MyLeaderboardSerializer(serializers.Serializer):
     me = LeaderboardRowSerializer()

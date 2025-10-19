@@ -1,12 +1,13 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Container, Navbar, Nav, NavDropdown, Button } from 'react-bootstrap'
+import { Container, Navbar, Nav, NavDropdown } from 'react-bootstrap'
 import Logo from './Logo'
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
+import '../../styles/QuestifyNavBar.css';
 
 const QuestifyNavBar = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -18,7 +19,7 @@ const QuestifyNavBar = () => {
   };
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
+    <Navbar expand="lg" className="bg-body-tertiary p-3">
       <Container fluid>
         <Navbar.Brand as={Link} to='/'>
           <Logo />
@@ -30,18 +31,34 @@ const QuestifyNavBar = () => {
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             <Nav.Link as={Link} to="/questions">Questions</Nav.Link>
             <Nav.Link as={Link} to="/post-question">Post Question</Nav.Link>
-            <NavDropdown title="More" id="basic-nav-dropdown">
-              <NavDropdown.Item as={Link} to="/user-profile">Profile</NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/leaderboard">Leaderboard</NavDropdown.Item>
+            <Nav.Link as={Link} to="/leaderboard">Leaderboard</Nav.Link>
+          </Nav>
+          <Nav className="ms-auto">
+            <NavDropdown
+              title={
+                <span>
+                  <i className="bi bi-person-circle user-avatar-icon"></i>
+                  {user?.display_name && (
+                    <span className="ms-2 user-display-name d-none d-md-inline">
+                      {user.display_name}
+                    </span>
+                  )}
+                </span>
+              }
+              id="user-dropdown"
+              align="end"
+            >
+              <NavDropdown.Item as={Link} to="/user-profile">
+                <i className="bi bi-person me-2"></i>
+                Profile
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item onClick={handleLogout}>
+                <i className="bi bi-box-arrow-right me-2"></i>
+                Logout
+              </NavDropdown.Item>
             </NavDropdown>
           </Nav>
-          <Button
-            variant='outline-secondary'
-            size='sm'
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
         </Navbar.Collapse>
       </Container>
     </Navbar>

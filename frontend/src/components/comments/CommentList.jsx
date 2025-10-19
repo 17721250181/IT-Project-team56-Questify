@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Alert, Spinner } from 'react-bootstrap';
 import CommentItem from './CommentItem';
-import { CommentService } from '../services/commentService';
+import { CommentService } from '../../services/commentService';
 
 /**
  * CommentList Component

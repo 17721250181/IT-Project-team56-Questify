@@ -246,10 +246,9 @@ class LeaderboardView(ListAPIView):
 class MyLeaderboardView(RetrieveAPIView):
     """
     GET /api/leaderboard/me/
-    나의 순위 + 주변(앞뒤 3명)을 제공한다.
     """
     permission_classes = [IsAuthenticated]
-    serializer_class = MyLeaderboardSerializer
+    serializer_class = LeaderboardRowSerializer
 
     def retrieve(self, request, *args, **kwargs):
         rows = _base_rows(request)
@@ -257,7 +256,6 @@ class MyLeaderboardView(RetrieveAPIView):
         idx = next((i for i, r in enumerate(rows) if r["user_id"] == my_id), None)
 
         if idx is None:
-            # 활동/시도가 전혀 없는 사용자도 '내 순위'를 알 수 있게 한다.
             me = {
                 "user_id": my_id,
                 "username": request.user.username,
@@ -266,13 +264,11 @@ class MyLeaderboardView(RetrieveAPIView):
                 "points": 0,
                 "last_activity": None,
                 "rank": len(rows) + 1,
+                "total_users": len(rows),
             }
-            around = rows[:5]
         else:
-            me = rows[idx]
-            lo = max(0, idx - 3)
-            hi = min(len(rows), idx + 4)
-            around = rows[lo:hi]
+            me = rows[idx].copy()
+            me["total_users"] = len(rows)
 
-        ser = self.get_serializer({"me": me, "around": around})
+        ser = self.get_serializer(me)
         return Response(ser.data)

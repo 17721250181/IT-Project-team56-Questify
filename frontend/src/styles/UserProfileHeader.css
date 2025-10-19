@@ -1,0 +1,63 @@
+/* UserProfileHeader Styles */
+
+/* Ranking Display Enhancement */
+.ranking-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ranking-medal {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.ranking-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Top 3 Rankings Special Styling */
+.ranking-top3 {
+    animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Stat Cards Enhancement */
+.stat-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Profile Picture Hover Effect */
+.profile-picture {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-picture:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .ranking-medal {
+        font-size: 1.5rem;
+    }
+    
+    .ranking-number {
+        font-size: 1.25rem;
+    }
+}
