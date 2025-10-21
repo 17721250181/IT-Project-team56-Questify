@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Row, Col, Image, Badge, Form, Button, Spinner, Alert } from 'react-bootstrap';
+import { Row, Col, Badge, Form, Button, Spinner, Alert } from 'react-bootstrap';
 import { AuthService } from '../../services/authService';
 import { UserProfileService } from '../../services/userProfileService';
+import { UserAvatar } from '../common';
 import '../../styles/UserProfileHeader.css';
 
 /**
@@ -130,25 +131,12 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         <div className="bg-light border rounded-3 p-4 shadow-sm">
             <Row className="align-items-center">
                 <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                    {avatarUrl ? (
-                        <Image
-                            src={avatarUrl}
-                            roundedCircle
-                            width={150}
-                            height={150}
-                            alt={"profile image"}
-                            className="border border-3 border-primary profile-picture"
-                            style={{
-                                objectFit: 'cover',
-                                objectPosition: 'center 10%',
-                            }}
-                        />
-                    ) : (
-                        <i
-                            className="bi bi-person-circle text-secondary"
-                            style={{ fontSize: '150px' }}
-                        />
-                    )}
+                    <UserAvatar
+                        avatarUrl={avatarUrl}
+                        size="xlarge"
+                        showBorder={true}
+                        hoverable={isEditable}
+                    />
                     {isEditable && (
                         <Form.Group controlId="formFile" className="d-flex justify-content-center mt-3">
                             <Form.Label

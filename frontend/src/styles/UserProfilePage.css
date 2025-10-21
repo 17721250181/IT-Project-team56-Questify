@@ -1,0 +1,170 @@
+/**
+ * UserProfilePage Unified CSS
+ * 
+ * Design System:
+ * - Primary color: #212529 (dark text)
+ * - Secondary color: #6c757d (muted text)
+ * - Border color: #dee2e6
+ * - Background: #f8f9fa (light backgrounds)
+ * - Border radius: 12px (cards and containers)
+ * - Spacing: 4px increments (Bootstrap standard)
+ * - Shadows: consistent elevation system
+ */
+
+/* ============================================
+   TYPOGRAPHY HIERARCHY
+   ============================================ */
+
+/* Page-level heading (not currently used, but available) */
+.profile-page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 1.5rem;
+}
+
+/* Section headings (h5 in tabs) */
+.profile-section-heading {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 1rem;
+}
+
+/* Tab titles and labels */
+.profile-tab-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Loading and error messages */
+.profile-message-text {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+/* ============================================
+   LAYOUT & CONTAINERS
+   ============================================ */
+
+/* Main page container */
+.profile-page-container {
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* Section spacing */
+.profile-section {
+    margin-bottom: 1.5rem;
+}
+
+/* Card containers */
+.profile-card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================
+   TABS STYLING
+   ============================================ */
+
+/* Unified tab styling */
+.profile-tabs {
+    border-bottom: 2px solid #dee2e6;
+}
+
+.profile-tabs .nav-link {
+    color: #6c757d;
+    font-weight: 500;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.profile-tabs .nav-link:hover {
+    color: #212529;
+    background-color: #f8f9fa;
+    border-bottom-color: #dee2e6;
+}
+
+.profile-tabs .nav-link.active {
+    color: #0d6efd;
+    background-color: transparent;
+    border-bottom-color: #0d6efd;
+}
+
+/* Tab icons */
+.profile-tab-icon {
+    margin-right: 0.5rem;
+}
+
+/* ============================================
+   LOADING & ERROR STATES
+   ============================================ */
+
+/* Loading container */
+.profile-loading {
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.profile-loading-spinner {
+    color: #0d6efd;
+}
+
+.profile-loading-text {
+    margin-top: 1rem;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+/* Error container */
+.profile-error {
+    padding: 3rem 0;
+}
+
+.profile-error-alert {
+    border-radius: 12px;
+    border-left: 4px solid #dc3545;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .profile-page-container {
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .profile-section {
+        margin-bottom: 1rem;
+    }
+
+    .profile-section-heading {
+        font-size: 1.125rem;
+    }
+
+    .profile-tabs .nav-link {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 577px) and (max-width: 768px) {
+    .profile-page-container {
+        margin-top: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+}
