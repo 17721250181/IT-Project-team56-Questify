@@ -1,4 +1,13 @@
 /* Leaderboard Page Styles */
+/* 
+ * Design System:
+ * - Primary Color: #212529 (dark gray/black)
+ * - Border Color: #e9ecef (light gray)
+ * - Hover Background: #f8f9fa (very light gray)
+ * - Text Color: #495057 (medium gray)
+ * - Border Radius: 12px (consistent rounded corners)
+ * - Box Shadow: 0 2px 4px rgba(0, 0, 0, 0.06) (subtle)
+ */
 
 .leaderboard-page {
     padding-bottom: 3rem;
@@ -11,6 +20,11 @@
     border: 2px solid #e9ecef;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     border-radius: 12px;
+    transition: box-shadow 0.3s ease;
+}
+
+.your-position-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .your-position-card .rank-badge {
@@ -52,44 +66,97 @@
     font-size: 1.2rem;
 }
 
+/* Time-based Rankings */
+.your-position-card .time-rank-item {
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.your-position-card .time-rank-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+.your-position-card .time-rank-item i {
+    font-size: 1.5rem;
+    display: block;
+}
+
+.your-position-card .time-rank-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.your-position-card .time-rank-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #212529;
+    min-height: 24px;
+}
+
+.your-position-card .time-rank-value .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 2px;
+}
+
 /* Top 3 Section */
 .top-3-section {
     padding: 2rem 0;
 }
 
+.top-3-section h4 {
+    color: #212529;
+    font-weight: 600;
+}
+
 .top-card {
     background: #ffffff;
-    border: 1px solid #e9ecef;
+    border: 2px solid #e9ecef;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .top-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-color: #dee2e6;
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .top-card.rank-1 {
-    border: 2px solid #212529;
+    border: 3px solid #212529;
     transform: scale(1.05);
     margin-top: 0;
 }
 
 .top-card.rank-1:hover {
-    transform: scale(1.05) translateY(-3px);
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
     border-color: #000000;
 }
 
 .top-card.rank-2 {
-    border: 2px solid #6c757d;
+    border: 3px solid #6c757d;
     margin-top: 20px;
 }
 
+.top-card.rank-2:hover {
+    border-color: #495057;
+}
+
 .top-card.rank-3 {
-    border: 2px solid #adb5bd;
+    border: 3px solid #adb5bd;
     margin-top: 20px;
+}
+
+.top-card.rank-3:hover {
+    border-color: #6c757d;
 }
 
 .top-card .rank-medal {
@@ -143,10 +210,15 @@
 
 /* Leaderboard List Card */
 .leaderboard-list-card {
-    border: 1px solid #e9ecef;
+    border: 2px solid #e9ecef;
     border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.leaderboard-list-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .leaderboard-list-card .card-header {
@@ -155,7 +227,7 @@
     font-weight: 600;
     font-size: 1.1rem;
     padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 2px solid #e9ecef;
 }
 
 /* Leaderboard List Items */
@@ -164,16 +236,36 @@
     overflow-y: auto;
 }
 
+/* Scrollbar styling for leaderboard list */
+.leaderboard-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.leaderboard-list::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+
+.leaderboard-list::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 4px;
+}
+
+.leaderboard-list::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+}
+
 .leaderboard-item {
     display: flex;
     align-items: center;
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .leaderboard-item:hover {
     background-color: #f8f9fa;
+    border-left: 3px solid #dee2e6;
+    padding-left: calc(1.5rem - 3px);
 }
 
 .leaderboard-item:last-child {
@@ -182,11 +274,13 @@
 
 .leaderboard-item.current-user {
     background-color: #f8f9fa;
-    border-left: 3px solid #212529;
+    border-left: 4px solid #212529;
+    padding-left: calc(1.5rem - 4px);
 }
 
 .leaderboard-item.current-user:hover {
     background-color: #e9ecef;
+    border-left-color: #000000;
 }
 
 .leaderboard-item .rank-column {

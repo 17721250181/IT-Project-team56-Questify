@@ -40,7 +40,7 @@ const LeaderboardList = ({
                                 {leaderboardData.map((user) => (
                                     <div 
                                         key={user.user_id} 
-                                        className={`leaderboard-item ${myRank?.me?.user_id === user.user_id ? 'current-user' : ''}`}
+                                        className={`leaderboard-item ${myRank?.user_id === user.user_id ? 'current-user' : ''}`}
                                     >
                                         <div className="rank-column">
                                             <span className="rank-number">
@@ -52,7 +52,7 @@ const LeaderboardList = ({
                                                 <i className="bi bi-person-circle"></i>
                                             </div>
                                             <div className="user-info">
-                                                <div className="username">{user.username}</div>
+                                                <div className="username">{user.display_name}</div>
                                                 <div className="user-stats">
                                                     <span className="stat">
                                                         <i className="bi bi-check-circle text-success"></i> {user.correct}
@@ -82,7 +82,7 @@ LeaderboardList.propTypes = {
     leaderboardData: PropTypes.arrayOf(
         PropTypes.shape({
             user_id: PropTypes.number.isRequired,
-            username: PropTypes.string.isRequired,
+            display_name: PropTypes.string.isRequired,
             points: PropTypes.number.isRequired,
             rank: PropTypes.number.isRequired,
             attempts: PropTypes.number.isRequired,
@@ -90,9 +90,10 @@ LeaderboardList.propTypes = {
         })
     ).isRequired,
     myRank: PropTypes.shape({
-        me: PropTypes.shape({
-            user_id: PropTypes.number.isRequired,
-        }),
+        user_id: PropTypes.number,
+        rank: PropTypes.number,
+        points: PropTypes.number,
+        display_name: PropTypes.string,
     }),
     activeTab: PropTypes.string.isRequired,
     getRankBadge: PropTypes.func.isRequired,

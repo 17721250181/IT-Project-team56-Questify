@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 class LeaderboardRowSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
-    username = serializers.CharField()
+    display_name = serializers.CharField()
     attempts = serializers.IntegerField()
     correct = serializers.IntegerField()
     points = serializers.IntegerField()

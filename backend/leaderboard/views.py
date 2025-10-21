@@ -136,18 +136,19 @@ def _base_rows(request):
     )
     agg = list(agg_qs)  # 쿼리 평가
 
-    # 2) 사용자 표시명 맵
+    # 2) 사용자 표시명 맵 (display_name 사용)
     user_ids_from_attempts = [r["attempter"] for r in agg]
+    users = User.objects.filter(id__in=user_ids_from_attempts).select_related('profile')
     user_map = {
-        u.id: u.username
-        for u in User.objects.filter(id__in=user_ids_from_attempts)
+        u.id: (u.profile.display_name if hasattr(u, 'profile') and u.profile.display_name else u.username)
+        for u in users
     }
 
     # 3) 기본 rows 구성
     rows = [
         {
             "user_id": r["attempter"],
-            "username": user_map.get(r["attempter"], "Unknown"),
+            "display_name": user_map.get(r["attempter"], "Unknown"),
             "attempts": r["attempts"],
             "correct": r["correct"],
             "points": r["points"],
@@ -182,12 +183,13 @@ def _base_rows(request):
         # - 포함시키면 전체 순위에 보인다(여기서는 포함하도록 구현한다).
         extra_user_ids = set(count_map.keys()) - set(rows_by_id.keys())
         if extra_user_ids:
-            # username 채우기
-            missing_users = User.objects.filter(id__in=list(extra_user_ids))
+            # display_name 채우기
+            missing_users = User.objects.filter(id__in=list(extra_user_ids)).select_related('profile')
             for u in missing_users:
+                display_name = u.profile.display_name if hasattr(u, 'profile') and u.profile.display_name else u.username
                 rows_by_id[u.id] = {
                     "user_id": u.id,
-                    "username": u.username,
+                    "display_name": display_name,
                     "attempts": 0,
                     "correct": 0,
                     "points": 0,
@@ -256,9 +258,15 @@ class MyLeaderboardView(RetrieveAPIView):
         idx = next((i for i, r in enumerate(rows) if r["user_id"] == my_id), None)
 
         if idx is None:
+            # 用户没有活动记录,返回默认值并使用 display_name
+            display_name = (
+                request.user.profile.display_name 
+                if hasattr(request.user, 'profile') and request.user.profile.display_name 
+                else request.user.username
+            )
             me = {
                 "user_id": my_id,
-                "username": request.user.username,
+                "display_name": display_name,
                 "attempts": 0,
                 "correct": 0,
                 "points": 0,

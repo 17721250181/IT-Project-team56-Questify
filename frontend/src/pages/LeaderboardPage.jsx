@@ -60,7 +60,6 @@ const LeaderboardPage = () => {
                 {/* Your Position Card */}
                 <YourPositionCard 
                     myRank={myRank}
-                    activeTab={activeTab}
                     getRankBadge={getRankBadge}
                 />
 

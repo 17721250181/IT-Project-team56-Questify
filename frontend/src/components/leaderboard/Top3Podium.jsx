@@ -36,7 +36,7 @@ const Top3Podium = ({ leaderboardData, loading }) => {
                             <div className="user-avatar mb-2">
                                 <i className="bi bi-person-circle"></i>
                             </div>
-                            <h5>{top3[1]?.username || 'Username'}</h5>
+                            <h5>{top3[1]?.display_name || 'User'}</h5>
                             <p className="score-text">{top3[1]?.points || 0} pts</p>
                         </Card.Body>
                     </Card>
@@ -50,7 +50,7 @@ const Top3Podium = ({ leaderboardData, loading }) => {
                             <div className="user-avatar mb-2">
                                 <i className="bi bi-person-circle"></i>
                             </div>
-                            <h5>{top3[0]?.username || 'Username'}</h5>
+                            <h5>{top3[0]?.display_name || 'User'}</h5>
                             <p className="score-text">{top3[0]?.points || 0} pts</p>
                         </Card.Body>
                     </Card>
@@ -64,7 +64,7 @@ const Top3Podium = ({ leaderboardData, loading }) => {
                             <div className="user-avatar mb-2">
                                 <i className="bi bi-person-circle"></i>
                             </div>
-                            <h5>{top3[2]?.username || 'Username'}</h5>
+                            <h5>{top3[2]?.display_name || 'User'}</h5>
                             <p className="score-text">{top3[2]?.points || 0} pts</p>
                         </Card.Body>
                     </Card>
@@ -78,7 +78,7 @@ Top3Podium.propTypes = {
     leaderboardData: PropTypes.arrayOf(
         PropTypes.shape({
             user_id: PropTypes.number.isRequired,
-            username: PropTypes.string.isRequired,
+            display_name: PropTypes.string.isRequired,
             points: PropTypes.number.isRequired,
             rank: PropTypes.number.isRequired,
         })
