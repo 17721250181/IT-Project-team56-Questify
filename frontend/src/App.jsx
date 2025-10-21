@@ -1,20 +1,24 @@
 // Importing the Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
+// Importing Bootstrap Icons CSS
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // Importing React Router components
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Importing page components
-import { HomePage, QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage, PostQuestionPage } from './pages';
+import { HomePage, QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage, PostQuestionPage, UserProfilePage } from './pages';
 // Auth Provider and Route Guards
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Routes>
         {/* Home page - protected route */}
         <Route
           path="/"
@@ -69,6 +73,22 @@ function App() {
           }
         />
         <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users/:userId"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/post-question"
           element={
             <ProtectedRoute>
@@ -79,8 +99,9 @@ function App() {
 
         {/* Catch all other routes and redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AuthProvider>
+        </Routes>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

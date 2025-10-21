@@ -33,13 +33,9 @@ else:
     print("DEBUG: OPENAI_API_KEY not set")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+DEBUG = True
 
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    "localhost,127.0.0.1"  # default for local/dev
-).split(",")
-
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -65,50 +61,15 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Frontend origins allowed by CORS/CSRF
-_default_frontend_origins = [
+CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5173"
 ]
-_frontend_url = os.getenv("FRONTEND_URL", "").strip()
-if _frontend_url:
-    _default_frontend_origins.append(_frontend_url)
-
-_additional_cors_origins = [
-    origin.strip()
-    for origin in os.getenv("CORS_ADDITIONAL_ORIGINS", "").split(",")
-    if origin.strip()
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
 ]
-
-CORS_ALLOWED_ORIGINS = list(
-    dict.fromkeys(_default_frontend_origins + _additional_cors_origins)
-)
-
-_default_cors_regexes = [
-    r"^https://.*\.onrender\.com$",
-    r"^http://localhost(:\d+)?$",
-    r"^http://127\.0\.0\.1(:\d+)?$",
-    r"^http://0\.0\.0\.0(:\d+)?$",
-    r"^http://(10|172\.(1[6-9]|2[0-9]|3[01])|192\.168)\..+(:\d+)?$",
-]
-_additional_cors_regexes = [
-    pattern.strip()
-    for pattern in os.getenv("CORS_ALLOWED_ORIGIN_REGEXES", "").split(",")
-    if pattern.strip()
-]
-
-CORS_ALLOWED_ORIGIN_REGEXES = list(
-    dict.fromkeys(_default_cors_regexes + _additional_cors_regexes)
-)
 CORS_ALLOW_CREDENTIALS = True
-
-_csrf_env = os.getenv("CSRF_TRUSTED_ORIGINS", "").strip()
-if _csrf_env:
-    CSRF_TRUSTED_ORIGINS = [
-        origin.strip() for origin in _csrf_env.split(",") if origin.strip()
-    ]
-else:
-    CSRF_TRUSTED_ORIGINS = _default_frontend_origins.copy()
 
 ROOT_URLCONF = "config.urls"
 
@@ -183,7 +144,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -204,19 +164,14 @@ REST_FRAMEWORK = {
 # Session and CSRF security
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = False
 
-_secure_cookies_enabled = os.getenv("COOKIE_SECURE", "False").lower() == "true"
-if _secure_cookies_enabled:
-    # Required for cross-site requests from hosted frontend over HTTPS
-    CSRF_COOKIE_SAMESITE = "None"
-    SESSION_COOKIE_SAMESITE = "None"
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-else:
-    CSRF_COOKIE_SAMESITE = "Lax"
-    SESSION_COOKIE_SAMESITE = "Lax"
-    CSRF_COOKIE_SECURE = False
-    SESSION_COOKIE_SECURE = False
+# Position for user profile pictures
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Email domain restrictions for registration
 ALLOWED_EMAIL_DOMAINS = {"student.unimelb.edu.au", "unimelb.edu.au"}
@@ -230,4 +185,3 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # For developm
 # EMAIL_HOST_USER = "your-email@gmail.com"
 # EMAIL_HOST_PASSWORD = "your-app-password"
 DEFAULT_FROM_EMAIL = "noreply@questify.com"
-

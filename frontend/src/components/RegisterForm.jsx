@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 const RegisterForm = () => {
     // State variables for inputs
     const [formData, setFormData] = useState({
-        fullName: '',
+        displayName: '',
         studentId: '',
         email: '',
         password: '',
@@ -42,11 +42,11 @@ const RegisterForm = () => {
     const validateForm = () => {
         const newErrors = {};
 
-        // Full Name validation
-        if (!formData.fullName.trim()) {
-            newErrors.fullName = 'Full name is required';
-        } else if (formData.fullName.trim().length < 2) {
-            newErrors.fullName = 'Full name must be at least 2 characters';
+        // Display Name validation
+        if (!formData.displayName.trim()) {
+            newErrors.displayName = 'Display name is required';
+        } else if (formData.displayName.trim().length < 2) {
+            newErrors.displayName = 'Display name must be at least 2 characters';
         }
 
         // Student ID validation
@@ -99,7 +99,7 @@ const RegisterForm = () => {
 
         try {
             const response = await register(
-                formData.fullName,
+                formData.displayName,
                 formData.studentId,
                 formData.email,
                 formData.password
@@ -110,7 +110,7 @@ const RegisterForm = () => {
 
             // Clear form
             setFormData({
-                fullName: '',
+                displayName: '',
                 studentId: '',
                 email: '',
                 password: '',
@@ -136,20 +136,20 @@ const RegisterForm = () => {
                 {/* Full Name Field */}
                 <Form.Group className="mb-3">
                     <Form.Label className="form-label">
-                        Full Name
+                        Display Name
                     </Form.Label>
                     <Form.Control
                         type="text"
-                        name="fullName"
-                        placeholder="Enter your full name"
-                        value={formData.fullName}
+                        name="displayName"
+                        placeholder="Choose how your name appears"
+                        value={formData.displayName}
                         onChange={handleChange}
                         className="form-input"
-                        isInvalid={!!errors.fullName}
+                        isInvalid={!!errors.displayName}
                         disabled={loading}
                     />
                     <Form.Control.Feedback type="invalid">
-                        {errors.fullName}
+                        {errors.displayName}
                     </Form.Control.Feedback>
                 </Form.Group>
 
@@ -263,10 +263,10 @@ const RegisterForm = () => {
                         disabled={loading}
                     >
                         {loading ? (
-                            <>
+                            <span className="d-flex align-items-center justify-content-center">
                                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                 Creating Account...
-                            </>
+                            </span>
                         ) : (
                             'Create Account'
                         )}

@@ -1,5 +1,9 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from django.db.models import Count
+from django.db.models.functions import TruncDate
+from datetime import datetime, timedelta
 from .models import Attempt
 from .serializers import AttemptSerializer
 from questions.models import Question
@@ -67,3 +71,40 @@ class QuestionAttemptListView(generics.ListAPIView):
     def get_queryset(self):
         question_id = self.kwargs['question_id']
         return Attempt.objects.filter(question_id=question_id).order_by('-submitted_at')
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_activity_heatmap(request):
+    """
+    Get user's activity data for heatmap visualization
+    Returns attempts count grouped by date for the past 365 days
+    """
+    user = request.user
+    
+    # Get date range (past 365 days / 12 months)
+    end_date = datetime.now().date()
+    start_date = end_date - timedelta(days=365)
+    
+    # Query attempts grouped by date
+    activity_data = (
+        Attempt.objects
+        .filter(attempter=user, submitted_at__date__gte=start_date)
+        .annotate(date=TruncDate('submitted_at'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+    
+    # Convert to dictionary for easier frontend processing
+    activity_dict = {
+        str(item['date']): item['count'] 
+        for item in activity_data
+    }
+    
+    return Response({
+        'start_date': str(start_date),
+        'end_date': str(end_date),
+        'activity': activity_dict,
+        'total_attempts': sum(activity_dict.values())
+    })

@@ -39,6 +39,7 @@ const PostQuestionForm = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [validationErrors, setValidationErrors] = useState({});
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -46,6 +47,14 @@ const PostQuestionForm = () => {
             ...prev,
             [name]: value
         }));
+        
+        // Clear validation error for this field
+        if (validationErrors[name]) {
+            setValidationErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
     };
 
     const handleTypeChange = (e) => {
@@ -82,10 +91,73 @@ const PostQuestionForm = () => {
                 ? [...prev.correct_options, option]
                 : prev.correct_options.filter(opt => opt !== option)
         }));
+        
+        // Clear correct_options validation error
+        if (validationErrors.correct_options) {
+            setValidationErrors(prev => ({
+                ...prev,
+                correct_options: ''
+            }));
+        }
+    };
+
+    // Validate form before submission
+    const validateForm = () => {
+        const errors = {};
+
+        // Validate question text
+        if (!formData.question.trim()) {
+            errors.question = 'Question text is required';
+        } else if (formData.question.trim().length < 10) {
+            errors.question = 'Question must be at least 10 characters';
+        }
+
+        // Validate week and topic
+        if (!formData.weekTopic) {
+            errors.weekTopic = 'Please select a week and topic';
+        }
+
+        // Type-specific validation
+        if (formData.type === 'SHORT') {
+            if (!formData.answer.trim()) {
+                errors.answer = 'Expected answer is required';
+            }
+        } else if (formData.type === 'MCQ') {
+            // Validate options
+            if (!formData.option_a.trim()) {
+                errors.option_a = 'Option A is required';
+            }
+            if (!formData.option_b.trim()) {
+                errors.option_b = 'Option B is required';
+            }
+            
+            // Validate correct options
+            if (formData.correct_options.length === 0) {
+                errors.correct_options = 'Please select at least one correct option';
+            }
+            
+            // Ensure selected correct options have text
+            formData.correct_options.forEach(opt => {
+                const optionKey = `option_${opt.toLowerCase()}`;
+                if (!formData[optionKey]?.trim()) {
+                    errors[optionKey] = `Option ${opt} cannot be empty if marked as correct`;
+                }
+            });
+        }
+
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Validate form
+        if (!validateForm()) {
+            setError('Please fix the errors before submitting');
+            return;
+        }
+        
         setLoading(true);
         setError('');
         setMessage('');
@@ -131,8 +203,11 @@ const PostQuestionForm = () => {
                 option_e: '',
                 correct_options: []
             });
+            setValidationErrors({});
         } catch (err) {
-            console.error('Error creating question:', err);
+            if (import.meta.env.DEV) {
+                console.error('Error creating question:', err);
+            }
             setError('Failed to create question. Please try again.');
         } finally {
             setLoading(false);
@@ -154,6 +229,7 @@ const PostQuestionForm = () => {
                             name="weekTopic"
                             value={formData.weekTopic}
                             onChange={handleWeekTopicChange}
+                            isInvalid={!!validationErrors.weekTopic}
                             required
                         >
                             <option value="">Select a week and topic...</option>
@@ -163,6 +239,9 @@ const PostQuestionForm = () => {
                                 </option>
                             ))}
                         </Form.Select>
+                        <Form.Control.Feedback type="invalid">
+                            {validationErrors.weekTopic}
+                        </Form.Control.Feedback>
                     </Form.Group>
 
                     {/* Question Text */}
@@ -175,8 +254,12 @@ const PostQuestionForm = () => {
                             value={formData.question}
                             onChange={handleInputChange}
                             placeholder="Enter your question..."
+                            isInvalid={!!validationErrors.question}
                             required
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {validationErrors.question}
+                        </Form.Control.Feedback>
                     </Form.Group>
 
                     {/* Question Type */}
@@ -195,7 +278,7 @@ const PostQuestionForm = () => {
                     {/* Short Answer Fields */}
                     {formData.type === 'SHORT' && (
                         <Form.Group className="mb-3">
-                            <Form.Label>Expected Answer</Form.Label>
+                            <Form.Label>Expected Answer <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 as="textarea"
                                 rows={2}
@@ -203,8 +286,12 @@ const PostQuestionForm = () => {
                                 value={formData.answer}
                                 onChange={handleInputChange}
                                 placeholder="Enter the expected answer..."
+                                isInvalid={!!validationErrors.answer}
                                 required
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {validationErrors.answer}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     )}
 
@@ -212,7 +299,13 @@ const PostQuestionForm = () => {
                     {formData.type === 'MCQ' && (
                         <>
                             <Form.Group className="mb-3">
-                                <Form.Label>Options (Check the correct answers)</Form.Label>
+                                <Form.Label>Options (Check the correct answers) <span className="text-danger">*</span></Form.Label>
+                                
+                                {validationErrors.correct_options && (
+                                    <div className="text-danger small mb-2">
+                                        {validationErrors.correct_options}
+                                    </div>
+                                )}
                                 
                                 {/* Option A */}
                                 <Row className="align-items-center mb-2">
@@ -222,8 +315,12 @@ const PostQuestionForm = () => {
                                             value={formData.option_a}
                                             onChange={handleInputChange}
                                             placeholder="Enter option A..."
+                                            isInvalid={!!validationErrors.option_a}
                                             required
                                         />
+                                        <Form.Control.Feedback type="invalid">
+                                            {validationErrors.option_a}
+                                        </Form.Control.Feedback>
                                     </Col>
                                     <Col md={2} className="text-center">
                                         <Form.Check
@@ -244,8 +341,12 @@ const PostQuestionForm = () => {
                                             value={formData.option_b}
                                             onChange={handleInputChange}
                                             placeholder="Enter option B..."
+                                            isInvalid={!!validationErrors.option_b}
                                             required
                                         />
+                                        <Form.Control.Feedback type="invalid">
+                                            {validationErrors.option_b}
+                                        </Form.Control.Feedback>
                                     </Col>
                                     <Col md={2} className="text-center">
                                         <Form.Check

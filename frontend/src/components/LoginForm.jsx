@@ -10,6 +10,7 @@ const LoginForm = () => {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({ email: '', password: '' });
 
     // Hooks for authentication and navigation
     const { login } = useAuth();
@@ -22,31 +23,84 @@ const LoginForm = () => {
         }
     }, [location.state]);
 
+    // Validate email format
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    // Handle email change with validation
+    const handleEmailChange = (e) => {
+        const value = e.target.value;
+        setEmail(value);
+        
+        if (value && !validateEmail(value)) {
+            setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+        } else {
+            setErrors(prev => ({ ...prev, email: '' }));
+        }
+    };
+
+    // Handle password change with validation
+    const handlePasswordChange = (e) => {
+        const value = e.target.value;
+        setPassword(value);
+        
+        if (value && value.length < 6) {
+            setErrors(prev => ({ ...prev, password: 'Password must be at least 6 characters' }));
+        } else {
+            setErrors(prev => ({ ...prev, password: '' }));
+        }
+    };
+
     // Handle form submission
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        // Clear previous messages
+        setMessage('');
+
         // Basic validation
-        if (!email.trim() || !password.trim()) {
-            setMessage('Please enter both email and password');
+        if (!email.trim()) {
+            setErrors(prev => ({ ...prev, email: 'Email is required' }));
+            return;
+        }
+        
+        if (!password.trim()) {
+            setErrors(prev => ({ ...prev, password: 'Password is required' }));
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            setErrors(prev => ({ ...prev, email: 'Please enter a valid email address' }));
+            return;
+        }
+
+        // Check if there are any validation errors
+        if (errors.email || errors.password) {
             return;
         }
 
         setLoading(true);
-        setMessage('');
 
         try {
-            console.log('Attempting login for:', email);
+            if (import.meta.env.DEV) {
+                console.log('Attempting login for:', email);
+            }
 
             // Use AuthContext login method
             await login(email, password);
 
-            console.log('Login successful');
+            if (import.meta.env.DEV) {
+                console.log('Login successful');
+            }
             // Note: PublicRoute will automatically redirect to home page
             // once isAuthenticated becomes true, so no manual navigation needed
 
         } catch (error) {
-            console.error('Login error:', error);
+            if (import.meta.env.DEV) {
+                console.error('Login error:', error);
+            }
             setMessage(error.message || 'Login failed. Please try again.');
         } finally {
             setLoading(false);
@@ -66,11 +120,15 @@ const LoginForm = () => {
                         type="email"
                         placeholder="Enter your email address"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={handleEmailChange}
                         className="form-input"
                         disabled={loading}
+                        isInvalid={!!errors.email}
                         required
                     />
+                    <Form.Control.Feedback type="invalid">
+                        {errors.email}
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 {/* Password Field */}
@@ -82,11 +140,15 @@ const LoginForm = () => {
                         type="password"
                         placeholder="Enter your password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={handlePasswordChange}
                         className="form-input"
                         disabled={loading}
+                        isInvalid={!!errors.password}
                         required
                     />
+                    <Form.Control.Feedback type="invalid">
+                        {errors.password}
+                    </Form.Control.Feedback>
                 </Form.Group>
 
                 {/* Primary Login Button */}
@@ -99,10 +161,10 @@ const LoginForm = () => {
                         disabled={loading}
                     >
                         {loading ? (
-                            <>
+                            <span className="d-flex align-items-center justify-content-center">
                                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                 Signing In...
-                            </>
+                            </span>
                         ) : (
                             'Sign In'
                         )}

@@ -38,16 +38,16 @@ export const AuthService = {
 
     /**
      * User Registration
-     * @param {string} fullName - User's full name
+     * @param {string} displayName - Preferred display name
      * @param {string} studentId - Student ID
      * @param {string} email - User email address
      * @param {string} password - User password
      * @returns {Promise<Object>} Registration response with user data
      */
-    register: async (fullName, studentId, email, password) => {
+    register: async (displayName, studentId, email, password) => {
         try {
             const response = await apiClient.post('/auth/register/', {
-                name: fullName.trim(),                    // Frontend 'fullName' → Backend 'name'
+                display_name: displayName.trim(),         // Frontend 'displayName' → Backend field
                 student_id: studentId.trim(),             // Frontend 'studentId' → Backend 'student_id'
                 email: email.trim().toLowerCase(),
                 password: password
@@ -124,6 +124,58 @@ export const AuthService = {
         }
     },
 
+    getProfilePict: async () => {
+        try {
+            const response = await apiClient.get("/me/profile-picture/");
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error("API error:", error);
+            }
+            throw new Error("Failed to fetch profile picture");
+        }
+    },
+
+    updateProfile: async (payload) => {
+        try {
+            const response = await apiClient.patch('/me/', payload);
+            return response.data;
+        } catch (error) {
+            if (error.response?.data) {
+                const message = error.response.data.message || 'Failed to update profile';
+                throw new Error(message);
+            }
+            throw new Error('Failed to update profile');
+        }
+    },
+
+    setProfilePict: async (formData) => {
+        try {
+            const res = await apiClient.patch("me/profile-picture/", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            return res.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error("API error:", error);
+            }
+            throw new Error("Failed to set profile picture");
+
+        }
+    },
+
+    getUserById: async (userId) => {
+        try {
+            const response = await apiClient.get(`/users/${userId}/`);
+            return response.data;
+        } catch (error) {
+            if (error.response?.status === 404) {
+                throw new Error('User not found');
+            }
+            throw new Error('Failed to load user profile');
+        }
+    },
+
     /**
      * User Logout
      * @returns {Promise<Object>} Logout response
@@ -135,7 +187,9 @@ export const AuthService = {
         } catch (error) {
             // For logout, we should succeed even if the server call fails
             // This ensures the user can always log out locally
-            console.error('Logout API call failed:', error);
+            if (import.meta.env.DEV) {
+                console.error('Logout API call failed:', error);
+            }
 
             return {
                 ok: true,

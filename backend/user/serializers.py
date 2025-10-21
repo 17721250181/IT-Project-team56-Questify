@@ -3,29 +3,117 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from attempts.models import Attempt
 from .models import UserProfile
 
+
+class UserUpdateSerializer(serializers.Serializer):
+    display_name = serializers.CharField(required=False, allow_blank=False, max_length=150)
+
+    def validate_display_name(self, value):
+        cleaned = value.strip()
+        if not cleaned:
+            raise serializers.ValidationError("Display name cannot be empty.")
+        return cleaned
+
+    def update(self, instance, validated_data):
+        display_name = validated_data.get("display_name")
+        if display_name is not None:
+            display_name = display_name.strip()
+            profile, _ = UserProfile.objects.get_or_create(user=instance)
+            profile.display_name = display_name
+            profile.save(update_fields=["display_name"])
+            instance.first_name = display_name
+            instance.last_name = ""
+            instance.save(update_fields=["first_name", "last_name"])
+        return instance
+
 class UserSerializer(serializers.ModelSerializer):
-    # User serializer which excludes password field for security
+    """
+    User serializer with profile information.
+    
+    Fields:
+    - display_name: User's preferred display name (from profile.display_name)
+    - name: Alias for display_name
+    - username: Login username (returns email)
+    - email: User's email address (also used as login username)
+    """
+    display_name = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
     student_id = serializers.SerializerMethodField()
+    profile_picture_url = serializers.SerializerMethodField()
+    attempted_questions = serializers.SerializerMethodField()
+    posted_questions = serializers.SerializerMethodField()
+    points = serializers.SerializerMethodField()
+    ranking = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'student_id', 'is_staff', 'date_joined', 'last_login']
+        fields = [
+            'id',
+            'email',
+            'username',
+            'display_name',
+            'name',
+            'student_id',
+            'profile_picture_url',
+            'attempted_questions',
+            'posted_questions',
+            'points',
+            'ranking',
+            'is_staff',
+            'date_joined',
+            'last_login',
+        ]
+
+    def get_display_name(self, obj):
+        """Get user's display name from profile, fallback to email"""
+        profile = getattr(obj, "profile", None)
+        if profile and profile.display_name:
+            return profile.display_name
+        # Fallback to email (which is the login username)
+        return obj.email or obj.username or "User"
 
     def get_name(self, obj):
-        return obj.get_full_name() or obj.username
+        """Alias for display_name for backward compatibility"""
+        return self.get_display_name(obj)
+
+    def get_username(self, obj):
+        """Get username (returns email as that's the login username)"""
+        return obj.email or obj.username or "User"
 
     def get_student_id(self, obj):
-        try:
-            return obj.profile.student_id
-        except UserProfile.DoesNotExist:
+        profile = getattr(obj, "profile", None)
+        return getattr(profile, "student_id", None)
+
+    def get_profile_picture_url(self, obj):
+        profile = getattr(obj, "profile", None)
+        if not profile or not profile.profile_picture:
             return None
+        request = self.context.get("request")
+        url = profile.profile_picture.url
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
+    def get_attempted_questions(self, obj):
+        return Attempt.objects.filter(attempter=obj).count()
+
+    def get_posted_questions(self, obj):
+        return obj.questions.count()
+
+    def get_points(self, obj):
+        # Placeholder until a scoring system is implemented
+        return 0
+
+    def get_ranking(self, obj):
+        # Placeholder ranking logic
+        return None
 
 class UserRegistrationSerializer(serializers.Serializer):
     # Serializer for user registration with secure password handling
-    name = serializers.CharField(max_length=150, required=True)
+    display_name = serializers.CharField(max_length=150, required=True)
     student_id = serializers.CharField(max_length=20, required=True)
     email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, required=True)
@@ -65,7 +153,7 @@ class UserRegistrationSerializer(serializers.Serializer):
     def create(self, validated_data):
         email = validated_data['email']
         password = validated_data['password']
-        name = validated_data['name']
+        display_name = validated_data['display_name']
         student_id = validated_data['student_id']
 
         user = User.objects.create_user(
@@ -74,18 +162,22 @@ class UserRegistrationSerializer(serializers.Serializer):
             password=password
         )
 
-        # Set first and last name
-        name_parts = name.split(" ", 1)
-        user.first_name = name_parts[0]
-        if len(name_parts) > 1:
-            user.last_name = name_parts[1]
+        # Store display name on user for compatibility
+        user.first_name = display_name
+        user.last_name = ""
         user.save()
 
         # Create user profile with student_id
-        UserProfile.objects.create(
+        profile, created = UserProfile.objects.get_or_create(
             user=user,
-            student_id=student_id
+            defaults={"student_id": student_id, "display_name": display_name}
         )
+
+        if not created:
+            profile.student_id = student_id
+            if not profile.display_name:
+                profile.display_name = display_name
+            profile.save(update_fields=["student_id", "display_name"])
 
         return user
 
@@ -120,3 +212,40 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 class CSRFTokenSerializer(serializers.Serializer):
     # Serializer for CSRF token response
     csrfToken = serializers.CharField(read_only=True)
+
+
+class ProfilePictureSerializer(serializers.ModelSerializer):
+    profile_picture_url = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ["user", "student_id", "profile_picture", "profile_picture_url", "updated_at"]
+        extra_kwargs = {"profile_picture": {"write_only": True, "required": True}}
+
+    def validate_profile_picture(self, file):
+        allowed = {"image/jpeg", "image/png", "image/webp"}
+        if getattr(file, "content_type", None) not in allowed:
+            raise serializers.ValidationError("Unsupported image type")
+        max_mb = getattr(settings, "PROFILE_PIC_MAX_MB", 5)
+        if file.size > max_mb * 1024 * 1024:
+            raise serializers.ValidationError("File too large")
+        return file
+
+    def get_profile_picture_url(self, obj):
+        request = self.context.get("request")
+        if not obj.profile_picture:
+            return None
+        url = obj.profile_picture.url
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
+    def update(self, instance, validated_data):
+        # Handle old profile picture deletion
+        new_picture = validated_data.get("profile_picture", None)
+        if new_picture and instance.profile_picture and instance.profile_picture.name:
+            try:
+                instance.profile_picture.delete(save=False)
+            except Exception:
+                pass
+        return super().update(instance, validated_data)

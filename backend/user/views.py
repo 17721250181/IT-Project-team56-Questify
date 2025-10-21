@@ -12,7 +12,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import get_object_or_404
+from .serializers import ProfilePictureSerializer, UserUpdateSerializer
 from .serializers import (
     UserSerializer,
     UserRegistrationSerializer,
@@ -52,7 +55,7 @@ class RegisterView(APIView):
             # Ensure CSRF token is set for subsequent requests
             get_token(request)
 
-            user_serializer = UserSerializer(user)
+            user_serializer = UserSerializer(user, context={"request": request})
             return Response({
                 "ok": True,
                 "message": "Registration successful",
@@ -86,7 +89,7 @@ class LoginView(APIView):
                 # Ensure CSRF token is set for subsequent requests
                 get_token(request)
 
-                user_serializer = UserSerializer(user)
+                user_serializer = UserSerializer(user, context={"request": request})
                 return Response({
                     "ok": True,
                     "message": "Login successful",
@@ -118,8 +121,23 @@ class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        serializer = UserSerializer(request.user)
+        serializer = UserSerializer(request.user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        serializer = UserUpdateSerializer(data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.update(request.user, serializer.validated_data)
+            refreshed = UserSerializer(request.user, context={"request": request})
+            return Response(refreshed.data, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "ok": False,
+                "message": "Invalid data",
+                "errors": serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class PasswordResetRequestView(APIView):
@@ -202,3 +220,21 @@ class PasswordResetConfirmView(APIView):
             "message": "Invalid data",
             "errors": serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        serializer = UserSerializer(user, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+class MeProfilePictureView(RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    serializer_class = ProfilePictureSerializer
+
+    def get_object(self):
+        return self.request.user.profile

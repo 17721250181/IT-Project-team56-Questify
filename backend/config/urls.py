@@ -17,15 +17,14 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from django.http import HttpResponse
-
-def healthz(_request):
-    return HttpResponse("ok")
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path("healthz", healthz),
     path("admin/", admin.site.urls),
     path("api/", include("user.urls")),
     path("api/attempts/", include("attempts.urls")),
     path("api/questions/", include("questions.urls")),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

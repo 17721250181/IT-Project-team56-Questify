@@ -1,15 +1,53 @@
 import apiClient from './apiClient.js';
+import { AttemptService } from './attemptService.js';
 
 // Question service API methods
 export const QuestionService = {
     // Get all questions from backend (matches QuestionListView)
-    getAllQuestions: async () => {
+    getAllQuestions: async (options = {}) => {
         try {
-            console.log("withCredentials:", apiClient.defaults.withCredentials);
-            const response = await apiClient.get('/questions/');
+            const params = {};
+
+            if (options.search?.trim()) {
+                params.search = options.search.trim();
+            }
+
+            const filters = options.filters || {};
+            if (filters.week) {
+                params.week = filters.week;
+            }
+            if (filters.topic) {
+                params.topic = filters.topic;
+            }
+            if (filters.type) {
+                params.type = filters.type;
+            }
+            if (filters.source) {
+                params.source = filters.source;
+            }
+            if (filters.creator) {
+                params.creator = filters.creator;
+            }
+            if (filters.verified) {
+                params.verified = 'true';
+            }
+            if (typeof filters.minRating === 'number' && filters.minRating > 0) {
+                params.min_rating = filters.minRating;
+            }
+            if (typeof filters.maxRating === 'number' && filters.maxRating > 0) {
+                params.max_rating = filters.maxRating;
+            }
+
+            if (options.sort) {
+                params.ordering = options.sort;
+            }
+
+            const response = await apiClient.get('/questions/', { params });
             return response.data;
         } catch (error) {
-            console.error('Failed to fetch questions:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch questions:', error);
+            }
             throw new Error('Failed to fetch questions');
         }
     },
@@ -29,7 +67,9 @@ export const QuestionService = {
             
             return filteredQuestions;
         } catch (error) {
-            console.error('Failed to search questions:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to search questions:', error);
+            }
             throw new Error('Failed to search questions');
         }
     },
@@ -40,7 +80,9 @@ export const QuestionService = {
             const response = await apiClient.get(`/questions/${id}/`);
             return response.data;
         } catch (error) {
-            console.error(`Failed to fetch question ${id}:`, error);
+            if (import.meta.env.DEV) {
+                console.error(`Failed to fetch question ${id}:`, error);
+            }
             throw new Error(`Failed to fetch question with id ${id}`);
         }
     },
@@ -51,7 +93,9 @@ export const QuestionService = {
             const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
-            console.error('Failed to create question:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to create question:', error);
+            }
             throw new Error('Failed to create question');
         }
     },
@@ -69,7 +113,9 @@ export const QuestionService = {
             const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
-            console.error('Failed to create short answer question:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to create short answer question:', error);
+            }
             throw new Error('Failed to create short answer question');
         }
     },
@@ -92,7 +138,9 @@ export const QuestionService = {
             const response = await apiClient.post('/questions/create/', questionData);
             return response.data;
         } catch (error) {
-            console.error('Failed to create MCQ question:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to create MCQ question:', error);
+            }
             throw new Error('Failed to create multiple choice question');
         }
     },
@@ -100,10 +148,13 @@ export const QuestionService = {
     // Submit answer for attempts
     submitAnswer: async (questionId, answer) => {
         try {
-            const response = await apiClient.post('/attempts/create/', {question:questionId, answer: answer});
-            return response.data;
+            // Use AttemptService for consistency
+            const response = await AttemptService.createAttempt(questionId, answer);
+            return response;
         } catch (error) {
-            console.error('Failed to submit answer:', error);
+            if (import.meta.env.DEV) {
+                console.error('Failed to submit answer:', error);
+            }
             
             // Provide more specific error messages
             if (error.response?.status === 401) {
@@ -117,6 +168,46 @@ export const QuestionService = {
             }
         }
     },
+
+    // Get questions created by current user
+    getUserQuestions: async () => {
+        try {
+            const response = await apiClient.get('/questions/user/');
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch user questions:', error);
+            }
+            throw new Error('Failed to fetch user questions');
+        }
+    },
+
+    // Get questions created by specific user (public)
+    getQuestionsByCreator: async (creatorId, options = {}) => {
+        const mergedFilters = {
+            ...(options.filters || {}),
+            creator: creatorId,
+        };
+        return QuestionService.getAllQuestions({
+            ...options,
+            filters: mergedFilters,
+        });
+    },
+
+    getQuestionMetadata: async () => {
+        try {
+            const response = await apiClient.get('/questions/metadata/');
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch question metadata:', error);
+            }
+            throw new Error('Failed to fetch question metadata');
+        }
+    },
+
+    // Note: Rating functions moved to ratingService.js
+    // Use RatingService.getQuestionRating, RatingService.rateQuestion, RatingService.clearRating
 };
 
 //export default api;

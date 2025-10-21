@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, ListGroupItem, Row, Col } from 'react-bootstrap';
 
-const QuestionListItem = ({
+const QListItem = ({
     id,
     title = 'Question Title',
     week = 'Week 0',
@@ -92,4 +92,4 @@ const QuestionListItem = ({
     );
 };
 
-export default QuestionListItem;
+export default QListItem;

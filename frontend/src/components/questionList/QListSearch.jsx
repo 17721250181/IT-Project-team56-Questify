@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Form, Button, InputGroup} from 'react-bootstrap';
 
-const QuestionListSearch = ({ onSearch }) => {
+const QListSearch = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Handle search action
@@ -36,4 +36,4 @@ const QuestionListSearch = ({ onSearch }) => {
   );
 };
 
-export default QuestionListSearch;
+export default QListSearch;

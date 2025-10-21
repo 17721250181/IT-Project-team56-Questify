@@ -94,15 +94,15 @@ export const AuthProvider = ({ children }) => {
 
     /**
      * Register new user
-     * @param {string} fullName - User's full name
+     * @param {string} displayName - Preferred display name
      * @param {string} studentId - Student ID
      * @param {string} email - User email
      * @param {string} password - User password
      * @returns {Promise<Object>} Registration response
      */
-    const register = async (fullName, studentId, email, password) => {
+    const register = async (displayName, studentId, email, password) => {
         try {
-            const response = await AuthService.register(fullName, studentId, email, password);
+            const response = await AuthService.register(displayName, studentId, email, password);
 
             if (response.ok && response.user) {
                 // Registration successful - update state and save to cookies (auto-login)
