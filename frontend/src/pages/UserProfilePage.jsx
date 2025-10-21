@@ -5,7 +5,7 @@ import { QuestifyNavBar } from '../components/common';
 import { UserProfileHeader, ActivityHeatmap } from '../components/profile';
 import QuestionGrid from '../components/questionList/QuestionGrid';
 import { useAuth } from '../contexts/AuthContext';
-import { AuthService } from '../services/authService';
+import { UserProfileService } from '../services/userProfileService';
 
 const UserProfilePage = () => {
     const { user: currentUser, checkAuthStatus } = useAuth();
@@ -37,7 +37,7 @@ const UserProfilePage = () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await AuthService.getUserById(viewingUserId);
+            const data = await UserProfileService.getUserById(viewingUserId);
             setProfileUser(data);
         } catch (err) {
             setError(err.message || 'Failed to load user profile.');

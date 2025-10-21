@@ -27,3 +27,7 @@ urlpatterns = [
     path("api/questions/", include("questions.urls")),
     path("api/leaderboard/", include("leaderboard.urls")),   
 ]
+
+# Serve media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

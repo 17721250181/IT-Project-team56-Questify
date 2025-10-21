@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Row, Col, Image, Badge, Form, Button, Spinner, Alert } from 'react-bootstrap';
 import { AuthService } from '../../services/authService';
+import { UserProfileService } from '../../services/userProfileService';
 import '../../styles/UserProfileHeader.css';
 
 /**
@@ -64,7 +65,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         let ignore = false;
         const fetchProfile = async () => {
             try {
-                const data = await AuthService.getProfilePict();
+                const data = await UserProfileService.getProfilePicture();
                 if (!ignore) {
                     setAvatarUrl(data.profile_picture_url || null);
                 }
@@ -88,7 +89,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         formData.append('profile_picture', file);
 
         try {
-            const data = await AuthService.setProfilePict(formData);
+            const data = await UserProfileService.setProfilePicture(formData);
             const newUrl = `${data.profile_picture_url}?t=${Date.now()}`;
             setAvatarUrl(newUrl);
             onProfileUpdated?.();
@@ -115,7 +116,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         setIsSavingName(true);
         setFeedback(null);
         try {
-            const updatedUser = await AuthService.updateProfile({ display_name: trimmed });
+            const updatedUser = await UserProfileService.updateProfile({ display_name: trimmed });
             onProfileUpdated?.(updatedUser);
             setIsEditingName(false);
         } catch (err) {

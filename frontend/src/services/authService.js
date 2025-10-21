@@ -124,18 +124,6 @@ export const AuthService = {
         }
     },
 
-    getProfilePict: async () => {
-        try {
-            const response = await apiClient.get("/me/profile-picture/");
-            return response.data;
-        } catch (error) {
-            if (import.meta.env.DEV) {
-                console.error("API error:", error);
-            }
-            throw new Error("Failed to fetch profile picture");
-        }
-    },
-
     /**
      * Get user statistics including points and ranking from leaderboard
      * @returns {Promise<Object>} User statistics with points and ranking
@@ -159,46 +147,6 @@ export const AuthService = {
                 ranking: null,
                 total_users: 0
             };
-        }
-    },
-
-    updateProfile: async (payload) => {
-        try {
-            const response = await apiClient.patch('/me/', payload);
-            return response.data;
-        } catch (error) {
-            if (error.response?.data) {
-                const message = error.response.data.message || 'Failed to update profile';
-                throw new Error(message);
-            }
-            throw new Error('Failed to update profile');
-        }
-    },
-
-    setProfilePict: async (formData) => {
-        try {
-            const res = await apiClient.patch("me/profile-picture/", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            return res.data;
-        } catch (error) {
-            if (import.meta.env.DEV) {
-                console.error("API error:", error);
-            }
-            throw new Error("Failed to set profile picture");
-
-        }
-    },
-
-    getUserById: async (userId) => {
-        try {
-            const response = await apiClient.get(`/users/${userId}/`);
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 404) {
-                throw new Error('User not found');
-            }
-            throw new Error('Failed to load user profile');
         }
     },
 
