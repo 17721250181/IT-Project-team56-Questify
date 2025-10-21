@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, Value
+from django.db.models.functions import Lower, Replace
 from .models import Question, ShortAnswerQuestion, MCQQuestion, Comment, QuestionRating
 from .serializers import QuestionCreateSerializer, QuestionSerializer, CommentSerializer, ReplySerializer
 import os
@@ -222,7 +223,15 @@ class QuestionListView(generics.ListAPIView):
 
         weeks = params.getlist("week")
         if weeks:
-            queryset = queryset.filter(week__in=weeks)
+            normalized_weeks = [
+                re.sub(r"\s+", "", week.strip().lower())
+                for week in weeks
+                if week and week.strip()
+            ]
+            if normalized_weeks:
+                queryset = queryset.annotate(
+                    week_normalized=Replace(Lower("week"), Value(" "), Value(""))
+                ).filter(week_normalized__in=normalized_weeks)
 
         topics = params.getlist("topic")
         if topics:
