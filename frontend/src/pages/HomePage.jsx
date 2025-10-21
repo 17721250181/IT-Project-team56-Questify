@@ -107,9 +107,9 @@ const HomePage = () => {
                         </Row>
 
                         {/* Placeholder Notice */}
-                        <div className="alert alert-info mt-5 text-center">
+                        {/* <div className="alert alert-info mt-5 text-center">
                             <strong>Note:</strong> This is a placeholder homepage. More features coming soon!
-                        </div>
+                        </div> */}
                     </Col>
                 </Row>
             </Container>
