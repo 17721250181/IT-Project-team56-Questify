@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework", "corsheaders", "questions", "user", "attempts",
+    "rest_framework", "corsheaders", "questions", "user", "attempts", "leaderboard"
 ]
 
 MIDDLEWARE = [
@@ -185,3 +185,19 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # For developm
 # EMAIL_HOST_USER = "your-email@gmail.com"
 # EMAIL_HOST_PASSWORD = "your-app-password"
 DEFAULT_FROM_EMAIL = "noreply@questify.com"
+
+# Leaderboard points
+LEADERBOARD_POINTS_PER_ATTEMPT = 1     # Points per attempt
+LEADERBOARD_POINTS_BONUS_CORRECT = 2   # Bonus points for correct answer
+
+# Activity points (set to 0 if not used)
+LEADERBOARD_POINTS_PER_COMMENT = 2     # Points per comment
+LEADERBOARD_POINTS_PER_RATING  = 1     # Points per rating
+# LEADERBOARD_POINTS_PER_LIKE = 0      # Disabled: M2M relationship not directly supported
+
+LEADERBOARD_ACTIVITY_MODELS = {
+    # "app_label.ModelName": {"user_field": "field_name"}
+    "questions.Comment": {"user_field": "author"},       # Fixed: field is 'author' not 'user'
+    "questions.QuestionRating": {"user_field": "user"},  # Fixed: model is 'QuestionRating' not 'Rating'
+    # Note: "questions.Like" removed - it's a M2M field, not a separate model
+}

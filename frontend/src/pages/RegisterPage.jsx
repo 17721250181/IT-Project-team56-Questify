@@ -4,8 +4,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 // Importing custom components
-import Logo from '../components/Logo';
-import RegisterForm from '../components/RegisterForm';
+import { Logo } from '../components/common';
+import { RegisterForm } from '../components/auth';
 import '../styles/LoginPage.css'; // Reuse LoginPage styles
 import '../styles/RegisterPage.css'; // Register-specific styles
 

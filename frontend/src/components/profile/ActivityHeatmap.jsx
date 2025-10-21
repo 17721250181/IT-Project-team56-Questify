@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, Spinner } from 'react-bootstrap';
-import { AttemptService } from '../services/attemptService';
-import '../styles/ActivityHeatmap.css';
+import { AttemptService } from '../../services/attemptService';
+import '../../styles/ActivityHeatmap.css';
 
 /**
  * Activity Heatmap Component

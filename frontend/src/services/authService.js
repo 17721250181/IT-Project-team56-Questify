@@ -64,7 +64,7 @@ export const AuthService = {
                     const errorMessages = [];
 
                     // Extract all error messages from different fields
-                    Object.entries(errorData.errors).forEach(([field, messages]) => {
+                    Object.entries(errorData.errors).forEach(([, messages]) => {
                         if (Array.isArray(messages)) {
                             errorMessages.push(...messages);
                         } else if (typeof messages === 'string') {
@@ -124,55 +124,29 @@ export const AuthService = {
         }
     },
 
-    getProfilePict: async () => {
+    /**
+     * Get user statistics including points and ranking from leaderboard
+     * @returns {Promise<Object>} User statistics with points and ranking
+     */
+    getUserStats: async () => {
         try {
-            const response = await apiClient.get("/me/profile-picture/");
-            return response.data;
+            const response = await apiClient.get('/leaderboard/me/');
+            // API now returns flat structure: { points, rank, total_users, ... }
+            return {
+                points: response.data.points ?? 0,
+                ranking: response.data.rank ?? null,
+                total_users: response.data.total_users ?? 0
+            };
         } catch (error) {
             if (import.meta.env.DEV) {
-                console.error("API error:", error);
+                console.error('Failed to fetch user stats:', error);
             }
-            throw new Error("Failed to fetch profile picture");
-        }
-    },
-
-    updateProfile: async (payload) => {
-        try {
-            const response = await apiClient.patch('/me/', payload);
-            return response.data;
-        } catch (error) {
-            if (error.response?.data) {
-                const message = error.response.data.message || 'Failed to update profile';
-                throw new Error(message);
-            }
-            throw new Error('Failed to update profile');
-        }
-    },
-
-    setProfilePict: async (formData) => {
-        try {
-            const res = await apiClient.patch("me/profile-picture/", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            return res.data;
-        } catch (error) {
-            if (import.meta.env.DEV) {
-                console.error("API error:", error);
-            }
-            throw new Error("Failed to set profile picture");
-
-        }
-    },
-
-    getUserById: async (userId) => {
-        try {
-            const response = await apiClient.get(`/users/${userId}/`);
-            return response.data;
-        } catch (error) {
-            if (error.response?.status === 404) {
-                throw new Error('User not found');
-            }
-            throw new Error('Failed to load user profile');
+            // Return default values if stats unavailable
+            return {
+                points: 0,
+                ranking: null,
+                total_users: 0
+            };
         }
     },
 

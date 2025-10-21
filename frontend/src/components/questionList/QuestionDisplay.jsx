@@ -281,14 +281,14 @@ const QuestionDisplay = ({
             return;
         }
 
-        const normalisedQuery = searchQuery.toLowerCase().replace(/\s+/g, '');
+        const normalizedQuery = searchQuery.toLowerCase().replace(/\s+/g, '');
         const filtered = items.filter((item) => {
             const questionText = isAttempted ? item.question_text : item.question;
             return (
                 questionText?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.week?.toLowerCase().replace(/\s+/g, '').includes(normalisedQuery) ||
-                item.topic?.toLowerCase().replace(/\s+/g, '').includes(normalisedQuery) ||
-                item.type?.toLowerCase().replace(/\s+/g, '').includes(normalisedQuery)
+                item.week?.toLowerCase().replace(/\s+/g, '').includes(normalizedQuery) ||
+                item.topic?.toLowerCase().replace(/\s+/g, '').includes(normalizedQuery) ||
+                item.type?.toLowerCase().replace(/\s+/g, '').includes(normalizedQuery)
             );
         });
 

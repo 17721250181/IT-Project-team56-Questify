@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Button, Form, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { CommentService } from '../services/commentService';
+import { CommentService } from '../../services/commentService';
 
 /**
  * SingleComment Component (Reusable comment/reply display component)

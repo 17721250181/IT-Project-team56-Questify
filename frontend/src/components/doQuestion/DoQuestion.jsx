@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Button, Alert, Spinner, Badge } from 'react-bootstrap';
-import { QuestionService } from '../services/QuestionService.js';
+import { QuestionService } from '../../services/QuestionService.js';
 import { useParams } from 'react-router-dom';
 import DoQuestionMCQ from './DoQuestionMCQ';
 import DoQuestionShort from './DoQuestionShort';

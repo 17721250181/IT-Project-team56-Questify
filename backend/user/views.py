@@ -55,6 +55,8 @@ class RegisterView(APIView):
             # Ensure CSRF token is set for subsequent requests
             get_token(request)
 
+            # Refresh user from database with related profile
+            user = User.objects.select_related('profile').get(pk=user.pk)
             user_serializer = UserSerializer(user, context={"request": request})
             return Response({
                 "ok": True,
@@ -89,6 +91,8 @@ class LoginView(APIView):
                 # Ensure CSRF token is set for subsequent requests
                 get_token(request)
 
+                # Refresh user from database with related profile
+                user = User.objects.select_related('profile').get(pk=user.pk)
                 user_serializer = UserSerializer(user, context={"request": request})
                 return Response({
                     "ok": True,
@@ -121,14 +125,18 @@ class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        serializer = UserSerializer(request.user, context={"request": request})
+        # Fetch user with related profile to avoid N+1 queries
+        user = User.objects.select_related('profile').get(pk=request.user.pk)
+        serializer = UserSerializer(user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request):
         serializer = UserUpdateSerializer(data=request.data, partial=True)
         if serializer.is_valid():
             serializer.update(request.user, serializer.validated_data)
-            refreshed = UserSerializer(request.user, context={"request": request})
+            # Refresh user from database with related profile
+            user = User.objects.select_related('profile').get(pk=request.user.pk)
+            refreshed = UserSerializer(user, context={"request": request})
             return Response(refreshed.data, status=status.HTTP_200_OK)
         return Response(
             {
@@ -226,7 +234,8 @@ class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
-        user = get_object_or_404(User, pk=user_id)
+        # Fetch user with related profile to avoid N+1 queries
+        user = get_object_or_404(User.objects.select_related('profile'), pk=user_id)
         serializer = UserSerializer(user, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     

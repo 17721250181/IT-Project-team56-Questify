@@ -1,0 +1,60 @@
+/**
+ * UserAvatar Component Styles
+ * Reusable styles for user avatar display across the application
+ * 
+ * Design System:
+ * - Small: 32px (navbar, inline displays)
+ * - Medium: 40px (dropdown, lists)
+ * - Large: 64px (profile cards)
+ * - XLarge: 150px (profile headers)
+ */
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+.user-avatar {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Ensure icon avatars are properly centered */
+.user-avatar.bi-person-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================
+   HOVER EFFECTS
+   ============================================ */
+
+.user-avatar-hoverable {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.user-avatar-hoverable:hover {
+    transform: scale(1.05);
+}
+
+/* Enhanced hover for large avatars */
+.user-avatar-xlarge.user-avatar-hoverable:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 576px) {
+    /* Slightly reduce XLarge size on mobile */
+    .user-avatar-xlarge {
+        max-width: 120px;
+        max-height: 120px;
+    }
+
+    .user-avatar-xlarge.bi-person-circle {
+        font-size: 120px !important;
+    }
+}

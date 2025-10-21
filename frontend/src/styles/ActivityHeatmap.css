@@ -1,38 +1,57 @@
-/* Heatmap wrapper - uses Bootstrap overflow utilities */
+/**
+ * ActivityHeatmap Component Styles
+ * GitHub-style contribution heatmap
+ * 
+ * Design System:
+ * - Cell size: 11px × 11px
+ * - Gap: 2-3px
+ * - Colors: GitHub green palette
+ * - Font size: 10-11px for labels
+ */
+
+/* ============================================
+   LAYOUT
+   ============================================ */
+
 .heatmap-wrapper {
     overflow-x: auto;
 }
 
-/* Month Labels - Dynamic Grid Layout */
+.heatmap-grid {
+    display: flex;
+    gap: 5px;
+}
+
+/* ============================================
+   MONTH LABELS
+   ============================================ */
+
 .month-labels {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: 11px;
     gap: 3px;
     margin-bottom: 6px;
-    margin-left: 38px; /* Align with cells: 30px (day labels) + 8px (visual spacing) */
+    margin-left: 38px; /* Align with cells */
 }
 
 .month-label {
     font-size: 10px;
-    color: var(--bs-secondary-color, #666);
+    color: #6c757d;
     white-space: nowrap;
 }
 
-/* Heatmap Grid */
-.heatmap-grid {
-    display: flex;
-    gap: 5px; /* Space between day labels and cells */
-}
+/* ============================================
+   DAY LABELS
+   ============================================ */
 
-/* Day Labels */
 .day-labels {
     display: flex;
     flex-direction: column;
     gap: 2px;
     justify-content: space-around;
     font-size: 10px;
-    color: var(--bs-secondary-color, #666);
+    color: #6c757d;
     width: 30px;
     padding-right: 5px;
     flex-shrink: 0;
@@ -44,7 +63,10 @@
     line-height: 11px;
 }
 
-/* Cells Container */
+/* ============================================
+   HEATMAP CELLS
+   ============================================ */
+
 .heatmap-cells {
     display: flex;
     gap: 3px;
@@ -71,28 +93,17 @@
     z-index: 10;
 }
 
-/* Activity Levels - GitHub Green Style */
-.activity-level-0 {
-    background-color: #ebedf0;
-}
+/* Activity levels - GitHub green style */
+.activity-level-0 { background-color: #ebedf0; }
+.activity-level-1 { background-color: #9be9a8; }
+.activity-level-2 { background-color: #40c463; }
+.activity-level-3 { background-color: #30a14e; }
+.activity-level-4 { background-color: #216e39; }
 
-.activity-level-1 {
-    background-color: #9be9a8;
-}
+/* ============================================
+   LEGEND
+   ============================================ */
 
-.activity-level-2 {
-    background-color: #40c463;
-}
-
-.activity-level-3 {
-    background-color: #30a14e;
-}
-
-.activity-level-4 {
-    background-color: #216e39;
-}
-
-/* Legend */
 .heatmap-legend {
     display: flex;
     align-items: center;
@@ -100,7 +111,7 @@
     gap: 3px;
     margin-top: 10px;
     font-size: 11px;
-    color: var(--bs-secondary-color, #666);
+    color: #6c757d;
 }
 
 .legend-label {
@@ -112,4 +123,3 @@
     height: 11px;
     border-radius: 2px;
 }
-

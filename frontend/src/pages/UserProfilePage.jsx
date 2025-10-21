@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Row, Col, Card, Tabs, Tab, Spinner, Alert } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import QuestifyNavBar from '../components/QuestifyNavBar';
-import UserProfileHeader from '../components/UserProfileHeader';
-import ActivityHeatmap from '../components/ActivityHeatmap';
+import { QuestifyNavBar } from '../components/common';
+import { UserProfileHeader, ActivityHeatmap } from '../components/profile';
 import QuestionGrid from '../components/questionList/QuestionGrid';
 import { useAuth } from '../contexts/AuthContext';
-import { AuthService } from '../services/authService';
+import { UserProfileService } from '../services/userProfileService';
+import '../styles/UserProfilePage.css';
 
 const UserProfilePage = () => {
     const { user: currentUser, checkAuthStatus } = useAuth();
@@ -38,7 +38,7 @@ const UserProfilePage = () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await AuthService.getUserById(viewingUserId);
+            const data = await UserProfileService.getUserById(viewingUserId);
             setProfileUser(data);
         } catch (err) {
             setError(err.message || 'Failed to load user profile.');
@@ -76,11 +76,11 @@ const UserProfilePage = () => {
         return (
             <>
                 <QuestifyNavBar />
-                <Container className="py-5 text-center">
-                    <Spinner animation="border" role="status">
+                <Container className="profile-loading">
+                    <Spinner animation="border" role="status" className="profile-loading-spinner">
                         <span className="visually-hidden">Loading profile...</span>
                     </Spinner>
-                    <p className="mt-3 text-muted">Loading profile...</p>
+                    <p className="profile-loading-text">Loading profile...</p>
                 </Container>
             </>
         );
@@ -90,8 +90,8 @@ const UserProfilePage = () => {
         return (
             <>
                 <QuestifyNavBar />
-                <Container className="py-5">
-                    <Alert variant="danger">
+                <Container className="profile-error">
+                    <Alert variant="danger" className="profile-error-alert">
                         <i className="bi bi-exclamation-triangle me-2"></i>
                         {error || 'Unable to load this profile.'}
                     </Alert>
@@ -103,8 +103,8 @@ const UserProfilePage = () => {
     return (
         <>
             <QuestifyNavBar />
-            <Container className="mt-4 mb-5">
-                <Row className="mb-4">
+            <Container className="profile-page-container">
+                <Row className="profile-section">
                     <Col>
                         <UserProfileHeader
                             user={profileUser}
@@ -115,7 +115,7 @@ const UserProfilePage = () => {
                 </Row>
 
                 {isOwnProfile && (
-                    <Row className="mb-4">
+                    <Row className="profile-section">
                         <Col>
                             <ActivityHeatmap />
                         </Col>
@@ -124,15 +124,15 @@ const UserProfilePage = () => {
 
                 <Row>
                     <Col>
-                        <Card className="shadow-sm">
+                        <Card className="profile-card">
                             <Card.Body>
                                 {isOwnProfile ? (
-                                    <Tabs defaultActiveKey="attempted" id="questions-tabs" className="mb-3" fill>
+                                    <Tabs defaultActiveKey="attempted" id="questions-tabs" className="profile-tabs mb-3" fill>
                                         <Tab
                                             eventKey="attempted"
                                             title={
-                                                <span>
-                                                    <i className="bi bi-pencil-square me-2"></i>
+                                                <span className="profile-tab-label">
+                                                    <i className="bi bi-pencil-square profile-tab-icon"></i>
                                                     Attempted Questions
                                                 </span>
                                             }
@@ -146,8 +146,8 @@ const UserProfilePage = () => {
                                         <Tab
                                             eventKey="posted"
                                             title={
-                                                <span>
-                                                    <i className="bi bi-upload me-2"></i>
+                                                <span className="profile-tab-label">
+                                                    <i className="bi bi-upload profile-tab-icon"></i>
                                                     Posted Questions
                                                 </span>
                                             }
@@ -161,8 +161,8 @@ const UserProfilePage = () => {
                                     </Tabs>
                                 ) : (
                                     <div>
-                                        <h5 className="mb-3">
-                                            <i className="bi bi-upload me-2"></i>
+                                        <h5 className="profile-section-heading">
+                                            <i className="bi bi-upload profile-tab-icon"></i>
                                             Questions Posted
                                         </h5>
                                         <QuestionGrid

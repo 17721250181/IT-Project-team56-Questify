@@ -2,7 +2,7 @@
 import { Container, Row, Col } from 'react-bootstrap';
 
 // Importing custom components
-import QuestifyNavBar from '../components/QuestifyNavBar.jsx';
+import { QuestifyNavBar } from '../components/common';
 import QuestionList from '../components/questionList/QuestionList';
 
 const QuestionListPage = () => {

@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 
 // Importing custom components
-import Logo from '../components/Logo';
-import ForgotPasswordForm from '../components/ForgotPasswordForm';
+import { Logo } from '../components/common';
+import { ForgotPasswordForm } from '../components/auth';
 import '../styles/LoginPage.css'; // Reuse LoginPage styles for header
 import '../styles/ForgotPasswordPage.css'; // Specific styles
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import PostQuestionForm from '../components/PostQuestionForm.jsx';
-import QuestifyNavBar from '../components/QuestifyNavBar.jsx';
+import { QuestifyNavBar } from '../components/common';
 
 const PostQuestionPage = () => {
     return (

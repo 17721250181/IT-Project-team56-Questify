@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Row, Col, Image, Badge, Form, Button, Spinner, Alert } from 'react-bootstrap';
-import { AuthService } from '../services/authService';
+import { Row, Col, Badge, Form, Button, Spinner, Alert } from 'react-bootstrap';
+import { AuthService } from '../../services/authService';
+import { UserProfileService } from '../../services/userProfileService';
+import { UserAvatar } from '../common';
+import '../../styles/UserProfileHeader.css';
 
 /**
  * User Profile Header Component
@@ -13,6 +16,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
     const [isSavingName, setIsSavingName] = useState(false);
     const [nameInput, setNameInput] = useState('');
     const [feedback, setFeedback] = useState(null);
+    const [userStats, setUserStats] = useState({ points: 0, ranking: null });
 
     const displayName = useMemo(() => {
         return user?.display_name || user?.name || user?.full_name || user?.email || 'User';
@@ -20,10 +24,10 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
 
     const email = user?.email || 'Not available';
     const studentId = user?.student_id || 'N/A';
-    const points = user?.points ?? 'N/A';
-    const ranking = user?.ranking ?? 'N/A';
-    const attemptedQuestions = user?.attempted_questions ?? 'N/A';
-    const postedQuestions = user?.posted_questions ?? 'N/A';
+    const points = userStats.points ?? user?.points ?? 0;
+    const ranking = userStats.ranking ?? user?.ranking ?? null;
+    const attemptedQuestions = user?.attempted_questions ?? 0;
+    const postedQuestions = user?.posted_questions ?? 0;
 
     useEffect(() => {
         setNameInput(displayName);
@@ -31,12 +35,38 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         setFeedback(null);
     }, [user, displayName]);
 
+    // Fetch user statistics (points and ranking) from leaderboard
+    useEffect(() => {
+        if (!isEditable) return;
+        
+        let ignore = false;
+        const fetchUserStats = async () => {
+            try {
+                const stats = await AuthService.getUserStats();
+                if (!ignore) {
+                    setUserStats({
+                        points: stats.points ?? 0,
+                        ranking: stats.ranking ?? null
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to load user stats:', err);
+                // Keep default values on error
+            }
+        };
+        
+        fetchUserStats();
+        return () => {
+            ignore = true;
+        };
+    }, [isEditable, user?.id]);
+
     useEffect(() => {
         if (!isEditable) return;
         let ignore = false;
         const fetchProfile = async () => {
             try {
-                const data = await AuthService.getProfilePict();
+                const data = await UserProfileService.getProfilePicture();
                 if (!ignore) {
                     setAvatarUrl(data.profile_picture_url || null);
                 }
@@ -60,7 +90,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         formData.append('profile_picture', file);
 
         try {
-            const data = await AuthService.setProfilePict(formData);
+            const data = await UserProfileService.setProfilePicture(formData);
             const newUrl = `${data.profile_picture_url}?t=${Date.now()}`;
             setAvatarUrl(newUrl);
             onProfileUpdated?.();
@@ -87,7 +117,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         setIsSavingName(true);
         setFeedback(null);
         try {
-            const updatedUser = await AuthService.updateProfile({ display_name: trimmed });
+            const updatedUser = await UserProfileService.updateProfile({ display_name: trimmed });
             onProfileUpdated?.(updatedUser);
             setIsEditingName(false);
         } catch (err) {
@@ -101,25 +131,12 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
         <div className="bg-light border rounded-3 p-4 shadow-sm">
             <Row className="align-items-center">
                 <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                    {avatarUrl ? (
-                        <Image
-                            src={avatarUrl}
-                            roundedCircle
-                            width={150}
-                            height={150}
-                            alt={"profile image"}
-                            className="border border-3 border-primary object-cover"
-                            style={{
-                                objectFit: 'cover',
-                                objectPosition: 'center 10%',
-                            }}
-                        />
-                    ) : (
-                        <i
-                            className="bi bi-person-circle text-secondary"
-                            style={{ fontSize: '150px' }}
-                        />
-                    )}
+                    <UserAvatar
+                        avatarUrl={avatarUrl}
+                        size="xlarge"
+                        showBorder={true}
+                        hoverable={isEditable}
+                    />
                     {isEditable && (
                         <Form.Group controlId="formFile" className="d-flex justify-content-center mt-3">
                             <Form.Label
@@ -205,20 +222,42 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
                         <div className="mb-3">
                             <Row>
                                 <Col xs={12} sm={6} md={3} className="mb-2">
-                                    <Badge bg="primary" className="mb-1">Points</Badge>
-                                    <div className="fw-bold">{points}</div>
+                                    <div className="stat-card">
+                                        <Badge bg="primary" className="mb-1">
+                                            <i className="bi bi-star-fill me-1"></i>
+                                            Points
+                                        </Badge>
+                                        <div className="fw-bold fs-5">{points}</div>
+                                    </div>
                                 </Col>
                                 <Col xs={12} sm={6} md={3} className="mb-2">
-                                    <Badge bg="success" className="mb-1">Ranking</Badge>
-                                    <div className="fw-bold">{ranking ?? 'N/A'}</div>
+                                    <div className="stat-card">
+                                        <Badge bg="success" className="mb-1">
+                                            <i className="bi bi-trophy-fill me-1"></i>
+                                            Ranking
+                                        </Badge>
+                                        <div className="fw-bold fs-5">
+                                            {ranking != null ? `#${ranking}` : <span className="text-muted">Unranked</span>}
+                                        </div>
+                                    </div>
                                 </Col>
                                 <Col xs={12} sm={6} md={3} className="mb-2">
-                                    <Badge bg="info" className="mb-1">Attempted</Badge>
-                                    <div className="fw-bold">{attemptedQuestions} questions</div>
+                                    <div className="stat-card">
+                                        <Badge bg="info" className="mb-1">
+                                            <i className="bi bi-check-circle-fill me-1"></i>
+                                            Attempted
+                                        </Badge>
+                                        <div className="fw-bold">{attemptedQuestions} questions</div>
+                                    </div>
                                 </Col>
                                 <Col xs={12} sm={6} md={3} className="mb-2">
-                                    <Badge bg="warning" className="mb-1">Posted</Badge>
-                                    <div className="fw-bold">{postedQuestions} questions</div>
+                                    <div className="stat-card">
+                                        <Badge bg="warning" className="mb-1">
+                                            <i className="bi bi-pencil-square me-1"></i>
+                                            Posted
+                                        </Badge>
+                                        <div className="fw-bold">{postedQuestions} questions</div>
+                                    </div>
                                 </Col>
                             </Row>
                         </div>
