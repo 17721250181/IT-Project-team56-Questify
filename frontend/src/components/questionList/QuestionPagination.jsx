@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pagination } from 'react-bootstrap';
+import { MAX_VISIBLE_PAGES } from './questionListConfig';
 
 /**
  * Pagination Component
@@ -8,13 +9,13 @@ import { Pagination } from 'react-bootstrap';
  * @param {number} currentPage - Current active page (1-indexed)
  * @param {number} totalPages - Total number of pages
  * @param {function} onPageChange - Callback when page changes
- * @param {number} maxVisiblePages - Maximum number of page buttons to show (default: 5)
+ * @param {number} maxVisiblePages - Maximum number of page buttons to show (default from config)
  */
 const QuestionPagination = ({ 
     currentPage, 
     totalPages, 
     onPageChange,
-    maxVisiblePages = 5 
+    maxVisiblePages = MAX_VISIBLE_PAGES
 }) => {
     // Don't render if only one page or no pages
     if (totalPages <= 1) {

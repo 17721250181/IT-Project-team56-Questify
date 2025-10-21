@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
-import { QUESTION_FILTER_DEFAULTS } from './filterConstants';
+import { QUESTION_FILTER_DEFAULTS, RATING_OPTIONS } from './questionListConfig';
 
 const QFilterOption = ({ filters = QUESTION_FILTER_DEFAULTS, onApply, onClear, options }) => {
     const [show, setShow] = useState(false);
@@ -132,7 +132,7 @@ const QFilterOption = ({ filters = QUESTION_FILTER_DEFAULTS, onApply, onClear, o
                                         value={localFilters.minRating}
                                         onChange={handleChange}
                                     >
-                                        {[0, 1, 2, 3, 4, 5].map((value) => (
+                                        {RATING_OPTIONS.map((value) => (
                                             <option key={value} value={value}>
                                                 {value === 0 ? 'Any rating' : `${value}+`}
                                             </option>
