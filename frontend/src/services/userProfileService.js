@@ -28,7 +28,7 @@ export const UserProfileService = {
      */
     setProfilePicture: async (formData) => {
         try {
-            const res = await apiClient.patch("/me/profile-picture/", formData, {
+            const res = await apiClient.patch("me/profile-picture/", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             return res.data;
