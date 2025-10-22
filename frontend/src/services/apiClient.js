@@ -6,15 +6,65 @@ import CookieUtils from '../utils/cookieUtils.js';
  * Handles all HTTP requests with automatic CSRF token management
  */
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const unsafeMethods = new Set(['post', 'put', 'patch', 'delete']);
+let csrfTokenCache = CookieUtils.getCSRFToken();
+let csrfFetchPromise = null;
+
+const buildApiUrl = (path = '') => {
+    const normalizedBase = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
+    const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
+    return `${normalizedBase}${normalizedPath}`;
+};
+
+const ensureHeadersMutable = (headers) => {
+    if (!headers) {
+        return {};
+    }
+    return headers;
+};
+
+const fetchCsrfToken = async () => {
+    if (csrfTokenCache) {
+        return csrfTokenCache;
+    }
+
+    if (!csrfFetchPromise) {
+        const url = buildApiUrl('/csrf/');
+
+        csrfFetchPromise = fetch(url, {
+            method: 'GET',
+            credentials: 'include',
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch CSRF token: ${response.status}`);
+                }
+                const data = await response.json();
+                const token = data?.csrfToken ?? null;
+                csrfTokenCache = token;
+                return token;
+            })
+            .catch((error) => {
+                console.error('Failed to refresh CSRF token', error);
+                throw error;
+            })
+            .finally(() => {
+                csrfFetchPromise = null;
+            });
+    }
+
+    return csrfFetchPromise;
+};
+
 // Create axios instance with base configuration
 const apiClient = axios.create({
-    // Standardize base to include /api so service paths don't need the prefix
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
+    baseURL: BASE_URL,
     timeout: 10000, // 10 second timeout
     withCredentials: true, // Include cookies for Django sessions
     headers: {
         'Content-Type': 'application/json',
-    }
+    },
 });
 
 /**
@@ -22,18 +72,36 @@ const apiClient = axios.create({
  * Automatically adds CSRF token to unsafe HTTP methods
  */
 apiClient.interceptors.request.use(
-    (config) => {
+    async (config) => {
         const method = (config.method || 'get').toLowerCase();
-        const unsafeMethods = ['post', 'put', 'patch', 'delete'];
+        const headers = ensureHeadersMutable(config.headers);
 
-        // Add CSRF token for unsafe methods
-        if (unsafeMethods.includes(method)) {
-            const csrfToken = CookieUtils.getCSRFToken();
-            if (csrfToken && !config.headers['X-CSRFToken']) {
-                config.headers['X-CSRFToken'] = csrfToken;
+        const existingHeader =
+            (typeof headers.get === 'function' && headers.get('X-CSRFToken')) ||
+            headers['X-CSRFToken'] ||
+            headers['x-csrftoken'];
+
+        if (unsafeMethods.has(method) && !existingHeader) {
+            let csrfToken = CookieUtils.getCSRFToken() || csrfTokenCache;
+            if (!csrfToken) {
+                try {
+                    csrfToken = await fetchCsrfToken();
+                } catch (error) {
+                    console.warn('Unable to obtain CSRF token before request', error);
+                }
+            }
+
+            if (csrfToken) {
+                if (typeof headers.set === 'function') {
+                    headers.set('X-CSRFToken', csrfToken);
+                } else {
+                    headers['X-CSRFToken'] = csrfToken;
+                }
+                csrfTokenCache = csrfToken;
             }
         }
 
+        config.headers = headers;
         return config;
     },
     (error) => {
@@ -58,7 +126,7 @@ apiClient.interceptors.response.use(
                 statusText: error.response.statusText,
                 url: error.config?.url,
                 method: error.config?.method?.toUpperCase(),
-                data: error.response.data
+                data: error.response.data,
             });
         } else if (error.request) {
             console.error('Network Error:', error.message);
@@ -75,6 +143,7 @@ apiClient.interceptors.response.use(
 
         if (error.response?.status === 403) {
             console.warn('Access forbidden - possible CSRF or permission issue');
+            csrfTokenCache = null;
         }
 
         return Promise.reject(error);
