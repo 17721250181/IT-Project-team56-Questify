@@ -73,7 +73,11 @@ export const AuthService = {
                     });
 
                     if (errorMessages.length > 0) {
-                        throw new Error(errorMessages.join('; '));
+                        // Clean trailing punctuation from each message before joining
+                        const cleanedMessages = errorMessages.map(msg =>
+                            msg.trim().replace(/[.!?;]+$/, '')
+                        );
+                        throw new Error(cleanedMessages.join('; '));
                     }
                 }
 
