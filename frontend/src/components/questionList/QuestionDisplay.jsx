@@ -7,47 +7,18 @@ import QListItem from './QListItem';
 import QGridCard from './QGridCard';
 import QSortingOption from './QSortingOption';
 import QFilterOption from './QFilterOption';
-import { QUESTION_FILTER_DEFAULTS } from './filterConstants';
+import {
+    QUESTION_FILTER_DEFAULTS,
+    SORT_DEFAULT,
+    DEFAULT_WEEK_OPTIONS,
+    DEFAULT_TOPIC_OPTIONS,
+    DEFAULT_TYPE_OPTIONS,
+    DEFAULT_SOURCE_OPTIONS,
+    ITEMS_PER_PAGE_GRID,
+    ITEMS_PER_PAGE_LIST
+} from './questionListConfig';
 import QListSearch from './QListSearch';
 import QuestionPagination from './QuestionPagination';
-
-const SORT_DEFAULT = 'newest';
-
-const DEFAULT_WEEK_OPTIONS = [
-    'Week1',
-    'Week2',
-    'Week3',
-    'Week4',
-    'Week5',
-    'Week6',
-    'Week7',
-    'Week8',
-    'Week9',
-    'Week10',
-    'Week11',
-    'Week12'
-];
-
-const DEFAULT_TOPIC_OPTIONS = [
-    'JAVA basics',
-    'Classes and Objects',
-    'Software Tools and Bagel',
-    'Arrays and Strings',
-    'Input and Output',
-    'Inheritance and Polymorphism',
-    'Interfaces and Polymorphism',
-    'Modelling Classes and Relationships',
-    'Generics',
-    'Collections and Maps',
-    'Design Patterns',
-    'Exceptions',
-    'Software Testing and Design',
-    'Event Driven Programming',
-    'Advanced Java'
-];
-
-const DEFAULT_TYPE_OPTIONS = ['MCQ', 'SHORT'];
-const DEFAULT_SOURCE_OPTIONS = ['STUDENT', 'TEACHING_TEAM'];
 
 const mergeWithDefaults = (defaults, extras = [], sortExtras) => {
     const seen = new Set();
@@ -137,7 +108,7 @@ const QuestionDisplay = ({
         sources: DEFAULT_SOURCE_OPTIONS,
     });
 
-    const itemsPerPage = mode === 'grid' ? 12 : 10;
+    const itemsPerPage = mode === 'grid' ? ITEMS_PER_PAGE_GRID : ITEMS_PER_PAGE_LIST;
     const shouldUsePagination = usePagination !== null ? usePagination : mode === 'grid';
 
     const navigate = useNavigate();
