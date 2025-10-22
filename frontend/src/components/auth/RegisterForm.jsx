@@ -15,6 +15,7 @@ const RegisterForm = () => {
         agreeToTerms: false
     });
     const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
@@ -96,6 +97,7 @@ const RegisterForm = () => {
 
         setLoading(true);
         setMessage('');
+        setError('');
 
         try {
             const response = await register(
@@ -124,7 +126,7 @@ const RegisterForm = () => {
             }, 1500);
         } catch (error) {
             console.error('Registration error:', error);
-            setMessage(error.message || 'Registration failed. Please try again.');
+            setError(error.message || 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -283,13 +285,17 @@ const RegisterForm = () => {
                     </div>
                 </div>
 
-                {/* Message Display */}
+                {/* Success Message */}
                 {message && (
-                    <div className={`alert ${message.includes('failed') || message.includes('error')
-                        ? 'alert-danger'
-                        : 'alert-success'
-                        }`}>
+                    <div className="alert alert-success">
                         {message}
+                    </div>
+                )}
+
+                {/* Error Message */}
+                {error && (
+                    <div className="alert alert-danger">
+                        {error}
                     </div>
                 )}
             </Form>

@@ -9,6 +9,7 @@ const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({ email: '', password: '' });
 
@@ -57,15 +58,15 @@ const LoginForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Clear previous messages
-        setMessage('');
+        // Clear previous error messages
+        setError('');
 
         // Basic validation
         if (!email.trim()) {
             setErrors(prev => ({ ...prev, email: 'Email is required' }));
             return;
         }
-        
+
         if (!password.trim()) {
             setErrors(prev => ({ ...prev, password: 'Password is required' }));
             return;
@@ -101,7 +102,7 @@ const LoginForm = () => {
             if (import.meta.env.DEV) {
                 console.error('Login error:', error);
             }
-            setMessage(error.message || 'Login failed. Please try again.');
+            setError(error.message || 'Login failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -195,13 +196,17 @@ const LoginForm = () => {
                     </div>
                 </div>
 
-                {/* Message Display */}
+                {/* Success Message */}
                 {message && (
-                    <div className={`alert ${message.includes('failed') || message.includes('error') || message.includes('Please enter')
-                        ? 'alert-danger'
-                        : 'alert-success'
-                        }`}>
+                    <div className="alert alert-success">
                         {message}
+                    </div>
+                )}
+
+                {/* Error Message */}
+                {error && (
+                    <div className="alert alert-danger">
+                        {error}
                     </div>
                 )}
             </Form>
