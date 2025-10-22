@@ -75,14 +75,26 @@ if USE_WHITENOISE:
     security_index = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware")
     MIDDLEWARE.insert(security_index + 1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
-CORS_ALLOWED_ORIGINS = [
+default_origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
 ]
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173"
+
+extra_origins = [
+    origin.strip()
+    for origin in os.getenv("DJANGO_CORS_ALLOWED_ORIGINS", "").split()
+    if origin.strip()
 ]
+
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(default_origins + extra_origins))
+
+extra_csrf_trusted = [
+    origin.strip()
+    for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
+    if origin.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(default_origins + extra_csrf_trusted))
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "config.urls"
