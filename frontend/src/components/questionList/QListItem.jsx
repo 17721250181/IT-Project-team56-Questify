@@ -27,23 +27,21 @@ const QListItem = ({
             style={{ cursor: 'pointer' }}
             onClick={handleQuestionClick}
         >
-            <Row className="align-items-start">
+            <Row className="align-items-center">
                 {/* Title Area */}
-                <Col xs={12} md={6} lg={3} className="text-start">
-                    <h6 className="mb-1 mb-md-0">
-                        <span
-                            style={{
-                                display: 'inline-block',
-                                maxWidth: '100%',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                                verticalAlign: 'middle',
-                                textAlign: 'left',
-                            }}
-                        >
-                            {title}
-                        </span>
+                <Col xs={12} md={6} lg={4} className="text-start">
+                    <h6 
+                        className="mb-1 mb-md-0" 
+                        style={{ 
+                            lineHeight: '1.5',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                        }}
+                    >
+                        {title}
                     </h6>
                 </Col>
 
@@ -60,16 +58,16 @@ const QListItem = ({
                 </Col>
 
                 {/* Question Tags Area */}
-                <Col xs={12} md={12} lg={6} className="text-start">
+                <Col xs={12} md={12} lg={5} className="text-start">
                     <div>
                         <Badge className="m-1" bg="secondary">
                             {week}
                         </Badge>
                         <Badge className="m-1" bg="secondary">
-                            {topic}
+                            {questionType}
                         </Badge>
                         <Badge className="m-1" bg="secondary">
-                            {questionType}
+                            {topic}
                         </Badge>
                         {verified ? (
                             <Badge className="m-1" bg="secondary">

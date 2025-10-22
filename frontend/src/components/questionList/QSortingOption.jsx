@@ -1,18 +1,8 @@
 import React from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { SORT_OPTIONS, SORT_DEFAULT } from './questionListConfig';
 
-const SORT_OPTIONS = [
-    { value: 'newest', label: 'Newest first' },
-    { value: 'oldest', label: 'Oldest first' },
-    { value: 'rating_desc', label: 'Highest rating' },
-    { value: 'rating_asc', label: 'Lowest rating' },
-    { value: 'attempts_desc', label: 'Most attempts' },
-    { value: 'attempts_asc', label: 'Fewest attempts' },
-    { value: 'author_asc', label: 'Author A → Z' },
-    { value: 'author_desc', label: 'Author Z → A' },
-];
-
-const QSortingOption = ({ sortOption = 'newest', onChange }) => {
+const QSortingOption = ({ sortOption = SORT_DEFAULT, onChange }) => {
     const activeLabel = SORT_OPTIONS.find((option) => option.value === sortOption)?.label || 'Sort';
 
     const handleSelect = (value) => {
