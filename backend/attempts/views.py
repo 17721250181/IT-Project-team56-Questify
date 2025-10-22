@@ -46,6 +46,10 @@ class AttemptCreateView(generics.CreateAPIView):
             is_correct=is_correct
         )
 
+        # Update question's attempt count
+        question.num_attempts = question.attempts.count()
+        question.save(update_fields=['num_attempts'])
+
         return Response({
             "id": attempt.id,
             "is_correct": attempt.is_correct,

@@ -52,7 +52,7 @@ const QListItem = ({
                             Rating: {rating}
                         </Badge>
                         <Badge className="m-1" bg="info">
-                            User Attempts: {numAttempts}
+                            Total Attempts: {numAttempts}
                         </Badge>
                     </div>
                 </Col>
