@@ -27,15 +27,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if OPENAI_API_KEY:
-    print("DEBUG OPENAI KEY:", OPENAI_API_KEY[:8])
-else:
-    print("DEBUG: OPENAI_API_KEY not set")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
+USE_WHITENOISE = os.getenv("USE_WHITENOISE", "True").lower() == "true"
 
-ALLOWED_HOSTS = []
+allowed_hosts_env = os.getenv("DJANGO_ALLOWED_HOSTS", "")
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split() if host.strip()]
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = [".onrender.com"]
+if DEBUG:
+    ALLOWED_HOSTS += ["localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -60,6 +62,18 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+if USE_WHITENOISE:
+    try:
+        import whitenoise  # noqa: F401  # pragma: no cover
+    except ImportError:
+        if not DEBUG:
+            raise
+        USE_WHITENOISE = False
+
+if USE_WHITENOISE:
+    security_index = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware")
+    MIDDLEWARE.insert(security_index + 1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
@@ -144,6 +158,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+if USE_WHITENOISE and not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
