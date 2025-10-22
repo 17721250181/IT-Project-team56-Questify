@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: questify-backend
+    env: python
+    buildCommand: |
+      cd backend
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate --noinput
+    startCommand: |
+      cd backend
+      gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: FRONTEND_URL
+        value: https://questify-frontend.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://questify-frontend.onrender.com
+      - key: COOKIE_SECURE
+        value: "true"
+
+  - type: web
+    name: questify-frontend
+    env: node
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    startCommand: |
+      cd frontend
+      npm run preview -- --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://questify-backend-wv3e.onrender.com/api
