@@ -19,6 +19,7 @@ def test_create_short_answer_question(django_user_model):
         }
 
     url = reverse("question-create")
+    before_count = ShortAnswerQuestion.objects.count()
     response = client.post(url, payload, format="json")
 
     assert response.status_code == 201
@@ -31,8 +32,7 @@ def test_create_short_answer_question(django_user_model):
     assert "ai_answer" in data
     assert len(data["ai_answer"]) > 0
 
-    #assert Question.objects.count() == 1
-    assert ShortAnswerQuestion.objects.count() == 13
+    assert ShortAnswerQuestion.objects.count() == before_count + 1
 
 
 @pytest.mark.django_db
@@ -55,6 +55,7 @@ def test_create_mcq_question(django_user_model):
     }
 
     url = reverse("question-create")
+    before_count = MCQQuestion.objects.count()
     response = client.post(url, payload, format="json")
 
     assert response.status_code == 201
@@ -66,5 +67,4 @@ def test_create_mcq_question(django_user_model):
     assert data["correct_options"] == ["C"]
     assert data["creator"] == "realuser2"
 
-    # assert Question.objects.count() == 1
-    assert MCQQuestion.objects.count() == 21
+    assert MCQQuestion.objects.count() == before_count + 1

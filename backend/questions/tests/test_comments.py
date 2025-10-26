@@ -1,18 +1,28 @@
 import pytest
 from rest_framework.test import APIClient
-from django.contrib.auth.models import User
 from questions.models import Question, Comment, ShortAnswerQuestion
+from user.models import UserProfile
 import uuid
+
 
 @pytest.mark.django_db
 class TestCommentAPI:
     @pytest.fixture
-    def setup_data(self):
-        # user
-        user1 = User.objects.get(username="alice")
-        user2 = User.objects.get(username="bob")
+    def setup_data(self, django_user_model):
+        unique_suffix = uuid.uuid4().hex[:8]
+        user1 = django_user_model.objects.create_user(
+            username=f"alice_{unique_suffix}",
+            password="alice123",
+            email="alice@example.com",
+        )
+        user2 = django_user_model.objects.create_user(
+            username=f"bob_{unique_suffix}",
+            password="bob123",
+            email="bob@example.com",
+        )
+        UserProfile.objects.filter(user=user1).update(student_id=f"SID{unique_suffix}1")
+        UserProfile.objects.filter(user=user2).update(student_id=f"SID{unique_suffix}2")
 
-        # create question
         question = Question.objects.create(
             id=uuid.uuid4(),
             question="Explain the concept of inheritance in OOSD.",
@@ -22,21 +32,18 @@ class TestCommentAPI:
             week="Week 6",
             topic="OOSD Classes",
         )
-        saq = ShortAnswerQuestion.objects.create(
+        ShortAnswerQuestion.objects.create(
             question=question,
             answer="Inheritance allows one class to acquire the properties and methods of another class.",
             ai_answer="It enables code reuse and establishes an 'is-a' relationship between classes.",
         )
-        client = APIClient()
-        client.force_authenticate(user=user1)
-        client.force_authenticate(user=user2)
-        return {"user1": user1, "user2": user2, "question": question, "client": client}
+        return {"user1": user1, "user2": user2, "question": question}
 
     def test_create_comment(self, setup_data):
-        client = setup_data["client"]
         user = setup_data["user1"]
         question = setup_data["question"]
-        client.login(username="alice", password="alice123")
+        client = APIClient()
+        client.force_authenticate(user=user)
 
         url = f"/api/questions/{question.id}/comments/"
         response = client.post(url, {"content": "This is a test comment."}, format="json")
@@ -51,7 +58,8 @@ class TestCommentAPI:
         Comment.objects.create(author=user, question=question, content="Root comment")
         Comment.objects.create(author=user, question=question, content="Another comment")
 
-        client = setup_data["client"]
+        client = APIClient()
+        client.force_authenticate(user=user)
         url = f"/api/questions/{question.id}/comments/"
         response = client.get(url)
         assert response.status_code == 200
@@ -63,8 +71,8 @@ class TestCommentAPI:
         question = setup_data["question"]
         parent = Comment.objects.create(author=user, question=question, content="Root comment")
 
-        client = setup_data["client"]
-        client.login(username="alice", password="alice123")
+        client = APIClient()
+        client.force_authenticate(user=user)
 
         url = f"/api/questions/comments/{parent.id}/reply/"
         response = client.post(url, {"content": "This is a reply"}, format="json")
@@ -82,18 +90,17 @@ class TestCommentAPI:
         question = setup_data["question"]
         comment = Comment.objects.create(author=user1, question=question, content="Like test")
 
-        client = setup_data["client"]
-        client.login(username="bob", password="bob123")
+        client = APIClient()
+        client.force_authenticate(user=user2)
 
         like_url = f"/api/questions/comments/{comment.id}/like/"
         unlike_url = f"/api/questions/comments/{comment.id}/unlike/"
 
-        # like
         response = client.post(like_url)
         assert response.status_code == 200
+        comment.refresh_from_db()
         assert comment.likes.count() == 1
 
-        # unlike
         response = client.post(unlike_url)
         assert response.status_code == 200
         comment.refresh_from_db()

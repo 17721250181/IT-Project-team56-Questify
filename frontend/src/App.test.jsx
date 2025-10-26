@@ -1,16 +1,41 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+
+vi.mock("./contexts/AuthContext", () => ({
+  AuthProvider: ({ children }) => <>{children}</>,
+}));
+
+vi.mock("./components/common", () => ({
+  ProtectedRoute: ({ children }) => <>{children}</>,
+  PublicRoute: ({ children }) => <>{children}</>,
+  ErrorBoundary: ({ children }) => <>{children}</>,
+}));
+
+vi.mock("./pages", () => ({
+  HomePage: () => <div>Home Page</div>,
+  QuestionListPage: () => <div>Question List Page</div>,
+  LoginPage: () => <div>Login Page</div>,
+  RegisterPage: () => <div>Register Page</div>,
+  ForgotPasswordPage: () => <div>Forgot Password Page</div>,
+  DoQuestionPage: () => <div>Do Question Page</div>,
+  PostQuestionPage: () => <div>Post Question Page</div>,
+  UserProfilePage: () => <div>User Profile Page</div>,
+}));
+
+vi.mock("./pages/LeaderboardPage", () => ({
+  default: () => <div>Leaderboard Page</div>,
+}));
+
 import App from "./App";
-import axios from "axios";
 
-vi.mock("axios");
+describe("App routing shell", () => {
+  it("renders the home route content", () => {
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
+      </MemoryRouter>
+    );
 
-test("renders backend message", async () => {
-  axios.get.mockResolvedValueOnce({ data: { msg: "hello" } });
-
-  render(<App />);
-
-  expect(screen.getByText(/Backend says:/i)).toBeInTheDocument();
-  expect(screen.getByText(/\.\.\./)).toBeInTheDocument();
-
-  expect(await screen.findByText(/Backend says:\s*hello/i)).toBeInTheDocument();
+    expect(screen.getByText("Home Page")).toBeInTheDocument();
+  });
 });

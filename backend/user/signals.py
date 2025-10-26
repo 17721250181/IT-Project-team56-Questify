@@ -6,4 +6,8 @@ from .models import UserProfile
 @receiver(post_save, sender=User)
 def create_profile_for_user(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance)
+        UserProfile.objects.create(
+            user=instance,
+            student_id=f"TEMP-{instance.pk}",
+            display_name=instance.first_name or instance.username,
+        )

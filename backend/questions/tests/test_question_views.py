@@ -60,11 +60,12 @@ def test_question_list_authenticated_empty(django_user_model):
     client.force_authenticate(user=user)
 
     url = reverse("question-list")
+    existing_count = Question.objects.count()
     response = client.get(url)
 
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 32
+    assert len(data) == existing_count
 
 
 @pytest.mark.django_db
