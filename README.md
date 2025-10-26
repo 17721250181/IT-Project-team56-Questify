@@ -22,15 +22,21 @@ A full-stack web application built as part of the OOSD course project. It provid
   - [Admin & Staff Features](#admin--staff-features)
 - [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
-- [Backend Setup](#backend-setup-django--drf--sqlite)
-- [Frontend Setup](#frontend-setup-react--vite)
+- [Setup Instructions](#setup-instructions)
+  - [Backend Setup (Django + DRF + SQLite)](#backend-setup-django--drf--sqlite)
+  - [Frontend Setup (React + Vite)](#frontend-setup-react--vite)
 - [Running the Project](#running-the-project)
   - [Backend](#backend)
   - [Frontend](#frontend)
+- [Testing](#testing)
+- [Deployment](#deployment)
+  - [Backend on Render](#backend-on-render)
+- [Security (Sessions & CSRF)](#security-sessions--csrf)
 - [Common Pitfalls](#common-pitfalls)
 - [Project Guidelines](#project-guidelines)
 - [Future Work](#future-work)
 - [.gitignore](#gitignore)
+- [Team](#team)
 
 ## Project Overview
 
@@ -211,6 +217,29 @@ cd frontend
 npm run dev
 ```
 
+## Testing
+Run automated tests (backend) with Pytest:
+```bash
+cd backend
+pytest
+```
+
+Generate line coverage using Python’s built-in trace module:
+```bash
+python -m trace --count --summary --module pytest
+python trace_summary.py   # helper script to aggregate trace_output/*.cover
+```
+The CI workflow executes `pytest` on every push/PR to enforce quality.
+
+## Deployment
+### Backend on Render
+1. Push the repository to GitHub (or fork).
+2. In Render, choose **Blueprint** → **New Blueprint from Git** and select this repo; `render.yaml` provisions the service.
+3. Configure environment variables (`DJANGO_SECRET_KEY`, `DEBUG=False`, DB credentials, CORS/CSRF origins, optional `OPENAI_API_KEY`).
+4. Deploy; the API will be reachable at `https://<service>.onrender.com/api/`.
+
+Alternative deployments (Docker, Heroku, ECS) follow the same environment variable requirements.
+
 ## Security (Sessions & CSRF)
 
 - The backend issues Django session and CSRF cookies; production deployments must run behind HTTPS and a distinct frontend origin.
@@ -302,3 +331,11 @@ dist/
 frontend/.env
 backend/.env
 ```
+
+## Team
+- **Team 56 – Questify Contributors**
+  - Product Owner / Frontend Developer: Chen Ma
+  - Frontend Lead: Chang (Jerry) Chang
+  - Testing Lead / Backend Developer: Cheolgyun (Bill) Park
+  - Scrum Master / Backend Developer: Chih-Yi Huang
+  - Backend Leader: Ziyi Zhang
