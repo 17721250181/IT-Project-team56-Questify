@@ -18,7 +18,7 @@ from .serializers import LeaderboardRowSerializer, MyLeaderboardSerializer
 
 User = get_user_model()
 
-# --- Scoring (settings에서 가져오되 기본값을 둔다) ---
+# --- Scoring ---
 POINT_PER_ATTEMPT = getattr(settings, "LEADERBOARD_POINTS_PER_ATTEMPT", 1)
 BONUS_CORRECT = getattr(settings, "LEADERBOARD_POINTS_BONUS_CORRECT", 9)
 
@@ -26,14 +26,12 @@ POINT_PER_COMMENT = getattr(settings, "LEADERBOARD_POINTS_PER_COMMENT", 0)
 POINT_PER_RATING  = getattr(settings, "LEADERBOARD_POINTS_PER_RATING", 0)
 POINT_PER_LIKE    = getattr(settings, "LEADERBOARD_POINTS_PER_LIKE", 0)
 
-
-# ---------- 유틸 ----------
 def _safe_dt(dt):
-    """None을 비교 가능한 datetime으로 변환(정렬 위해)."""
+    """Convert None to a comparable datetime (for sorting purposes)."""
     return dt if dt is not None else datetime.min.replace(tzinfo=timezone.utc)
 
 def _parse_date(s: str | None) -> date | None:
-    """YYYY-MM-DD 형식만 허용(잘못된 값은 무시)."""
+    """Only accept YYYY-MM-DD format (ignore invalid values)."""
     if not s:
         return None
     try:
@@ -43,8 +41,8 @@ def _parse_date(s: str | None) -> date | None:
 
 def _get_existing_activity_models():
     """
-    settings.LEADERBOARD_ACTIVITY_MODELS에 등록된 모델들 중
-    실제로 프로젝트에 '존재하는' 모델만 [(ModelClass, user_field, label)]로 반환한다.
+    From the models registered in settings.LEADERBOARD_ACTIVITY_MODELS,
+    return only the models that actually 'exist' in the project as [(ModelClass, user_field, label)].
     """
     models_cfg = getattr(settings, "LEADERBOARD_ACTIVITY_MODELS", {}) or {}
     existing = []
@@ -61,25 +59,25 @@ def _get_existing_activity_models():
 
 def _count_by_user(model_cls, user_field: str, filters: dict | None = None) -> dict[int, int]:
     """
-    주어진 모델에서 사용자별 개수를 values(<user_field>)로 집계해
-    {user_id: count} 딕셔너리로 리턴한다.
+    Aggregate the count per user from the given model using values(<user_field>)
+    and return as a {user_id: count} dictionary.
     """
     qs = model_cls.objects.all()
     if filters:
         qs = qs.filter(**filters)
     rows = qs.values(user_field).annotate(c=Count("id"))
-    # values(user_field) 시 user_field 값은 <필드명> 키에 담긴다.
+    # When using values(user_field), the user_field value is stored in the <field_name> key.
     return {row[user_field]: row["c"] for row in rows}
 
 
-# ---------- 페이지네이션 ----------
+# ---------- Pagination ----------
 class LeaderboardPagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = "page_size"
     max_page_size = 1000
 
 
-# ---------- 필터 ----------
+# ---------- Filters ----------
 def _filtered_attempts(qs, request):
     """
     쿼리스트링 필터:
@@ -106,17 +104,17 @@ def _filtered_attempts(qs, request):
     return qs
 
 
-# ---------- 핵심 집계 ----------
+# ---------- Core Aggregation ----------
 def _base_rows(request):
     """
-    사용자별 집계:
-      attempts: 총 시도 수
-      correct : 정답 수
-      points  : 기본 시도/정답 점수 + 활동(댓글/평가/좋아요) 가중치
-      last_activity: Attempt.submitted_at의 최대값
-    그 뒤 파이썬에서 정렬/동순위(dense rank) 부여한다.
+    Aggregate per user:
+      attempts: total number of attempts
+      correct: number of correct answers
+      points: base attempt/correct score + activity weights (comments/ratings/likes)
+      last_activity: maximum value of Attempt.submitted_at
+    Then sort in Python and assign dense rank.
     """
-    # 1) Attempt 기반 기본 집계
+    # 1) Base aggregation from Attempt
     qs = _filtered_attempts(Attempt.objects.all(), request)
 
     agg_qs = (
@@ -134,9 +132,9 @@ def _base_rows(request):
               )
           )
     )
-    agg = list(agg_qs)  # 쿼리 평가
+    agg = list(agg_qs)  # Evaluate query
 
-    # 2) 사용자 표시명 맵 (display_name 사용)
+    # 2) User display name map (use display_name)
     user_ids_from_attempts = [r["attempter"] for r in agg]
     users = User.objects.filter(id__in=user_ids_from_attempts).select_related('profile')
     user_map = {
@@ -144,7 +142,7 @@ def _base_rows(request):
         for u in users
     }
 
-    # 3) 기본 rows 구성
+    # 3) Build base rows
     rows = [
         {
             "user_id": r["attempter"],
@@ -158,9 +156,9 @@ def _base_rows(request):
     ]
     rows_by_id = {r["user_id"]: r for r in rows}
 
-    # 4) 활동 모델(댓글/평가/좋아요 등) 점수 반영
-    #    - settings.LEADERBOARD_ACTIVITY_MODELS에 등록된 모델 중 존재하는 것만 집계
-    #    - 사용자별 개수 * 해당 활동 가중치 를 points에 더함
+    # 4) Reflect activity model (comments/ratings/likes, etc.) scores
+    #    - Aggregate only existing models from those registered in settings.LEADERBOARD_ACTIVITY_MODELS
+    #    - Add count per user * activity weight to points
     activity_models = _get_existing_activity_models()
 
     for model_cls, user_field, label in activity_models:
@@ -172,18 +170,18 @@ def _base_rows(request):
         elif label_lower.endswith(".like"):
             pts = POINT_PER_LIKE
         else:
-            pts = 0  # 정의되지 않은 모델은 0점(원하면 정책 변경 가능)
+            pts = 0  # Undefined models get 0 points (can change policy if desired)
 
         if pts == 0:
             continue
 
         count_map = _count_by_user(model_cls, user_field)
 
-        # 활동만 있고 Attempt가 없는 사용자를 rows에 포함시킬지 여부:
-        # - 포함시키면 전체 순위에 보인다(여기서는 포함하도록 구현한다).
+        # Whether to include users who only have activity but no Attempts in rows:
+        # - If included, they will appear in the overall ranking (implemented to include them here).
         extra_user_ids = set(count_map.keys()) - set(rows_by_id.keys())
         if extra_user_ids:
-            # display_name 채우기
+            # Fill in display_name
             missing_users = User.objects.filter(id__in=list(extra_user_ids)).select_related('profile')
             for u in missing_users:
                 display_name = u.profile.display_name if hasattr(u, 'profile') and u.profile.display_name else u.username
@@ -196,21 +194,21 @@ def _base_rows(request):
                     "last_activity": None,
                 }
 
-        # 점수 가산
+        # Add points
         for uid, cnt in count_map.items():
             r = rows_by_id.get(uid)
             if r:
                 r["points"] += cnt * pts
 
-    # 5) dict → list 재구성
+    # 5) Reconstruct dict → list
     rows = list(rows_by_id.values())
 
-    # 6) 정렬: 점수 ↓, 정답수 ↓, 최근활동 ↓, user_id ↑
+    # 6) Sort: points ↓, correct ↓, last_activity ↓, user_id ↑
     rows.sort(
         key=lambda x: (-x["points"], -x["correct"], _safe_dt(x["last_activity"]), x["user_id"])
     )
 
-    # 7) 동순위(dense rank)
+    # 7) Dense rank
     rank = 0
     prev_key = None
     for r in rows:
@@ -223,7 +221,7 @@ def _base_rows(request):
     return rows
 
 
-# ---------- API 뷰 ----------
+# ---------- API Views ----------
 class LeaderboardView(ListAPIView):
     """
     GET /api/leaderboard/
@@ -235,7 +233,7 @@ class LeaderboardView(ListAPIView):
     serializer_class = LeaderboardRowSerializer
 
     def get_queryset(self):
-        # DRF 제네릭 뷰 인터페이스 요구사항으로만 존재(실제 쿼리셋은 사용하지 않음)
+        # Only exists for DRF generic view interface requirements (actual queryset is not used)
         return User.objects.none()
 
     def list(self, request, *args, **kwargs):
@@ -258,7 +256,7 @@ class MyLeaderboardView(RetrieveAPIView):
         idx = next((i for i, r in enumerate(rows) if r["user_id"] == my_id), None)
 
         if idx is None:
-            # 用户没有活动记录,返回默认值并使用 display_name
+            # User has no activity records, return default values and use display_name
             display_name = (
                 request.user.profile.display_name 
                 if hasattr(request.user, 'profile') and request.user.profile.display_name 
