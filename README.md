@@ -57,8 +57,7 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 │   ├── requirements.txt            # Backend dependencies
 │   ├── manage.py                   # Django entry point
 │   ├── pytest.ini                  # Pytest config
-│   ├── coverage_report.txt         # Latest test coverage summary
-│   └── db.sqlite3                  # Local database (ignored in Git)
+│   └──  coverage_report.txt         # Latest test coverage summary
 │
 ├── frontend/                       # React (Vite) frontend
 │   ├── src/
