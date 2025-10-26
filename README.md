@@ -11,6 +11,7 @@ A full-stack web application built as part of the OOSD course project. It provid
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Project Structure](#project-structure)
 - [Key Features](#key-features)
   - [Authentication](#authentication)
   - [Main Page](#main-page)
@@ -35,6 +36,46 @@ A full-stack web application built as part of the OOSD course project. It provid
 Questify is designed to transform the way OOSD students practice and learn. Instead of passively consuming practice questions, students actively create, evaluate, and discuss them.
 
 This approach improves retention and understanding, aligns with research on active learning, and keeps students engaged.
+
+## Project Structure
+
+IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                  # CI/CD pipeline for automated testing
+│
+├── backend/                        # Django REST API backend
+│   ├── attempts/                   # Question attempt & progress tracking
+│   ├── config/                     # Project settings & URLs
+│   ├── leaderboard/                # Ranking and reward logic
+│   ├── media/                      # Uploaded user images (avatars)
+│   ├── questions/                  # Question creation, moderation, listing
+│   ├── user/                       # Authentication & profile modules
+│   ├── env/                        # Virtual environment (local only, ignored)
+│   ├── requirements.txt            # Backend dependencies
+│   ├── manage.py                   # Django entry point
+│   ├── pytest.ini                  # Pytest config
+│   ├── coverage_report.txt         # Latest test coverage summary
+│   └── db.sqlite3                  # Local database (ignored in Git)
+│
+├── frontend/                       # React (Vite) frontend
+│   ├── src/
+│   │   ├── components/             # Reusable UI components
+│   │   ├── pages/                  # Main page views (Home, Profile, Admin)
+│   │   ├── services/               # API & CSRF service layers
+│   │   ├── context/                # Global state (AuthContext etc.)
+│   │   └── App.jsx                 # App entry
+│   ├── public/                     # Static assets
+│   ├── package.json                # Frontend dependencies
+│   ├── vite.config.js              # Vite configuration
+│   ├── setupTests.js               # Frontend test setup
+│   └── .env                        # Local API base URL config
+│
+├── render.yaml                     # Render deployment configuration
+├── LICENSE                         # License information
+├── API Documentation.md            # API reference for endpoints
+├── README.md                       # Main project documentation
+└── questify-start.bat / questify-stop.bat  # Local scripts for quick start/stop
 
 ## Key Features
 
