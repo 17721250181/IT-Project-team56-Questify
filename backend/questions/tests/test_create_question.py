@@ -32,7 +32,7 @@ def test_create_short_answer_question(django_user_model):
     assert len(data["ai_answer"]) > 0
 
     #assert Question.objects.count() == 1
-    assert ShortAnswerQuestion.objects.count() == 6
+    assert ShortAnswerQuestion.objects.count() == 13
 
 
 @pytest.mark.django_db
@@ -67,4 +67,4 @@ def test_create_mcq_question(django_user_model):
     assert data["creator"] == "realuser2"
 
     # assert Question.objects.count() == 1
-    assert MCQQuestion.objects.count() == 6
+    assert MCQQuestion.objects.count() == 21

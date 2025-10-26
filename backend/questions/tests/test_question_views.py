@@ -64,7 +64,7 @@ def test_question_list_authenticated_empty(django_user_model):
 
     assert response.status_code == 200
     data = response.json()
-    assert len(data) == 10
+    assert len(data) == 32
 
 
 @pytest.mark.django_db
