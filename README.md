@@ -29,6 +29,7 @@ A full-stack web application built as part of the OOSD course project. It provid
   - [Frontend](#frontend)
 - [Common Pitfalls](#common-pitfalls)
 - [Project Guidelines](#project-guidelines)
+- [Future Work](#future-work)
 - [.gitignore](#gitignore)
 
 ## Project Overview
@@ -244,6 +245,36 @@ npm run dev
   - Engagement statistics
   - Activity dashboards
 - User profile includes attempt history
+
+## Future Work
+
+- **OAuth 2.0 / SSO Integration**
+  - Integrate University of Melbourne SSO via Azure AD to replace manual registration.
+  - Improve user security and simplify onboarding.
+
+- **Reward for Students**
+  - Facilitate rewards for top students on the leaderboard during the coarse.
+
+- **Database Migration**
+  - Replace SQLite with PostgreSQL or MySQL for production scalability.
+  - Add backup and restore scripts for admin use.
+
+- **Enhanced AI Assistance**
+  - Expand AI-generated feedback to include hints and difficulty analysis.
+  - Provide automatic question tagging and topic recommendation.
+
+- **Gamification Expansion**
+  - Introduce achievement badges and streak tracking to motivate consistent participation.
+  - Add a seasonal leaderboard with reset cycles.
+
+- **Question Recommendation System**
+  - Implement personalized question suggestions based on user history and performance.
+
+- **Mobile Responsiveness**
+  - Optimize React frontend for mobile and tablet users.
+
+- **Cloud Deployment**
+  - Migrate from Render to AWS (Elastic Beanstalk + RDS) for better performance and cost management.
 
 ## .gitignore
 
