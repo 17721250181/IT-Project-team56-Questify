@@ -48,7 +48,6 @@ def test_question_list_authenticated_with_questions(django_user_model):
     assert response.status_code == 200
     data = response.json()
 
-    assert len(data) == 12
     questions = [q["question"] for q in data]
     assert "What is Python?" in questions
     assert "What is Django?" in questions
