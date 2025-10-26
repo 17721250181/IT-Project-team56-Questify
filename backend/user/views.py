@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.middleware.csrf import get_token
+from django.middleware.csrf import get_token, rotate_token
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
@@ -26,18 +26,24 @@ from .serializers import (
 )
 
 
+def csrf_response(request, payload=None, status_code=status.HTTP_200_OK):
+    """
+    Helper to issue a Response that always includes a fresh CSRF token payload
+    and guarantees the CSRF cookie is refreshed by the middleware.
+    """
+    data = {"csrfToken": get_token(request)}
+    if payload:
+        data.update(payload)
+    return Response(data, status=status_code)
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class GetCSRFTokenView(APIView):
     """Get CSRF token for frontend authentication"""
     permission_classes = [AllowAny]
 
-    # def get(self, request):
-    #     serializer = CSRFTokenSerializer(data={'csrfToken': get_token(request)})
-    #     serializer.is_valid()
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
-   
     def get(self, request):
-        token = get_token(request)
-        return Response({"csrfToken": token}, status=status.HTTP_200_OK)
+        return csrf_response(request, status_code=status.HTTP_200_OK)
 
 
 @method_decorator(ensure_csrf_cookie, name='dispatch')
@@ -46,23 +52,28 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = UserRegistrationSerializer(data=request.data)
+        incoming_data = request.data.copy()
+        if "display_name" not in incoming_data and incoming_data.get("name"):
+            incoming_data["display_name"] = incoming_data.get("name")
+        serializer = UserRegistrationSerializer(data=incoming_data)
 
         if serializer.is_valid():
             user = serializer.save()
             login(request, user)
-
-            # Ensure CSRF token is set for subsequent requests
-            get_token(request)
+            rotate_token(request)
 
             # Refresh user from database with related profile
             user = User.objects.select_related('profile').get(pk=user.pk)
             user_serializer = UserSerializer(user, context={"request": request})
-            return Response({
-                "ok": True,
-                "message": "Registration successful",
-                "user": user_serializer.data
-            }, status=status.HTTP_201_CREATED)
+            return csrf_response(
+                request,
+                {
+                    "ok": True,
+                    "message": "Registration successful",
+                    "user": user_serializer.data
+                },
+                status.HTTP_201_CREATED
+            )
 
         return Response({
             "ok": False,
@@ -87,18 +98,20 @@ class LoginView(APIView):
 
             if user is not None:
                 login(request, user)
-
-                # Ensure CSRF token is set for subsequent requests
-                get_token(request)
+                rotate_token(request)
 
                 # Refresh user from database with related profile
                 user = User.objects.select_related('profile').get(pk=user.pk)
                 user_serializer = UserSerializer(user, context={"request": request})
-                return Response({
-                    "ok": True,
-                    "message": "Login successful",
-                    "user": user_serializer.data
-                }, status=status.HTTP_200_OK)
+                return csrf_response(
+                    request,
+                    {
+                        "ok": True,
+                        "message": "Login successful",
+                        "user": user_serializer.data
+                    },
+                    status.HTTP_200_OK
+                )
             else:
                 return Response({
                     "ok": False,
@@ -116,8 +129,18 @@ class LogoutView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         logout(request)
-        response = Response({"ok": True, "message": "Logout successful"}, status=status.HTTP_200_OK)
-        response.delete_cookie("sessionid")  # Remove session cookie
+        rotate_token(request)
+        response = csrf_response(
+            request,
+            {"ok": True, "message": "Logout successful"},
+            status.HTTP_200_OK
+        )
+        response.delete_cookie(
+            settings.SESSION_COOKIE_NAME,
+            path=getattr(settings, "SESSION_COOKIE_PATH", "/"),
+            domain=getattr(settings, "SESSION_COOKIE_DOMAIN", None),
+            samesite=getattr(settings, "SESSION_COOKIE_SAMESITE", "Lax"),
+        )
         return response
    
 class MeView(APIView):
@@ -164,7 +187,8 @@ class PasswordResetRequestView(APIView):
                 token = default_token_generator.make_token(user)
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-                reset_url = f"http://localhost:5173/password-reset-confirm?uid={uid}&token={token}"
+                frontend_origin = getattr(settings, "FRONTEND_ORIGIN", None) or "http://localhost:5173"
+                reset_url = f"{frontend_origin.rstrip('/')}/password-reset-confirm?uid={uid}&token={token}"
 
                 send_mail(
                     subject="Password Reset - Questify",

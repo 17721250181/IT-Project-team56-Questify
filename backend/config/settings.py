@@ -14,7 +14,35 @@ from pathlib import Path
 import os
 import dj_database_url
 from dotenv import load_dotenv
+
 load_dotenv()
+
+
+def env_flag(name: str, default: bool = False) -> bool:
+    """Return boolean environment flag with sensible defaults."""
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_list(name: str, default=None):
+    """Parse comma/space separated environment values into a list."""
+    value = os.getenv(name)
+    if not value:
+        return list(default or [])
+    parts = []
+    for chunk in value.replace(",", " ").split():
+        cleaned = chunk.strip()
+        if cleaned:
+            parts.append(cleaned)
+    return parts
+
+
+def normalize_origin(origin: str | None) -> str | None:
+    if not origin:
+        return None
+    return origin.rstrip("/")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,15 +57,14 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
-USE_WHITENOISE = os.getenv("USE_WHITENOISE", "True").lower() == "true"
+DEBUG = env_flag("DJANGO_DEBUG", env_flag("DEBUG", True))
+USE_WHITENOISE = env_flag("USE_WHITENOISE", True)
 
-allowed_hosts_env = os.getenv("DJANGO_ALLOWED_HOSTS", "")
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split() if host.strip()]
-if not ALLOWED_HOSTS:
-    ALLOWED_HOSTS = [".onrender.com"]
+allowed_hosts_env = env_list("DJANGO_ALLOWED_HOSTS") or env_list("ALLOWED_HOSTS")
+ALLOWED_HOSTS = allowed_hosts_env or [".onrender.com"]
 if DEBUG:
     ALLOWED_HOSTS += ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
 
 
 # Application definition
@@ -75,27 +102,35 @@ if USE_WHITENOISE:
     security_index = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware")
     MIDDLEWARE.insert(security_index + 1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
-default_origins = [
+local_dev_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://questify-frontend.onrender.com"
 ]
 
-extra_origins = [
-    origin.strip()
-    for origin in os.getenv("DJANGO_CORS_ALLOWED_ORIGINS", "").split()
-    if origin.strip()
+frontend_origin = normalize_origin(os.getenv("FRONTEND_ORIGIN") or os.getenv("FRONTEND_URL"))
+FRONTEND_ORIGIN = frontend_origin
+extra_cors = env_list("DJANGO_CORS_ALLOWED_ORIGINS") or env_list("CORS_ALLOWED_ORIGINS")
+
+cors_candidate_origins = []
+if DEBUG:
+    cors_candidate_origins.extend(local_dev_origins)
+if frontend_origin:
+    cors_candidate_origins.append(frontend_origin)
+cors_candidate_origins.extend(normalize_origin(origin) for origin in extra_cors if origin)
+CORS_ALLOWED_ORIGINS = [
+    origin for origin in dict.fromkeys(filter(None, cors_candidate_origins))
+] or local_dev_origins
+
+extra_csrf_trusted = env_list("DJANGO_CSRF_TRUSTED_ORIGINS") or env_list("CSRF_TRUSTED_ORIGINS")
+csrf_candidate_origins = []
+if frontend_origin:
+    csrf_candidate_origins.append(frontend_origin)
+csrf_candidate_origins.extend(normalize_origin(origin) for origin in extra_csrf_trusted if origin)
+if DEBUG:
+    csrf_candidate_origins.extend(local_dev_origins)
+CSRF_TRUSTED_ORIGINS = [
+    origin for origin in dict.fromkeys(filter(None, csrf_candidate_origins))
 ]
-
-CORS_ALLOWED_ORIGINS = list(dict.fromkeys(default_origins + extra_origins))
-
-extra_csrf_trusted = [
-    origin.strip()
-    for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
-    if origin.strip()
-]
-
-CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(default_origins + extra_csrf_trusted))
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "config.urls"
@@ -192,12 +227,27 @@ REST_FRAMEWORK = {
 }
 
 # Session and CSRF security
+SESSION_COOKIE_NAME = os.getenv("SESSION_COOKIE_NAME", "sessionid")
 SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = False
-SESSION_COOKIE_SAMESITE = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
-CSRF_COOKIE_SAMESITE = os.getenv("CSRF_COOKIE_SAMESITE", "Lax")
-SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "False").lower() == "true"
-CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "False").lower() == "true"
+SESSION_COOKIE_SECURE = env_flag("SESSION_COOKIE_SECURE", not DEBUG)
+SESSION_COOKIE_SAMESITE = os.getenv("SESSION_COOKIE_SAMESITE", "Lax" if DEBUG else "None")
+SESSION_COOKIE_AGE = int(os.getenv("SESSION_COOKIE_AGE", str(60 * 60 * 4)))  # 4 hours
+SESSION_COOKIE_PATH = os.getenv("SESSION_COOKIE_PATH", "/")
+SESSION_COOKIE_DOMAIN = os.getenv("SESSION_COOKIE_DOMAIN") or None
+SESSION_EXPIRE_AT_BROWSER_CLOSE = env_flag("SESSION_EXPIRE_AT_BROWSER_CLOSE", False)
+SESSION_SAVE_EVERY_REQUEST = env_flag("SESSION_SAVE_EVERY_REQUEST", False)
+
+CSRF_COOKIE_NAME = os.getenv("CSRF_COOKIE_NAME", "csrftoken")
+CSRF_COOKIE_HTTPONLY = env_flag("CSRF_COOKIE_HTTPONLY", False)
+CSRF_COOKIE_SECURE = env_flag("CSRF_COOKIE_SECURE", not DEBUG)
+CSRF_COOKIE_SAMESITE = os.getenv("CSRF_COOKIE_SAMESITE", "Lax" if DEBUG else "None")
+CSRF_COOKIE_PATH = os.getenv("CSRF_COOKIE_PATH", "/")
+CSRF_COOKIE_DOMAIN = os.getenv("CSRF_COOKIE_DOMAIN") or None
+CSRF_COOKIE_AGE = int(os.getenv("CSRF_COOKIE_AGE", str(60 * 60 * 24)))  # 1 day
+CSRF_USE_SESSIONS = env_flag("CSRF_USE_SESSIONS", False)
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = env_flag("SECURE_SSL_REDIRECT", not DEBUG)
 
 # Position for user profile pictures
 MEDIA_URL = '/media/'

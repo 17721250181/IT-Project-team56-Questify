@@ -138,7 +138,6 @@ cd frontend
 
 # 1. Install deps
 npm install
-npm install axios
 
 # 2. Create .env
 echo "VITE_API_BASE_URL=http://localhost:8000/api" > .env
@@ -169,11 +168,27 @@ cd frontend
 npm run dev
 ```
 
+## Security (Sessions & CSRF)
+
+- The backend issues Django session and CSRF cookies; production deployments must run behind HTTPS and a distinct frontend origin.
+- `/api/csrf/` returns JSON `{"csrfToken": "<value>"}` and refreshes the cookie so clients can safely bootstrap.
+- The React client ships with a `CsrfService` that pre-fetches the token on boot and injects it into all unsafe requests, so no manual cookie handling is required.
+- Key environment variables (see `render.yaml` for production-ready values):
+  - `FRONTEND_ORIGIN`
+  - `DJANGO_CORS_ALLOWED_ORIGINS`
+  - `DJANGO_CSRF_TRUSTED_ORIGINS`
+  - `SESSION_COOKIE_SECURE`
+  - `SESSION_COOKIE_SAMESITE`
+  - `CSRF_COOKIE_SECURE`
+  - `CSRF_COOKIE_SAMESITE`
+- Local development defaults remain `Secure=False` and `SameSite=Lax`; override them only when testing full cross-site flows.
+
 ## Common Pitfalls
 
 - **Wrong Node version** → use Node 20.19+
 - **Forgot to activate venv** → always activate before running backend
 - **Missing .env file** → ensure `frontend/.env` exists with `VITE_API_BASE_URL`
+- **Cross-domain cookies blocked** — for split frontend/backends ensure `SameSite=None` and the `Secure` flags are enabled (covered in `render.yaml`)
 - **db.sqlite3 committed** → must be ignored in Git
 
 ## Project Guidelines

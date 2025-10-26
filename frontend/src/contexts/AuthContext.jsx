@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthService } from '../services/authService';
+import { CsrfService } from '../services/apiClient.js';
 
 /**
  * Authentication Context
@@ -52,13 +53,11 @@ export const AuthProvider = ({ children }) => {
     const checkAuthStatus = async () => {
         try {
             setLoading(true);
-            
-            // Get user data directly from Django Session
+
             const userData = await AuthService.getCurrentUser();
             updateAuthState(userData);
             console.log('Django Session authenticated');
         } catch (error) {
-            // Session invalid or expired
             console.log('Not authenticated:', error.message);
             updateAuthState(null);
         } finally {
@@ -125,14 +124,12 @@ export const AuthProvider = ({ children }) => {
      */
     const logout = async () => {
         try {
-            // Call logout API
             await AuthService.logout();
             console.log('Server logout successful');
         } catch (error) {
-            // Even if API call fails, we should clear local state
             console.error('Logout API call failed:', error);
         } finally {
-            // Always clear authentication state and cookies
+            CsrfService.clearToken();
             updateAuthState(null);
             console.log('Authentication state and cookies cleared');
         }
@@ -144,12 +141,34 @@ export const AuthProvider = ({ children }) => {
      */
     const handleAutoLogout = () => {
         console.log('Auto-logout triggered - clearing authentication state and cookies');
+        CsrfService.clearToken();
         updateAuthState(null);
     };
 
     // Initialize authentication state on mount
     useEffect(() => {
-        checkAuthStatus();
+        let isActive = true;
+
+        const bootstrapAuth = async () => {
+            try {
+                await CsrfService.ensureToken();
+            } catch (error) {
+                if (import.meta.env.DEV) {
+                    console.warn('Unable to prefetch CSRF token:', error);
+                }
+            } finally {
+                if (isActive) {
+                    await checkAuthStatus();
+                }
+            }
+        };
+
+        bootstrapAuth();
+
+        return () => {
+            isActive = false;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Listen for unauthorized events from apiClient

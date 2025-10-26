@@ -1,4 +1,4 @@
-import apiClient from './apiClient.js';
+import apiClient, { CsrfService } from './apiClient.js';
 
 /**
  * Authentication Service
@@ -15,23 +15,33 @@ export const AuthService = {
         try {
             const response = await apiClient.post('/auth/login/', {
                 email: email.trim().toLowerCase(),
-                password: password
+                password
             });
 
-            return response.data;
+            const data = response.data;
+            if (data?.csrfToken) {
+                CsrfService.setToken(data.csrfToken);
+            }
+
+            return data;
         } catch (error) {
+            const token = error.response?.data?.csrfToken;
+            if (token) {
+                CsrfService.setToken(token);
+            } else {
+                CsrfService.clearToken();
+            }
+
             // Handle API errors
             if (error.response?.data) {
                 const errorData = error.response.data;
                 throw new Error(errorData.message || 'Login failed');
             }
 
-            // Handle network errors
             if (error.request) {
                 throw new Error('Network error - please check your connection');
             }
 
-            // Handle other errors
             throw new Error('Login failed - please try again');
         }
     },
@@ -47,23 +57,31 @@ export const AuthService = {
     register: async (displayName, studentId, email, password) => {
         try {
             const response = await apiClient.post('/auth/register/', {
-                display_name: displayName.trim(),         // Frontend 'displayName' → Backend field
-                student_id: studentId.trim(),             // Frontend 'studentId' → Backend 'student_id'
+                display_name: displayName.trim(),
+                student_id: studentId.trim(),
                 email: email.trim().toLowerCase(),
-                password: password
+                password
             });
 
-            return response.data;
+            const data = response.data;
+            if (data?.csrfToken) {
+                CsrfService.setToken(data.csrfToken);
+            }
+            return data;
         } catch (error) {
-            // Handle API errors with validation details
+            const token = error.response?.data?.csrfToken;
+            if (token) {
+                CsrfService.setToken(token);
+            } else {
+                CsrfService.clearToken();
+            }
+
             if (error.response?.data) {
                 const errorData = error.response.data;
 
-                // Handle validation errors (field-specific errors)
                 if (errorData.errors && typeof errorData.errors === 'object') {
                     const errorMessages = [];
 
-                    // Extract all error messages from different fields
                     Object.entries(errorData.errors).forEach(([, messages]) => {
                         if (Array.isArray(messages)) {
                             errorMessages.push(...messages);
@@ -73,24 +91,20 @@ export const AuthService = {
                     });
 
                     if (errorMessages.length > 0) {
-                        // Clean trailing punctuation from each message before joining
-                        const cleanedMessages = errorMessages.map(msg =>
+                        const cleanedMessages = errorMessages.map((msg) =>
                             msg.trim().replace(/[.!?;]+$/, '')
                         );
                         throw new Error(cleanedMessages.join('; '));
                     }
                 }
 
-                // Handle general error message
                 throw new Error(errorData.message || 'Registration failed');
             }
 
-            // Handle network errors
             if (error.request) {
                 throw new Error('Network error - please check your connection');
             }
 
-            // Handle other errors
             throw new Error('Registration failed - please try again');
         }
     },
@@ -102,9 +116,15 @@ export const AuthService = {
     getCurrentUser: async () => {
         try {
             const response = await apiClient.get('/me/');
-            return response.data;
+            const data = response.data;
+            const token = data?.csrfToken;
+            if (token) {
+                CsrfService.setToken(token);
+            }
+            return data;
         } catch (error) {
-            // Handle authentication errors specifically
+            CsrfService.clearToken();
+
             if (error.response?.status === 401) {
                 throw new Error('Not authenticated');
             }
@@ -113,17 +133,14 @@ export const AuthService = {
                 throw new Error('Access denied');
             }
 
-            // Handle other API errors
             if (error.response?.data) {
                 throw new Error(error.response.data.message || 'Failed to get user information');
             }
 
-            // Handle network errors
             if (error.request) {
                 throw new Error('Network error - please check your connection');
             }
 
-            // Handle other errors
             throw new Error('Failed to get user information');
         }
     },
@@ -135,7 +152,6 @@ export const AuthService = {
     getUserStats: async () => {
         try {
             const response = await apiClient.get('/leaderboard/me/');
-            // API now returns flat structure: { points, rank, total_users, ... }
             return {
                 points: response.data.points ?? 0,
                 ranking: response.data.rank ?? null,
@@ -145,7 +161,6 @@ export const AuthService = {
             if (import.meta.env.DEV) {
                 console.error('Failed to fetch user stats:', error);
             }
-            // Return default values if stats unavailable
             return {
                 points: 0,
                 ranking: null,
@@ -161,13 +176,19 @@ export const AuthService = {
     logout: async () => {
         try {
             const response = await apiClient.post('/auth/logout/');
-            return response.data;
+            const data = response.data;
+            if (data?.csrfToken) {
+                CsrfService.setToken(data.csrfToken);
+            } else {
+                CsrfService.clearToken();
+            }
+            return data;
         } catch (error) {
-            // For logout, we should succeed even if the server call fails
-            // This ensures the user can always log out locally
             if (import.meta.env.DEV) {
                 console.error('Logout API call failed:', error);
             }
+
+            CsrfService.clearToken();
 
             return {
                 ok: true,

@@ -16,15 +16,25 @@ services:
         value: 3.11.0
       - key: SECRET_KEY
         generateValue: true
-      - key: DEBUG
+      - key: DJANGO_DEBUG
         value: false
-      - key: ALLOWED_HOSTS
-        value: .onrender.com
-      - key: FRONTEND_URL
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "questify-backend-wv3e.onrender.com .onrender.com"
+      - key: FRONTEND_ORIGIN
         value: https://questify-frontend.onrender.com
-      - key: CSRF_TRUSTED_ORIGINS
+      - key: DJANGO_CORS_ALLOWED_ORIGINS
         value: https://questify-frontend.onrender.com
-      - key: COOKIE_SECURE
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: https://questify-frontend.onrender.com
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
+      - key: CSRF_COOKIE_SECURE
+        value: "true"
+      - key: SESSION_COOKIE_SAMESITE
+        value: 'None'
+      - key: CSRF_COOKIE_SAMESITE
+        value: 'None'
+      - key: SECURE_SSL_REDIRECT
         value: "true"
 
   - type: web

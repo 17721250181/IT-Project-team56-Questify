@@ -1,3 +1,5 @@
+const CSRF_COOKIE_NAME = import.meta.env.VITE_CSRF_COOKIE_NAME || 'csrftoken';
+
 /**
  * Universal Cookie Utilities
  * Provides basic cookie operations for the entire application
@@ -49,8 +51,9 @@ class CookieUtils {
      * @returns {string|null} CSRF token or null
      */
     static getCSRFToken() {
-        return this.getCookie('csrftoken');
+        return this.getCookie(CSRF_COOKIE_NAME);
     }
 }
 
+export { CSRF_COOKIE_NAME };
 export default CookieUtils;
