@@ -39,6 +39,7 @@ This approach improves retention and understanding, aligns with research on acti
 
 ## Project Structure
 
+```
 IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 ├── .github/
 │   └── workflows/
@@ -76,6 +77,7 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 ├── API Documentation.md            # API reference for endpoints
 ├── README.md                       # Main project documentation
 └── questify-start.bat / questify-stop.bat  # Local scripts for quick start/stop
+```
 
 ## Key Features
 
