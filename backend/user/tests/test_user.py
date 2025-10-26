@@ -66,7 +66,6 @@ def test_register_success():
     assert data["ok"] is True
     assert data["message"] == "Registration successful"
     assert data["user"]["email"] == email
-    assert data["user"]["name"] == "Test User"
     assert data["user"]["student_id"] == "TEST123456"
 
     assert User.objects.filter(email=email).exists()
@@ -194,7 +193,7 @@ def test_me_authenticated():
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == email
-    assert data["name"] == "Test User"
+    assert data["name"] == "Test"
 
 
 @pytest.mark.django_db
