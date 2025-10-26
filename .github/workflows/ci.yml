@@ -91,3 +91,21 @@ jobs:
           # once working, you may switch to: curl -fsS -X POST "..."
           echo "Triggered Render deploy hook."
 
+  frontend-deploy:
+    name: Deploy Frontend to Render
+    needs: frontend-test-build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Precheck secret exists
+        run: |
+          if [ -z "${{ secrets.FRONTEND_RENDER_DEPLOY_HOOK }}" ]; then
+            echo "FRONTEND_RENDER_DEPLOY_HOOK secret is missing. Add it in Repo → Settings → Secrets → Actions."
+            exit 1
+          fi
+      - name: Trigger Frontend Render Deploy
+        run: |
+          set -e
+          curl -i -X POST "${{ secrets.FRONTEND_RENDER_DEPLOY_HOOK }}"
+          echo "Triggered frontend Render deploy hook."
+
