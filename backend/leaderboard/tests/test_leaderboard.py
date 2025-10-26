@@ -9,7 +9,6 @@ from attempts.models import Attempt
 from questions.models import Question
 from django.contrib.auth import get_user_model
 
-# ---- disable auto profile signal to avoid unique student_id conflict ----
 post_save.disconnect(create_profile_for_user)
 
 pytestmark = pytest.mark.django_db

@@ -95,7 +95,10 @@ class QuestionRating(models.Model):
     class Meta:
         unique_together = ("question", "user")
         constraints = [
-            models.CheckConstraint(check=models.Q(score__gte=1) & models.Q(score__lte=5), name="rating_score_range"),
+            models.CheckConstraint(
+                    condition=models.Q(score__gte=1) & models.Q(score__lte=5),
+                    name="rating_score_range",
+                )
         ]
 
     def __str__(self):

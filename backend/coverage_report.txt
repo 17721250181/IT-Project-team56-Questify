@@ -1,0 +1,81 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.2, pytest-7.4.4, pluggy-1.6.0
+django: version: 5.2.5, settings: config.settings (from ini)
+rootdir: /Users/ShirleyHuang/Documents/2025s2/IT project/IT-Project-team56-OOSD-Question-Bank/backend
+configfile: pytest.ini
+plugins: django-4.11.1, anyio-4.2.0, cov-7.0.0
+collected 44 items
+
+attempts/tests/test_attempt.py ..........                                [ 22%]
+leaderboard/tests/test_leaderboard.py ....                               [ 31%]
+questions/tests/test_comments.py ....                                    [ 40%]
+questions/tests/test_create_question.py ..                               [ 45%]
+questions/tests/test_invalid_cases.py ......                             [ 59%]
+questions/tests/test_question_views.py ....                              [ 68%]
+user/tests/test_urls.py ..                                               [ 72%]
+user/tests/test_user.py ............                                     [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.12.2-final-0 _______________
+
+Name                                                                Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------------------------------------
+attempts/__init__.py                                                    0      0   100%
+attempts/admin.py                                                       1      0   100%
+attempts/apps.py                                                        4      0   100%
+attempts/migrations/0001_initial.py                                     8      0   100%
+attempts/migrations/__init__.py                                         0      0   100%
+attempts/models.py                                                     14      1    93%   21
+attempts/serializers.py                                                 9      0   100%
+attempts/tests/test_attempt.py                                         86      0   100%
+attempts/urls.py                                                        3      0   100%
+attempts/views.py                                                      51      1    98%   36
+config/__init__.py                                                      0      0   100%
+config/asgi.py                                                          4      4     0%   10-16
+config/settings.py                                                    112     15    87%   26, 34-39, 45, 98, 102-103, 118, 127, 163, 211
+config/urls.py                                                          7      1    86%   33
+config/wsgi.py                                                          4      4     0%   10-16
+leaderboard/__init__.py                                                 0      0   100%
+leaderboard/admin.py                                                    1      0   100%
+leaderboard/apps.py                                                     4      0   100%
+leaderboard/migrations/__init__.py                                      0      0   100%
+leaderboard/models.py                                                   1      0   100%
+leaderboard/serializers.py                                             13      0   100%
+leaderboard/tests/test_leaderboard.py                                  72      0   100%
+leaderboard/urls.py                                                     3      0   100%
+leaderboard/views.py                                                  133     17    87%   41-42, 54-55, 57, 69, 105, 171, 173, 187-190, 201-203, 239
+manage.py                                                              11     11     0%   3-22
+questions/__init__.py                                                   0      0   100%
+questions/admin.py                                                      1      0   100%
+questions/apps.py                                                       4      0   100%
+questions/migrations/0001_initial.py                                    8      0   100%
+questions/migrations/0002_initial_questions.py                         25      3    88%   15, 401-402
+questions/migrations/0003_question_rating_count_questionrating.py       6      0   100%
+questions/migrations/0004_ensure_comment_table.py                      11      1    91%   14
+questions/migrations/0005_update_num_attempts.py                       10      0   100%
+questions/migrations/__init__.py                                        0      0   100%
+questions/models.py                                                    75      9    88%   41, 44-49, 81, 105
+questions/serializers.py                                              112     11    90%   67, 72, 76, 81, 84, 142, 154-156, 170, 191
+questions/tests/test_comments.py                                       70      0   100%
+questions/tests/test_create_question.py                                38      0   100%
+questions/tests/test_invalid_cases.py                                  80      0   100%
+questions/tests/test_question_views.py                                 63      0   100%
+questions/urls.py                                                       3      0   100%
+questions/views.py                                                    208     50    76%   52-64, 68-69, 247, 251, 262-265, 269, 316, 372-373, 384-385, 396-411, 424-426, 434-450, 458-462
+user/__init__.py                                                        0      0   100%
+user/admin.py                                                           1      0   100%
+user/apps.py                                                            6      0   100%
+user/migrations/0001_initial.py                                         7      0   100%
+user/migrations/0002_default_user.py                                   15      2    87%   34-35
+user/migrations/0003_userprofile_display_name.py                       17      1    94%   13
+user/migrations/__init__.py                                             0      0   100%
+user/models.py                                                         11      1    91%   13
+user/serializers.py                                                   160     51    68%   14-17, 20-29, 76, 94-98, 133, 142, 149-150, 179, 206-210, 226-232, 235-241, 245-251
+user/signals.py                                                         8      0   100%
+user/tests/test_urls.py                                                63      6    90%   39, 53-54, 56-58
+user/tests/test_user.py                                               143      0   100%
+user/urls.py                                                            6      0   100%
+user/views.py                                                         132     29    78%   121, 157-164, 208, 220-250, 262-264, 273
+-------------------------------------------------------------------------------------------------
+TOTAL                                                                1824    218    88%
+============================= 44 passed in 25.75s ==============================
