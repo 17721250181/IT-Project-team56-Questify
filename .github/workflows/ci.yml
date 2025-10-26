@@ -51,7 +51,9 @@ jobs:
         run: python manage.py migrate --noinput
       - name: Run backend tests
         working-directory: backend
-        run: pytest -s -v
+        run: |
+          pip install pytest pytest-django pytest-cov
+          pytest -s -v
 
   frontend-test-build:
     name: Frontend (tests + build)
