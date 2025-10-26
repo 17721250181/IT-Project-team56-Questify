@@ -70,15 +70,6 @@ jobs:
       - name: Build frontend (Vite)
         working-directory: frontend
         run: npm -s run build
-      # === IMPORTANT: upload the site as a Pages artifact ===
-      - name: Configure Pages
-        if: github.ref == 'refs/heads/main'
-        uses: actions/configure-pages@v4
-      - name: Upload artifact for Pages
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: frontend/dist
 
   backend-deploy:
     name: Deploy Backend to Render
@@ -100,15 +91,3 @@ jobs:
           # once working, you may switch to: curl -fsS -X POST "..."
           echo "Triggered Render deploy hook."
 
-  frontend-deploy:
-    name: Deploy Frontend to GitHub Pages
-    needs: frontend-test-build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
