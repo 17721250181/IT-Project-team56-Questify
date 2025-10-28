@@ -7,11 +7,11 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Importing page components
-import { HomePage, QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage, PostQuestionPage, UserProfilePage } from './pages';
+import { HomePage, QuestionListPage, LoginPage, RegisterPage, ForgotPasswordPage, DoQuestionPage, PostQuestionPage, UserProfilePage, AdminDashboardPage } from './pages';
 import LeaderboardPage from './pages/LeaderboardPage';
 // Auth Provider and Route Guards
 import { AuthProvider } from './contexts/AuthContext';
-import { ProtectedRoute, PublicRoute, ErrorBoundary } from './components/common';
+import { ProtectedRoute, PublicRoute, AdminRoute, ErrorBoundary } from './components/common';
 
 function App() {
   return (
@@ -101,6 +101,14 @@ function App() {
             <ProtectedRoute>
               <LeaderboardPage />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
           }
         />
 

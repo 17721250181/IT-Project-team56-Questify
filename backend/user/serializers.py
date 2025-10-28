@@ -47,6 +47,7 @@ class UserSerializer(serializers.ModelSerializer):
     posted_questions = serializers.SerializerMethodField()
     points = serializers.SerializerMethodField()
     ranking = serializers.SerializerMethodField()
+    is_admin = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -63,6 +64,7 @@ class UserSerializer(serializers.ModelSerializer):
             'points',
             'ranking',
             'is_staff',
+            'is_admin',
             'date_joined',
             'last_login',
         ]
@@ -110,6 +112,11 @@ class UserSerializer(serializers.ModelSerializer):
     def get_ranking(self, obj):
         # Placeholder ranking logic
         return None
+
+    def get_is_admin(self, obj):
+        admin_emails = getattr(settings, "ADMIN_EMAILS", set()) or set()
+        email = (obj.email or "").strip().lower()
+        return email in admin_emails
 
 class UserRegistrationSerializer(serializers.Serializer):
     # Serializer for user registration with secure password handling

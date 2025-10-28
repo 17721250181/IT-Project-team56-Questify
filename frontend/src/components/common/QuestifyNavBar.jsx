@@ -29,6 +29,11 @@ const QuestifyNavBar = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
+                        {user?.is_admin && (
+                            <Nav.Link as={Link} to="/admin">
+                                Admin
+                            </Nav.Link>
+                        )}
                         <Nav.Link as={Link} to="/">
                             Home
                         </Nav.Link>

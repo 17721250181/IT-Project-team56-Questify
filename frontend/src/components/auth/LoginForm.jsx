@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 const LoginForm = () => {
@@ -16,6 +16,7 @@ const LoginForm = () => {
     // Hooks for authentication and navigation
     const { login } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
 
     // Handle messages passed from other pages (e.g., password reset success)
     useEffect(() => {
@@ -90,13 +91,17 @@ const LoginForm = () => {
             }
 
             // Use AuthContext login method
-            await login(email, password);
+            const response = await login(email, password);
 
             if (import.meta.env.DEV) {
                 console.log('Login successful');
             }
-            // Note: PublicRoute will automatically redirect to home page
-            // once isAuthenticated becomes true, so no manual navigation needed
+
+            if (response?.user?.is_admin) {
+                navigate('/admin', { replace: true });
+            } else {
+                navigate('/', { replace: true });
+            }
 
         } catch (error) {
             if (import.meta.env.DEV) {

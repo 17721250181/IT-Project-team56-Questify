@@ -76,7 +76,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework", "corsheaders", "questions", "user", "attempts", "leaderboard"
+    "rest_framework",
+    "corsheaders",
+    "questions",
+    "user",
+    "attempts",
+    "leaderboard",
+    "adminpanel",
 ]
 
 MIDDLEWARE = [
@@ -281,3 +287,7 @@ LEADERBOARD_ACTIVITY_MODELS = {
     "questions.QuestionRating": {"user_field": "user"},  # Fixed: model is 'QuestionRating' not 'Rating'
     # Note: "questions.Like" removed - it's a M2M field, not a separate model
 }
+
+# Admin-facing email safelist (lowercase). Update this list manually or via ADMIN_EMAILS env var.
+_admin_email_default = {"admin@questify.com"}
+ADMIN_EMAILS = {email.lower() for email in env_list("ADMIN_EMAILS")} or _admin_email_default

@@ -25,7 +25,8 @@ urlpatterns = [
     path("api/", include("user.urls")),
     path("api/attempts/", include("attempts.urls")),
     path("api/questions/", include("questions.urls")),
-    path("api/leaderboard/", include("leaderboard.urls")),   
+    path("api/leaderboard/", include("leaderboard.urls")),
+    path("api/admin/", include("adminpanel.urls")),
 ]
 
 # Serve media files in development

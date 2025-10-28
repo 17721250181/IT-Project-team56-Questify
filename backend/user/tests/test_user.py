@@ -3,6 +3,7 @@ import uuid
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.test import override_settings
 from rest_framework.test import APIClient
 from rest_framework import status
 
@@ -239,3 +240,41 @@ def test_password_reset_request_nonexistent_user():
     data = response.json()
     assert data["ok"] is True
     assert "reset link has been sent" in data["message"]
+
+
+@override_settings(ADMIN_EMAILS={"admin@questify.com"})
+@pytest.mark.django_db
+def test_login_marks_admin_user():
+    client = APIClient()
+    email = "admin@questify.com"
+    password = "AdminPass123!"
+    user, _ = User.objects.get_or_create(username=email, defaults={"email": email})
+    user.email = email
+    user.set_password(password)
+    user.save()
+
+    url = reverse("user:login")
+    response = client.post(url, {"email": email, "password": password}, format="json")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["user"]["is_admin"] is True
+
+
+@override_settings(ADMIN_EMAILS={"admin@questify.com"})
+@pytest.mark.django_db
+def test_me_includes_admin_flag():
+    client = APIClient()
+    email = "admin@questify.com"
+    user, _ = User.objects.get_or_create(username=email, defaults={"email": email})
+    user.email = email
+    user.set_password("AdminPass123!")
+    user.save()
+
+    client.force_authenticate(user=user)
+    url = reverse("user:me")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["is_admin"] is True

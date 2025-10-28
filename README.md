@@ -180,6 +180,8 @@ python manage.py runserver 8000
 
 **API runs at:** <http://localhost:8000/api>
 
+> Default admin credentials (development): `admin@questify.com` / `12345678q`
+
 ## Frontend Setup (React + Vite)
 
 ```bash

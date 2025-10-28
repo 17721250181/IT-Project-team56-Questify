@@ -7,3 +7,4 @@ export { default as ForgotPasswordPage } from './ForgotPasswordPage.jsx';
 export { default as DoQuestionPage } from './DoQuestionPage.jsx';
 export { default as UserProfilePage } from './UserProfilePage.jsx';
 export { default as PostQuestionPage } from './PostQuestionPage.jsx';
+export { default as AdminDashboardPage } from './AdminDashboardPage.jsx';
