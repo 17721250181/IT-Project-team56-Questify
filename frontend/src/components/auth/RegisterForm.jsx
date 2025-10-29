@@ -5,6 +5,8 @@ import Button from 'react-bootstrap/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import PasswordInput from '../common/PasswordInput';
 import ErrorMessage from '../common/ErrorMessage';
+import TermsModal from '../common/TermsModal';
+import PrivacyModal from '../common/PrivacyModal';
 
 const RegisterForm = () => {
     // State variables for inputs
@@ -20,6 +22,8 @@ const RegisterForm = () => {
     const [error, setError] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [showTerms, setShowTerms] = useState(false);
+    const [showPrivacy, setShowPrivacy] = useState(false);
 
     const { register } = useAuth();
     const navigate = useNavigate();
@@ -232,7 +236,30 @@ const RegisterForm = () => {
                         disabled={loading}
                         label={
                             <span>
-                                I agree to the <Link to="/terms" target="_blank">Terms and Conditions</Link> and <Link to="/privacy" target="_blank">Privacy Policy</Link>
+                                I agree to the{' '}
+                                <Button 
+                                    variant="link" 
+                                    className="p-0 align-baseline text-decoration-underline"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setShowTerms(true);
+                                    }}
+                                    style={{ fontSize: 'inherit', verticalAlign: 'baseline' }}
+                                >
+                                    Terms and Conditions
+                                </Button>
+                                {' '}and{' '}
+                                <Button 
+                                    variant="link" 
+                                    className="p-0 align-baseline text-decoration-underline"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setShowPrivacy(true);
+                                    }}
+                                    style={{ fontSize: 'inherit', verticalAlign: 'baseline' }}
+                                >
+                                    Privacy Policy
+                                </Button>
                             </span>
                         }
                     />
@@ -283,6 +310,12 @@ const RegisterForm = () => {
                     </div>
                 )}
             </Form>
+
+            {/* Terms and Conditions Modal */}
+            <TermsModal show={showTerms} onHide={() => setShowTerms(false)} />
+            
+            {/* Privacy Policy Modal */}
+            <PrivacyModal show={showPrivacy} onHide={() => setShowPrivacy(false)} />
         </div>
     );
 };
