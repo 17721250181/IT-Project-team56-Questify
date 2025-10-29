@@ -206,6 +206,38 @@ export const QuestionService = {
         }
     },
 
+    // Verify question (admin only)
+    verifyQuestion: async (questionId, approved, rejectionReason = '') => {
+        try {
+            const payload = {
+                approved: approved
+            };
+
+            // Include rejection reason if rejecting
+            if (!approved && rejectionReason) {
+                payload.rejectionReason = rejectionReason;
+            }
+
+            const response = await apiClient.post(`/questions/${questionId}/verify/`, payload);
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Failed to verify question:', error);
+            }
+
+            // Provide specific error messages
+            if (error.response?.status === 403) {
+                throw new Error('Only administrators can verify questions');
+            } else if (error.response?.status === 404) {
+                throw new Error('Question not found');
+            } else if (error.response?.data?.error) {
+                throw new Error(error.response.data.error);
+            } else {
+                throw new Error('Failed to verify question');
+            }
+        }
+    },
+
     // Note: Rating functions moved to ratingService.js
     // Use RatingService.getQuestionRating, RatingService.rateQuestion, RatingService.clearRating
 };

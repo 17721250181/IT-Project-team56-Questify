@@ -348,7 +348,7 @@ const QuestionDisplay = ({
                     week={item.week}
                     topic={item.topic}
                     attempted={isAttempted ? true : item.attempted}
-                    verified={verifyStatus === 'APPROVED' || item.verified}
+                    verifyStatus={verifyStatus}
                     questionType={item.type}
                     rating={Number(rating).toFixed(1)}
                     numAttempts={numAttempts}

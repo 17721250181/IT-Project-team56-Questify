@@ -460,3 +460,52 @@ class QuestionRatingView(APIView):
         if deleted[0]:
             question.recalculate_rating()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class QuestionVerifyView(APIView):
+    """
+    Admin-only endpoint to verify (approve/reject) questions.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        # Check if user is admin
+        if not (request.user.is_staff or request.user.is_superuser):
+            return Response(
+                {"error": "Only administrators can verify questions."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        question = get_object_or_404(Question, pk=pk)
+        
+        # Get verification data from request
+        approved = request.data.get("approved")
+        rejection_reason = request.data.get("rejectionReason", "").strip()
+
+        # Validate input
+        if approved is None:
+            return Response(
+                {"error": "Field 'approved' is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # If rejecting, rejection reason is required
+        if not approved and not rejection_reason:
+            return Response(
+                {"error": "Rejection reason is required when rejecting a question."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Update question verification status
+        if approved:
+            question.verify_status = Question.VerifyStatus.APPROVED
+            question.admin_feedback = None  # Clear any previous rejection reason
+        else:
+            question.verify_status = Question.VerifyStatus.REJECTED
+            question.admin_feedback = rejection_reason
+
+        question.save()
+
+        # Return updated question data
+        serializer = QuestionSerializer(question, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
