@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, ListGroupItem, Row, Col } from 'react-bootstrap';
+import { Badge, ListGroupItem } from 'react-bootstrap';
 
 const QListItem = ({
     id,
@@ -12,6 +12,7 @@ const QListItem = ({
     questionType = 'undefined type',
     rating = 0.0,
     numAttempts = 0,
+    isSaved = false,
 }) => {
     const navigate = useNavigate();
 
@@ -23,69 +24,51 @@ const QListItem = ({
 
     return (
         <ListGroupItem
-            className="p-1 border-bottom"
+            className="p-3 mb-3 border rounded-3 shadow-sm ql-card"
             style={{ cursor: 'pointer' }}
             onClick={handleQuestionClick}
         >
-            <Row className="align-items-center">
-                {/* Title Area */}
-                <Col xs={12} md={6} lg={4} className="text-start">
-                    <h6 
-                        className="mb-1 mb-md-0" 
-                        style={{ 
-                            lineHeight: '1.5',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                        }}
-                    >
-                        {title}
-                    </h6>
-                </Col>
+            {/* Title on top, left-aligned */}
+            <div className="mb-3" style={{
+                lineHeight: '1.5',
+                fontSize: '1.2rem',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+            }}>
+                <strong>{title}</strong>
+            </div>
 
-                {/* Rating information Area */}
-                <Col xs={12} md={6} lg={3} className="text-start text-md-end order-lg-3">
-                    <div>
-                        <Badge className="m-1" bg="info">
-                            Rating: {rating}
-                        </Badge>
-                        <Badge className="m-1" bg="info">
-                            Total Attempts: {numAttempts}
-                        </Badge>
-                    </div>
-                </Col>
+            {/* Footer: left chips, right stats */}
+            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                {/* Left chips (Week / Type / Topic optional) */}
+                <div className="d-flex align-items-center flex-wrap gap-2">
+                    <span className="badge rounded-pill text-body-secondary border bg-light">{week}</span>
+                    <span className="badge rounded-pill text-body-secondary border bg-light">{questionType}</span>
+                    <span className="badge rounded-pill text-body-secondary border bg-light d-none d-md-inline">{topic}</span>
+                    {verifyStatus === 'APPROVED' && (
+                        <span className="text-success small d-none d-md-inline"><i className="bi bi-shield-check me-1"></i>Verified</span>
+                    )}
+                    {verifyStatus === 'REJECTED' && (
+                        <span className="text-danger small d-none d-md-inline"><i className="bi bi-slash-circle me-1"></i>Rejected</span>
+                    )}
+                </div>
 
-                {/* Question Tags Area */}
-                <Col xs={12} md={12} lg={5} className="text-start">
-                    <div>
-                        <Badge className="m-1" bg="secondary">
-                            {week}
-                        </Badge>
-                        <Badge className="m-1" bg="secondary">
-                            {questionType}
-                        </Badge>
-                        <Badge className="m-1" bg="secondary">
-                            {topic}
-                        </Badge>
-                        {verifyStatus === 'APPROVED' ? (
-                            <Badge className="m-1" bg="success">
-                                Verified
-                            </Badge>
-                        ) : verifyStatus === 'REJECTED' ? (
-                            <Badge className="m-1" bg="danger">
-                                Rejected
-                            </Badge>
-                        ) : null}
-                        {attempted ? (
-                            <Badge className="m-1" bg="secondary">
-                                Attempted
-                            </Badge>
-                        ) : null}
-                    </div>
-                </Col>
-            </Row>
+                {/* Right stats (rating / attempts / attempted / saved) */}
+                <div className="d-flex align-items-center flex-wrap gap-3 text-muted small">
+                    <span><i className="bi bi-star-fill text-warning me-1" aria-hidden="true"></i>{Number(rating).toFixed(1)}</span>
+                    <span className="text-secondary">·</span>
+                    <span><i className="bi bi-clipboard-check me-1" aria-hidden="true"></i>{numAttempts}</span>
+                    {attempted && (
+                        <i className="bi bi-check2-circle" title="Attempted" aria-label="Attempted"></i>
+                    )}
+                    {isSaved && (
+                        <i className="bi bi-bookmark-fill text-primary" title="Saved" aria-label="Saved"></i>
+                    )}
+                </div>
+            </div>
         </ListGroupItem>
     );
 };

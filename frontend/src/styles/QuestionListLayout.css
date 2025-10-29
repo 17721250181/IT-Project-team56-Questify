@@ -1,0 +1,38 @@
+.ql-page-header h5 {
+    font-weight: 600;
+}
+
+.ql-toolbar {
+    position: sticky;
+    top: 100px; /* below navbar with padding */
+    z-index: 10;
+}
+
+.ql-card {
+    position: relative;
+    transition: box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.ql-card:hover {
+    background-color: #ffffff;
+    border-color: #d1d5db !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+}
+
+.ql-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: #3b82f6;
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+    transition: width 0.18s ease;
+}
+
+.ql-card:hover::before {
+    width: 3px;
+}
+

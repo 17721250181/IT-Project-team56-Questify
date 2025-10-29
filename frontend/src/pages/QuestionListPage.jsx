@@ -11,12 +11,10 @@ const QuestionListPage = () => {
             <QuestifyNavBar />
             <hr />
             <Container className="mt-3">
-                <Row>
-                    <Col align="center">
-                        <h1>Question List</h1>
-                        <div className="border rounded-4 p-2 bg-body-tertiary mb-3">
-                            <QuestionList title={null} />
-                        </div>
+                <Row className="justify-content-center">
+                    <Col md={11} lg={9} xl={8}>
+                        <h1 className="text-center">Question List</h1>
+                        <QuestionList title={null} />
                     </Col>
                 </Row>
             </Container>

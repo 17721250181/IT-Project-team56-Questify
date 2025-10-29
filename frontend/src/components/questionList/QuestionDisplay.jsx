@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Spinner, ListGroup } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import '../../styles/QuestionListLayout.css';
 import { AttemptService } from '../../services/attemptService';
 import { QuestionService } from '../../services/QuestionService';
 import QListItem from './QListItem';
@@ -361,6 +362,7 @@ const QuestionDisplay = ({
                     questionType={item.type}
                     rating={Number(rating).toFixed(1)}
                     numAttempts={numAttempts}
+                    isSaved={isSaved || Boolean(item?.is_saved) || item?.saved === true}
                 />
             );
         });
@@ -401,7 +403,7 @@ const QuestionDisplay = ({
 
         return (
             <div>
-                <ListGroup variant="flush" className="bg-body-secondary">
+                <ListGroup>
                     {questionItems}
                 </ListGroup>
 
@@ -458,43 +460,76 @@ const QuestionDisplay = ({
                         {isAttempted
                             ? 'No Attempts Yet'
                             : isPosted
-                            ? 'No Questions Posted Yet'
-                            : 'No Questions Available'}
+                                ? 'No Questions Posted Yet'
+                                : 'No Questions Available'}
                     </strong>
                     <p className="mb-0 mt-2">
                         {isAttempted
                             ? "You haven't attempted any questions yet. Start practicing to see your history here!"
                             : isPosted
-                            ? "You haven't created any questions yet. Start contributing by uploading questions!"
-                            : 'No questions are currently available.'}
+                                ? "You haven't created any questions yet. Start contributing by uploading questions!"
+                                : 'No questions are currently available.'}
                     </p>
                 </div>
             </Alert>
         );
     }
 
+    // Build a compact filter summary for the header
+    const activeSummaryParts = [];
+    if (filters?.week) activeSummaryParts.push(String(filters.week));
+    if (filters?.type) activeSummaryParts.push(String(filters.type));
+    if (filters?.topic) activeSummaryParts.push(String(filters.topic));
+    const activeSummary = activeSummaryParts.join(' · ');
+
     return (
         <div>
-            {title && <h1>{title}</h1>}
-
             {showSearch && mode === 'list' && (
-                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 m-1">
-                    <div className="d-flex flex-wrap gap-2">
-                        {isAll && (
-                            <>
-                                <QFilterOption
-                                    filters={filters}
-                                    onApply={handleFilterApply}
-                                    onClear={handleFilterClear}
-                                    options={filterOptions}
-                                />
-                                <QSortingOption sortOption={sortOption} onChange={handleSortChange} />
-                            </>
-                        )}
+                <div className="ql-toolbar card p-2 mb-3">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                        <div className="text-muted small">
+                            {filteredItems.length} results{activeSummary ? ` · ${activeSummary}` : ''}
+                        </div>
+                        <Link to="/post-question" className="btn btn-outline-primary btn-sm">
+                            <i className="bi bi-plus-circle me-1"></i> Post Question
+                        </Link>
                     </div>
-                    <div className="align-self-start align-self-md-center">
-                        <QListSearch onSearch={handleSearch} />
+                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                        <div className="d-flex flex-wrap gap-2">
+                            {isAll && (
+                                <>
+                                    <QFilterOption
+                                        filters={filters}
+                                        onApply={handleFilterApply}
+                                        onClear={handleFilterClear}
+                                        options={filterOptions}
+                                    />
+                                    <QSortingOption sortOption={sortOption} onChange={handleSortChange} />
+                                </>
+                            )}
+                        </div>
+                        <div className="align-self-start align-self-md-center">
+                            <QListSearch onSearch={handleSearch} />
+                        </div>
                     </div>
+
+                    {/* Non-interactive chips to reflect active filters */}
+                    {isAll && (filtersApplied || hasSearchValue) && (
+                        <div className="ql-chips mt-2 d-flex flex-wrap gap-2">
+                            {filters?.week && (
+                                <span className="badge rounded-pill text-body-secondary border bg-light">{filters.week}</span>
+                            )}
+                            {filters?.type && (
+                                <span className="badge rounded-pill text-body-secondary border bg-light">{filters.type}</span>
+                            )}
+                            {filters?.topic && (
+                                <span className="badge rounded-pill text-body-secondary border bg-light">{filters.topic}</span>
+                            )}
+                            {hasSearchValue && (
+                                <span className="badge rounded-pill text-body-secondary border bg-light">Search: {searchQuery}</span>
+                            )}
+                        </div>
+                    )}
                 </div>
             )}
 
