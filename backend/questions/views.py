@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
 from django.db.models import Q, Prefetch, Value
 from django.db.models.functions import Lower, Replace
-from .models import Question, ShortAnswerQuestion, MCQQuestion, Comment, QuestionRating
-from .serializers import QuestionCreateSerializer, QuestionSerializer, CommentSerializer, ReplySerializer
+from .models import Question, ShortAnswerQuestion, MCQQuestion, Comment, QuestionRating, SavedQuestion
+from .serializers import QuestionCreateSerializer, QuestionSerializer, CommentSerializer, ReplySerializer, SavedQuestionSerializer
 import os
 import re
 import requests
@@ -460,3 +460,29 @@ class QuestionRatingView(APIView):
         if deleted[0]:
             question.recalculate_rating()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class SaveQuestionView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, question_id):
+        user = request.user
+        try:
+            question = Question.objects.get(id=question_id)
+        except Question.DoesNotExist:
+            return Response({"error": "Question not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        saved, created = SavedQuestion.objects.get_or_create(user=user, question=question)
+        if not created:
+            saved.delete()
+            return Response({"message": "Question unsaved."}, status=status.HTTP_200_OK)
+
+        return Response({"message": "Question saved."}, status=status.HTTP_201_CREATED)
+
+
+class SavedQuestionListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        saved_qs = SavedQuestion.objects.filter(user=request.user).select_related("question").order_by("-saved_at")
+        serializer = SavedQuestionSerializer(saved_qs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

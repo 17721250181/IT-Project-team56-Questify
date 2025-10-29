@@ -7,6 +7,8 @@ from .views import (
     CommentViewSet,
     QuestionMetadataView,
     QuestionRatingView,
+    SaveQuestionView,
+    SavedQuestionListView,
 )
 urlpatterns = [
     path("create/", QuestionCreateView.as_view(), name="question-create"),
@@ -19,4 +21,6 @@ urlpatterns = [
     path("comments/<uuid:pk>/reply/", CommentViewSet.as_view({'post': 'reply'}), name="comment-reply"),
     path("comments/<uuid:pk>/like/", CommentViewSet.as_view({'post': 'like'}), name="comment-like"),
     path("comments/<uuid:pk>/unlike/", CommentViewSet.as_view({'post': 'unlike'}), name="comment-unlike"),
+    path("save/<uuid:question_id>/", SaveQuestionView.as_view(), name="save-question"),
+    path("saved-list/", SavedQuestionListView.as_view(), name="saved-question-list"),
 ]

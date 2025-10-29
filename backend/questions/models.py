@@ -103,3 +103,15 @@ class QuestionRating(models.Model):
 
     def __str__(self):
         return f"{self.user.username} → {self.question_id}: {self.score}"
+
+
+class SavedQuestion(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="saved_questions")
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="saved_by_users")
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "question")
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.question.id}"
