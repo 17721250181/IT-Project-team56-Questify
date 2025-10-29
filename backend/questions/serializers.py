@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Question, MCQQuestion, ShortAnswerQuestion, Comment, QuestionRating
+from .models import Question, MCQQuestion, ShortAnswerQuestion, Comment, QuestionRating, SavedQuestion
 from attempts.models import Attempt
 from user.models import UserProfile
 
@@ -192,3 +192,21 @@ class CommentSerializer(serializers.ModelSerializer):
             return False
         user = request.user
         return user.is_authenticated and obj.likes.filter(id=user.id).exists()
+
+
+
+class SavedQuestionSerializer(serializers.ModelSerializer):
+    question_detail = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SavedQuestion
+        fields = ["id", "question", "saved_at", "question_detail"]
+
+    def get_question_detail(self, obj):
+        return {
+            "id": obj.question.id,
+            "question": obj.question.question,
+            "verify_status": obj.question.verify_status,
+            "topic": obj.question.topic,
+            "week": obj.question.week,
+        }

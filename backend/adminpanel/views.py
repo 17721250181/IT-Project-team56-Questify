@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from attempts.models import Attempt
 from questions.models import Question, ShortAnswerQuestion
 from .permissions import IsAdminEmail
+from rest_framework import status
 
 
 class AdminOverviewView(APIView):
@@ -186,3 +187,33 @@ class AdminAIUsageView(APIView):
         }
 
         return Response(response)
+    
+
+class AdminVerifyQuestionView(APIView):
+    """Approve or reject a student-submitted question."""
+    permission_classes = [IsAdminEmail]
+
+    def post(self, request, question_id):
+        # status = Question.VerifyStatus
+        action = request.data.get("action")
+
+        try:
+            question = Question.objects.get(id=question_id)
+        except Question.DoesNotExist:
+            return Response({"error": "Question not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        if action == "APPROVE":
+            question.verify_status = Question.VerifyStatus.APPROVED
+        elif action == "REJECT":
+            question.verify_status = Question.VerifyStatus.REJECTED
+        else:
+            return Response({"error": "Invalid action"}, status=status.HTTP_400_BAD_REQUEST)
+
+        question.save()
+        return Response(
+            {
+                "message": f"Question {action.lower()}d successfully",
+                "new_status": question.verify_status,
+            },
+            status=status.HTTP_200_OK,
+        )
