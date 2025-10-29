@@ -1,108 +1,166 @@
 /* Leaderboard Page Styles */
 /* 
- * Design System:
- * - Primary Color: #212529 (dark gray/black)
- * - Border Color: #e9ecef (light gray)
- * - Hover Background: #f8f9fa (very light gray)
- * - Text Color: #495057 (medium gray)
- * - Border Radius: 12px (consistent rounded corners)
+ * Design System - Updated to match app theme:
+ * - Primary Color: #3b82f6 (blue)
+ * - Border Color: #e5e7eb (light gray)
+ * - Hover Background: #f9fafb (very light gray)
+ * - Text Color: #374151 (medium gray)
+ * - Border Radius: 0.75rem (consistent rounded corners)
  * - Box Shadow: 0 2px 4px rgba(0, 0, 0, 0.06) (subtle)
  */
 
+/* Page Background */
 .leaderboard-page {
-    padding-bottom: 3rem;
+    min-height: 100vh;
+    background: #f3f4f6;
 }
 
-/* Your Position Card */
-.your-position-card {
+/* Modern Compact Header */
+.leaderboard-header {
     background: #ffffff;
-    color: #212529;
-    border: 2px solid #e9ecef;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-    border-radius: 12px;
-    transition: box-shadow 0.3s ease;
+    padding: 1.5rem 0;
+    border-bottom: 2px solid #e5e7eb;
 }
 
-.your-position-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.your-position-card .rank-badge {
-    font-size: 2rem;
-}
-
-.your-position-card .score-display {
-    text-align: center;
-}
-
-.your-position-card .score-label {
-    font-size: 0.875rem;
-    opacity: 0.9;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.your-position-card .score-value {
-    font-size: 2.5rem;
-    font-weight: bold;
-    line-height: 1;
-}
-
-.your-position-card .stats-row {
-    display: flex;
-    justify-content: space-around;
-    padding-top: 1rem;
-    border-top: 1px solid #e9ecef;
-}
-
-.your-position-card .stat-item {
+.leaderboard-header-content {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
+    justify-content: center;
+    gap: 0.875rem;
 }
 
-.your-position-card .stat-item i {
-    font-size: 1.2rem;
+.leaderboard-header-icon {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-radius: 0.5rem;
+    color: #ffffff;
+    font-size: 1rem;
+    box-shadow: 0 2px 6px rgba(251, 191, 36, 0.3);
 }
 
-/* Time-based Rankings */
-.your-position-card .time-rank-item {
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.your-position-card .time-rank-item:hover {
-    background-color: #f8f9fa;
-    transform: translateY(-2px);
-}
-
-.your-position-card .time-rank-item i {
-    font-size: 1.5rem;
-    display: block;
-}
-
-.your-position-card .time-rank-label {
-    font-size: 0.75rem;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
+.leaderboard-header-title {
+    font-size: 1.375rem;
     font-weight: 600;
+    margin: 0;
+    color: #111827;
+    letter-spacing: -0.01em;
 }
 
-.your-position-card .time-rank-value {
+/* Main Content Area */
+.leaderboard-content {
+    padding: 2.5rem 0 3rem;
+}
+
+/* Your Position Stats - Horizontal Cards */
+.your-position-stats {
+    margin-bottom: 2rem;
+}
+
+.stats-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.stats-section-title i {
+    font-size: 1rem;
+}
+
+.stat-card {
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
     font-size: 1.25rem;
-    font-weight: bold;
-    color: #212529;
-    min-height: 24px;
+    color: #6b7280;
+    flex-shrink: 0;
 }
 
-.your-position-card .time-rank-value .spinner-border {
-    width: 1rem;
-    height: 1rem;
+.stat-icon-overall {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: #ffffff;
+}
+
+.stat-icon-daily {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #ffffff;
+}
+
+.stat-icon-weekly {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+}
+
+.stat-icon-monthly {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: #ffffff;
+}
+
+.stat-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.2;
+}
+
+.stat-badge {
+    font-size: 1rem;
+    margin-left: 0.25rem;
+}
+
+.stat-sublabel {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.stat-value .spinner-border {
+    width: 1.25rem;
+    height: 1.25rem;
     border-width: 2px;
 }
 
@@ -112,14 +170,14 @@
 }
 
 .top-3-section h4 {
-    color: #212529;
+    color: #111827;
     font-weight: 600;
 }
 
 .top-card {
     background: #ffffff;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
@@ -130,33 +188,33 @@
 }
 
 .top-card.rank-1 {
-    border: 3px solid #212529;
+    border: 3px solid #3b82f6;
     transform: scale(1.05);
     margin-top: 0;
 }
 
 .top-card.rank-1:hover {
     transform: scale(1.05) translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    border-color: #000000;
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+    border-color: #2563eb;
 }
 
 .top-card.rank-2 {
-    border: 3px solid #6c757d;
+    border: 3px solid #60a5fa;
     margin-top: 20px;
 }
 
 .top-card.rank-2:hover {
-    border-color: #495057;
+    border-color: #3b82f6;
 }
 
 .top-card.rank-3 {
-    border: 3px solid #adb5bd;
+    border: 3px solid #93c5fd;
     margin-top: 20px;
 }
 
 .top-card.rank-3:hover {
-    border-color: #6c757d;
+    border-color: #60a5fa;
 }
 
 .top-card .rank-medal {
@@ -171,7 +229,7 @@
 
 .top-card h5 {
     font-weight: 600;
-    color: #212529;
+    color: #111827;
     margin-bottom: 0.25rem;
 }
 
@@ -184,11 +242,11 @@
 
 /* Tabs */
 .leaderboard-tabs {
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid #e5e7eb;
 }
 
 .leaderboard-tabs .nav-link {
-    color: #6c757d;
+    color: #6b7280;
     border: none;
     border-bottom: 2px solid transparent;
     padding: 0.75rem 1.5rem;
@@ -197,21 +255,21 @@
 }
 
 .leaderboard-tabs .nav-link:hover {
-    color: #212529;
-    background-color: #f8f9fa;
-    border-bottom-color: #dee2e6;
+    color: #111827;
+    background-color: #f9fafb;
+    border-bottom-color: #d1d5db;
 }
 
 .leaderboard-tabs .nav-link.active {
-    color: #212529;
+    color: #3b82f6;
     background-color: transparent;
-    border-bottom-color: #212529;
+    border-bottom-color: #3b82f6;
 }
 
 /* Leaderboard List Card */
 .leaderboard-list-card {
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     overflow: hidden;
     transition: box-shadow 0.3s ease;
@@ -222,12 +280,12 @@
 }
 
 .leaderboard-list-card .card-header {
-    background: #f8f9fa;
-    color: #212529;
+    background: #f9fafb;
+    color: #111827;
     font-weight: 600;
     font-size: 1.1rem;
     padding: 1rem 1.5rem;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid #e5e7eb;
 }
 
 /* Leaderboard List Items */
@@ -242,16 +300,16 @@
 }
 
 .leaderboard-list::-webkit-scrollbar-track {
-    background: #f8f9fa;
+    background: #f9fafb;
 }
 
 .leaderboard-list::-webkit-scrollbar-thumb {
-    background: #dee2e6;
+    background: #d1d5db;
     border-radius: 4px;
 }
 
 .leaderboard-list::-webkit-scrollbar-thumb:hover {
-    background: #adb5bd;
+    background: #9ca3af;
 }
 
 .leaderboard-item {
@@ -263,8 +321,8 @@
 }
 
 .leaderboard-item:hover {
-    background-color: #f8f9fa;
-    border-left: 3px solid #dee2e6;
+    background-color: #f9fafb;
+    border-left: 3px solid #d1d5db;
     padding-left: calc(1.5rem - 3px);
 }
 
@@ -273,14 +331,14 @@
 }
 
 .leaderboard-item.current-user {
-    background-color: #f8f9fa;
-    border-left: 4px solid #212529;
+    background-color: rgba(59, 130, 246, 0.05);
+    border-left: 4px solid #3b82f6;
     padding-left: calc(1.5rem - 4px);
 }
 
 .leaderboard-item.current-user:hover {
-    background-color: #e9ecef;
-    border-left-color: #000000;
+    background-color: rgba(59, 130, 246, 0.08);
+    border-left-color: #2563eb;
 }
 
 .leaderboard-item .rank-column {
@@ -315,7 +373,7 @@
 .leaderboard-item .username {
     font-weight: 600;
     font-size: 1.1rem;
-    color: #212529;
+    color: #111827;
 }
 
 .leaderboard-item .user-stats {
@@ -338,7 +396,7 @@
 .leaderboard-item .score-column .score-value {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #212529;
+    color: #111827;
     line-height: 1;
 }
 
@@ -359,6 +417,39 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .leaderboard-header {
+        padding: 1.25rem 0;
+    }
+    
+    .leaderboard-header-icon {
+        width: 1.75rem;
+        height: 1.75rem;
+        font-size: 0.875rem;
+    }
+    
+    .leaderboard-header-title {
+        font-size: 1.25rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+    
+    .stat-icon {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    
     .top-card.rank-1,
     .top-card.rank-2,
     .top-card.rank-3 {
@@ -368,15 +459,6 @@
 
     .top-card.rank-1:hover {
         transform: translateY(-5px);
-    }
-
-    .your-position-card .score-display {
-        margin-top: 1rem;
-    }
-
-    .your-position-card .stats-row {
-        flex-direction: column;
-        gap: 0.5rem;
     }
 
     .leaderboard-tabs .nav-link {

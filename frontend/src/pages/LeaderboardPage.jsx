@@ -20,7 +20,7 @@ const LeaderboardPage = () => {
     const fetchLeaderboard = useCallback(async (timeFrame = null) => {
         setLoading(true);
         setError('');
-        
+
         try {
             const data = await LeaderboardService.fetchLeaderboardData(timeFrame);
             setLeaderboardData(data.leaderboard);
@@ -42,54 +42,64 @@ const LeaderboardPage = () => {
     };
 
     return (
-        <>
+        <div className="leaderboard-page">
             <QuestifyNavBar />
-            <hr />
-            <Container className="leaderboard-page mt-4">
-                <h1 className="text-center mb-4">
-                    <i className="bi bi-trophy-fill text-warning me-2"></i>
-                    Leaderboard
-                </h1>
 
-                {error && (
-                    <Alert variant="danger" dismissible onClose={() => setError('')}>
-                        {error}
-                    </Alert>
-                )}
+            {/* Modern Compact Header */}
+            <div className="leaderboard-header">
+                <Container>
+                    <div className="leaderboard-header-content">
+                        <div className="leaderboard-header-icon">
+                            <i className="bi bi-trophy-fill"></i>
+                        </div>
+                        <h1 className="leaderboard-header-title">Leaderboard</h1>
+                    </div>
+                </Container>
+            </div>
 
-                {/* Your Position Card */}
-                <YourPositionCard 
-                    myRank={myRank}
-                    getRankBadge={getRankBadge}
-                />
+            {/* Main Content */}
+            <div className="leaderboard-content">
+                <Container>
+                    {error && (
+                        <Alert variant="danger" dismissible onClose={() => setError('')}>
+                            {error}
+                        </Alert>
+                    )}
 
-                {/* Top 3 Section */}
-                <Top3Podium 
-                    leaderboardData={leaderboardData}
-                    loading={loading}
-                />
-
-                {/* Tabs */}
-                <LeaderboardTabs 
-                    activeTab={activeTab}
-                    onTabChange={handleTabChange}
-                />
-
-                {/* Leaderboard List */}
-                {loading ? (
-                    <LoadingSpinner text="Loading leaderboard..." />
-                ) : (
-                    <LeaderboardList 
-                        leaderboardData={leaderboardData}
+                    {/* Your Position Card */}
+                    <YourPositionCard
                         myRank={myRank}
-                        activeTab={activeTab}
                         getRankBadge={getRankBadge}
-                        getTabIcon={getTabIcon}
-                        getTabLabel={getTabLabel}
                     />
-                )}
-            </Container>
-        </>
+
+                    {/* Top 3 Section */}
+                    <Top3Podium
+                        leaderboardData={leaderboardData}
+                        loading={loading}
+                    />
+
+                    {/* Tabs */}
+                    <LeaderboardTabs
+                        activeTab={activeTab}
+                        onTabChange={handleTabChange}
+                    />
+
+                    {/* Leaderboard List */}
+                    {loading ? (
+                        <LoadingSpinner text="Loading leaderboard..." />
+                    ) : (
+                        <LeaderboardList
+                            leaderboardData={leaderboardData}
+                            myRank={myRank}
+                            activeTab={activeTab}
+                            getRankBadge={getRankBadge}
+                            getTabIcon={getTabIcon}
+                            getTabLabel={getTabLabel}
+                        />
+                    )}
+                </Container>
+            </div>
+        </div>
     );
 };
 

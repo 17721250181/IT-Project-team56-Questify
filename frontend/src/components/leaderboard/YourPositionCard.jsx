@@ -54,38 +54,36 @@ const YourPositionCard = ({ myRank, getRankBadge }) => {
     }
 
     return (
-        <Card className="mb-4 your-position-card">
-            <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h5 className="mb-1">
-                            <i className="bi bi-person-circle me-2"></i>
-                            Your Position
-                        </h5>
-                        <div className="position-details">
-                            <span className="rank-badge">
-                                {getRankBadge(myRank.rank)}
-                            </span>
-                            <span className="ms-3">
-                                <strong>Overall:</strong> #{myRank.rank}
-                            </span>
+        <div className="your-position-stats mb-4">
+            <h6 className="stats-section-title">
+                <i className="bi bi-person-circle me-2"></i>
+                My Rankings
+            </h6>
+            <Row className="g-3">
+                {/* Overall Rank Card */}
+                <Col xs={6} md={3}>
+                    <div className="stat-card">
+                        <div className="stat-icon stat-icon-overall">
+                            <i className="bi bi-trophy-fill"></i>
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-label">Overall</div>
+                            <div className="stat-value">
+                                #{myRank.rank} <span className="stat-badge">{getRankBadge(myRank.rank)}</span>
+                            </div>
                         </div>
                     </div>
-                    <div className="text-end">
-                        <div className="score-display">
-                            <div className="score-label">Score</div>
-                            <div className="score-value">{myRank.points}</div>
-                        </div>
-                    </div>
-                </div>
+                </Col>
 
-                {/* Time-based rankings */}
-                <Row className="mt-3 pt-3 border-top">
-                    <Col xs={4} className="text-center">
-                        <div className="time-rank-item">
-                            <i className="bi bi-sun-fill text-warning mb-1"></i>
-                            <div className="time-rank-label">Daily</div>
-                            <div className="time-rank-value">
+                {/* Daily Rank Card */}
+                <Col xs={6} md={3}>
+                    <div className="stat-card">
+                        <div className="stat-icon stat-icon-daily">
+                            <i className="bi bi-sun-fill"></i>
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-label">Daily</div>
+                            <div className="stat-value">
                                 {rankData.loading ? (
                                     <Spinner animation="border" size="sm" />
                                 ) : rankData.daily ? (
@@ -95,12 +93,18 @@ const YourPositionCard = ({ myRank, getRankBadge }) => {
                                 )}
                             </div>
                         </div>
-                    </Col>
-                    <Col xs={4} className="text-center">
-                        <div className="time-rank-item">
-                            <i className="bi bi-calendar-week-fill text-primary mb-1"></i>
-                            <div className="time-rank-label">Weekly</div>
-                            <div className="time-rank-value">
+                    </div>
+                </Col>
+
+                {/* Weekly Rank Card */}
+                <Col xs={6} md={3}>
+                    <div className="stat-card">
+                        <div className="stat-icon stat-icon-weekly">
+                            <i className="bi bi-calendar-week-fill"></i>
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-label">Weekly</div>
+                            <div className="stat-value">
                                 {rankData.loading ? (
                                     <Spinner animation="border" size="sm" />
                                 ) : rankData.weekly ? (
@@ -110,12 +114,18 @@ const YourPositionCard = ({ myRank, getRankBadge }) => {
                                 )}
                             </div>
                         </div>
-                    </Col>
-                    <Col xs={4} className="text-center">
-                        <div className="time-rank-item">
-                            <i className="bi bi-calendar-month-fill text-info mb-1"></i>
-                            <div className="time-rank-label">Monthly</div>
-                            <div className="time-rank-value">
+                    </div>
+                </Col>
+
+                {/* Monthly Rank Card */}
+                <Col xs={6} md={3}>
+                    <div className="stat-card">
+                        <div className="stat-icon stat-icon-monthly">
+                            <i className="bi bi-calendar-month-fill"></i>
+                        </div>
+                        <div className="stat-content">
+                            <div className="stat-label">Monthly</div>
+                            <div className="stat-value">
                                 {rankData.loading ? (
                                     <Spinner animation="border" size="sm" />
                                 ) : rankData.monthly ? (
@@ -125,10 +135,10 @@ const YourPositionCard = ({ myRank, getRankBadge }) => {
                                 )}
                             </div>
                         </div>
-                    </Col>
-                </Row>
-            </Card.Body>
-        </Card>
+                    </div>
+                </Col>
+            </Row>
+        </div>
     );
 };
 
