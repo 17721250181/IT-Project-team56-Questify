@@ -2,7 +2,8 @@
 
 /* Navbar Container */
 .questify-navbar {
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+    /* Slightly deepen the slate gradient for stronger presence */
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%) !important; /* slighter darker */
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding: 1rem 0 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -37,7 +38,8 @@
 
 /* Nav Links */
 .questify-navbar .nav-link {
-    color: #d1d5db !important;
+    /* Tone down brightness slightly for better contrast with darker background */
+    color: #d1d5db !important; /* gray-300 */
     font-weight: 500;
     font-size: 0.95rem;
     padding: 0.5rem 1rem !important;
@@ -62,7 +64,7 @@
 
 .questify-navbar .nav-link:hover {
     color: #f9fafb !important;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .questify-navbar .nav-link:hover::after {
@@ -76,7 +78,8 @@
 /* Active Nav Link */
 .questify-navbar .nav-link.active {
     color: #f9fafb !important;
-    background: rgba(59, 130, 246, 0.1);
+    /* Slightly stronger active state to reduce washed-out feel */
+    background: rgba(59, 130, 246, 0.10);
 }
 
 .questify-navbar .nav-link.active::after {
