@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("questions", "0005_update_num_attempts"),
+        ("questions", "0006_question_admin_feedback"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
