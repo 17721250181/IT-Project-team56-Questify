@@ -8,7 +8,7 @@ const QListItem = ({
     week = 'Week 0',
     topic = 'Topic 0',
     attempted = false,
-    verified = false,
+    verifyStatus = 'PENDING',
     questionType = 'undefined type',
     rating = 0.0,
     numAttempts = 0,
@@ -69,15 +69,15 @@ const QListItem = ({
                         <Badge className="m-1" bg="secondary">
                             {topic}
                         </Badge>
-                        {verified ? (
-                            <Badge className="m-1" bg="secondary">
-                                Verified✅
+                        {verifyStatus === 'APPROVED' ? (
+                            <Badge className="m-1" bg="success">
+                                Verified
                             </Badge>
-                        ) : (
-                            <Badge className="m-1" bg="secondary">
-                                Not Verified
+                        ) : verifyStatus === 'REJECTED' ? (
+                            <Badge className="m-1" bg="danger">
+                                Rejected
                             </Badge>
-                        )}
+                        ) : null}
                         {attempted ? (
                             <Badge className="m-1" bg="secondary">
                                 Attempted

@@ -51,6 +51,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "attempted",
             "source",
             "verify_status",
+            "admin_feedback",
             "created_at",
             "updated_at",
             "creator",

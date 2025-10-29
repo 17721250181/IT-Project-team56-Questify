@@ -184,11 +184,6 @@ const DoQuestion = () => {
             </Row>
             <hr />
             
-            {/* Question content */}
-            <Row className="mb-1 text-start">
-                <p className="m-1">{question.content}</p>
-            </Row>
-
             {/* Answer area */}
             <Row className="mb-3 text-start">
                 {question.type === 'MCQ' ? (

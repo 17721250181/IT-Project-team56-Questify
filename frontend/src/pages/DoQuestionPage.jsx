@@ -7,14 +7,20 @@ import Col from 'react-bootstrap/Col';
 // Importing custom components
 import { QuestifyNavBar } from '../components/common';
 import DoQuestion from '../components/doQuestion/DoQuestion';
+import DoQuestionAdmin from '../components/doQuestion/DoQuestionAdmin';
 import { CommentForm, CommentList } from '../components/comments';
 import QuestionRating from '../components/QuestionRating.jsx';
+import { useAuth } from '../contexts/AuthContext';
 
 const DoQuestionPage = () => {
     // Get question ID from URL parameters using React Router
     const { questionId } = useParams();
     const id = parseInt(questionId) || 1;
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const { user } = useAuth();
+
+    // Check if user is admin
+    const isAdmin = user?.is_staff || user?.is_superuser || false;
 
     // Callback to refresh comments when a new comment is posted
     const handleCommentPosted = () => {
@@ -28,8 +34,12 @@ const DoQuestionPage = () => {
             <Container className="mt-3">
                 <Row>
                     <Col xs={12} md={7}>
-                        {/* DoQuestion component to display the question */}
-                        <DoQuestion questionId={id} />
+                        {/* Conditionally render DoQuestion or DoQuestionAdmin based on user role */}
+                        {isAdmin ? (
+                            <DoQuestionAdmin questionId={id} />
+                        ) : (
+                            <DoQuestion questionId={id} />
+                        )}
 
                         {/* Comment Form below DoQuestion */}
                         <div className="mt-4">
