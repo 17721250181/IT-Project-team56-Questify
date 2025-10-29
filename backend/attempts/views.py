@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from django.db.models import Count
+from django.db.models import Count, F, OuterRef, Subquery
 from django.db.models.functions import TruncDate
 from datetime import datetime, timedelta
 from .models import Attempt
@@ -64,7 +64,19 @@ class UserAttemptListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Attempt.objects.filter(attempter=self.request.user).order_by('-submitted_at')
+        user = self.request.user
+
+        latest_attempt_subquery = Attempt.objects.filter(
+            attempter=user,
+            question_id=OuterRef("question_id")
+        ).order_by("-submitted_at", "-id").values("id")[:1]
+
+        return (
+            Attempt.objects.filter(attempter=user)
+            .annotate(latest_attempt_id=Subquery(latest_attempt_subquery))
+            .filter(pk=F("latest_attempt_id"))
+            .order_by("-submitted_at", "-id")
+        )
 
 
 class QuestionAttemptListView(generics.ListAPIView):
