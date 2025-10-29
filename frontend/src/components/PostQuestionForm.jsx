@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button, Alert, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, Alert, Row, Col } from 'react-bootstrap';
 import { QuestionService } from '../services/QuestionService.js';
 
 const PostQuestionForm = () => {
@@ -47,7 +47,7 @@ const PostQuestionForm = () => {
             ...prev,
             [name]: value
         }));
-        
+
         // Clear validation error for this field
         if (validationErrors[name]) {
             setValidationErrors(prev => ({
@@ -75,7 +75,7 @@ const PostQuestionForm = () => {
     const handleWeekTopicChange = (e) => {
         const selectedValue = e.target.value;
         const selected = weekTopicOptions.find(opt => opt.value === selectedValue);
-        
+
         setFormData(prev => ({
             ...prev,
             weekTopic: selectedValue,
@@ -87,11 +87,11 @@ const PostQuestionForm = () => {
     const handleCorrectOptionChange = (option, isChecked) => {
         setFormData(prev => ({
             ...prev,
-            correct_options: isChecked 
+            correct_options: isChecked
                 ? [...prev.correct_options, option]
                 : prev.correct_options.filter(opt => opt !== option)
         }));
-        
+
         // Clear correct_options validation error
         if (validationErrors.correct_options) {
             setValidationErrors(prev => ({
@@ -130,12 +130,12 @@ const PostQuestionForm = () => {
             if (!formData.option_b.trim()) {
                 errors.option_b = 'Option B is required';
             }
-            
+
             // Validate correct options
             if (formData.correct_options.length === 0) {
                 errors.correct_options = 'Please select at least one correct option';
             }
-            
+
             // Ensure selected correct options have text
             formData.correct_options.forEach(opt => {
                 const optionKey = `option_${opt.toLowerCase()}`;
@@ -151,13 +151,13 @@ const PostQuestionForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Validate form
         if (!validateForm()) {
             setError('Please fix the errors before submitting');
             return;
         }
-        
+
         setLoading(true);
         setError('');
         setMessage('');
@@ -215,14 +215,41 @@ const PostQuestionForm = () => {
     };
 
     return (
-        <Container>
-            <h4 className="mb-4">Create New Question</h4>
-            
+        <>
             {message && <Alert variant="success">{message}</Alert>}
             {error && <Alert variant="danger">{error}</Alert>}
 
-                <Form onSubmit={handleSubmit}>
-                    {/* Week and Topic Selection */}
+            <Form onSubmit={handleSubmit}>
+                {/* Question Type Selection - First */}
+                <div className="mb-4">
+                    <Form.Label className="mb-3">Question Type <span className="text-danger">*</span></Form.Label>
+                    <div className="type-selection-cards">
+                        <div
+                            className={`type-card ${formData.type === 'SHORT' ? 'selected' : ''}`}
+                            onClick={() => handleTypeChange({ target: { value: 'SHORT' } })}
+                        >
+                            <i className="bi bi-pencil type-card-icon"></i>
+                            <h6 className="type-card-title">Short Answer</h6>
+                            <p className="type-card-description">Students write their own response</p>
+                        </div>
+                        <div
+                            className={`type-card ${formData.type === 'MCQ' ? 'selected' : ''}`}
+                            onClick={() => handleTypeChange({ target: { value: 'MCQ' } })}
+                        >
+                            <i className="bi bi-list-check type-card-icon"></i>
+                            <h6 className="type-card-title">Multiple Choice</h6>
+                            <p className="type-card-description">Students select from options</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Question Details Section */}
+                <div className="form-section">
+                    <h6 className="form-section-title">
+                        <i className="bi bi-info-circle"></i>
+                        Question Details
+                    </h6>
+
                     <Form.Group className="mb-3">
                         <Form.Label>Week & Topic <span className="text-danger">*</span></Form.Label>
                         <Form.Select
@@ -244,8 +271,7 @@ const PostQuestionForm = () => {
                         </Form.Control.Feedback>
                     </Form.Group>
 
-                    {/* Question Text */}
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-0">
                         <Form.Label>Question <span className="text-danger">*</span></Form.Label>
                         <Form.Control
                             as="textarea"
@@ -261,27 +287,19 @@ const PostQuestionForm = () => {
                             {validationErrors.question}
                         </Form.Control.Feedback>
                     </Form.Group>
+                </div>
 
-                    {/* Question Type */}
-                    <Form.Group className="mb-3">
-                        <Form.Label>Question Type</Form.Label>
-                        <Form.Select
-                            name="type"
-                            value={formData.type}
-                            onChange={handleTypeChange}
-                        >
-                            <option value="SHORT">Short Answer</option>
-                            <option value="MCQ">Multiple Choice</option>
-                        </Form.Select>
-                    </Form.Group>
-
-                    {/* Short Answer Fields */}
-                    {formData.type === 'SHORT' && (
-                        <Form.Group className="mb-3">
-                            <Form.Label>Expected Answer <span className="text-danger">*</span></Form.Label>
+                {/* Short Answer Fields */}
+                {formData.type === 'SHORT' && (
+                    <div className="form-section">
+                        <h6 className="form-section-title">
+                            <i className="bi bi-check-circle"></i>
+                            Expected Answer
+                        </h6>
+                        <Form.Group className="mb-0">
                             <Form.Control
                                 as="textarea"
-                                rows={2}
+                                rows={3}
                                 name="answer"
                                 value={formData.answer}
                                 onChange={handleInputChange}
@@ -293,160 +311,163 @@ const PostQuestionForm = () => {
                                 {validationErrors.answer}
                             </Form.Control.Feedback>
                         </Form.Group>
-                    )}
-
-                    {/* Multiple Choice Fields */}
-                    {formData.type === 'MCQ' && (
-                        <>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Options (Check the correct answers) <span className="text-danger">*</span></Form.Label>
-                                
-                                {validationErrors.correct_options && (
-                                    <div className="text-danger small mb-2">
-                                        {validationErrors.correct_options}
-                                    </div>
-                                )}
-                                
-                                {/* Option A */}
-                                <Row className="align-items-center mb-2">
-                                    <Col md={10}>
-                                        <Form.Control
-                                            name="option_a"
-                                            value={formData.option_a}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter option A..."
-                                            isInvalid={!!validationErrors.option_a}
-                                            required
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {validationErrors.option_a}
-                                        </Form.Control.Feedback>
-                                    </Col>
-                                    <Col md={2} className="text-center">
-                                        <Form.Check
-                                            type="checkbox"
-                                            id="correct-a"
-                                            label="Correct"
-                                            checked={formData.correct_options.includes('A')}
-                                            onChange={(e) => handleCorrectOptionChange('A', e.target.checked)}
-                                        />
-                                    </Col>
-                                </Row>
-
-                                {/* Option B */}
-                                <Row className="align-items-center mb-2">
-                                    <Col md={10}>
-                                        <Form.Control
-                                            name="option_b"
-                                            value={formData.option_b}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter option B..."
-                                            isInvalid={!!validationErrors.option_b}
-                                            required
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {validationErrors.option_b}
-                                        </Form.Control.Feedback>
-                                    </Col>
-                                    <Col md={2} className="text-center">
-                                        <Form.Check
-                                            type="checkbox"
-                                            id="correct-b"
-                                            label="Correct"
-                                            checked={formData.correct_options.includes('B')}
-                                            onChange={(e) => handleCorrectOptionChange('B', e.target.checked)}
-                                        />
-                                    </Col>
-                                </Row>
-
-                                {/* Option C */}
-                                <Row className="align-items-center mb-2">
-                                    <Col md={10}>
-                                        <Form.Control
-                                            name="option_c"
-                                            value={formData.option_c}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter option C..."
-                                            required
-                                        />
-                                    </Col>
-                                    <Col md={2} className="text-center">
-                                        <Form.Check
-                                            type="checkbox"
-                                            id="correct-c"
-                                            label="Correct"
-                                            checked={formData.correct_options.includes('C')}
-                                            onChange={(e) => handleCorrectOptionChange('C', e.target.checked)}
-                                        />
-                                    </Col>
-                                </Row>
-
-                                {/* Option D */}
-                                <Row className="align-items-center mb-2">
-                                    <Col md={10}>
-                                        <Form.Control
-                                            name="option_d"
-                                            value={formData.option_d}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter option D..."
-                                            required
-                                        />
-                                    </Col>
-                                    <Col md={2} className="text-center">
-                                        <Form.Check
-                                            type="checkbox"
-                                            id="correct-d"
-                                            label="Correct"
-                                            checked={formData.correct_options.includes('D')}
-                                            onChange={(e) => handleCorrectOptionChange('D', e.target.checked)}
-                                        />
-                                    </Col>
-                                </Row>
-
-                                {/* Option E */}
-                                <Row className="align-items-center mb-2">
-                                    <Col md={10}>
-                                        <Form.Control
-                                            name="option_e"
-                                            value={formData.option_e}
-                                            onChange={handleInputChange}
-                                            placeholder="Enter option E..."
-                                            required
-                                        />
-                                    </Col>
-                                    <Col md={2} className="text-center">
-                                        <Form.Check
-                                            type="checkbox"
-                                            id="correct-e"
-                                            label="Correct"
-                                            checked={formData.correct_options.includes('E')}
-                                            onChange={(e) => handleCorrectOptionChange('E', e.target.checked)}
-                                        />
-                                    </Col>
-                                </Row>
-                            </Form.Group>
-                            
-                            {/* Validation message */}
-                            {formData.correct_options.length === 0 && (
-                                <Alert variant="warning" className="mb-3">
-                                    Please select at least one correct answer.
-                                </Alert>
-                            )}
-                        </>
-                    )}
-
-                    {/* Submit Button */}
-                    <div className="d-grid">
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            disabled={loading}
-                        >
-                            {loading ? 'Creating Question...' : 'Create Question'}
-                        </Button>
                     </div>
-                </Form>
-        </Container>
+                )}
+
+                {/* Multiple Choice Fields */}
+                {formData.type === 'MCQ' && (
+                    <div className="form-section">
+                        <h6 className="form-section-title">
+                            <i className="bi bi-list-check"></i>
+                            Answer Options
+                        </h6>
+                        <Form.Group className="mb-3">
+                            {validationErrors.correct_options && (
+                                <div className="text-danger small mb-2">
+                                    {validationErrors.correct_options}
+                                </div>
+                            )}
+
+                            {/* Option A */}
+                            <Row className="align-items-center mb-2">
+                                <Col md={10}>
+                                    <Form.Control
+                                        name="option_a"
+                                        value={formData.option_a}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter option A..."
+                                        isInvalid={!!validationErrors.option_a}
+                                        required
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {validationErrors.option_a}
+                                    </Form.Control.Feedback>
+                                </Col>
+                                <Col md={2} className="text-center">
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="correct-a"
+                                        label="Correct"
+                                        checked={formData.correct_options.includes('A')}
+                                        onChange={(e) => handleCorrectOptionChange('A', e.target.checked)}
+                                    />
+                                </Col>
+                            </Row>
+
+                            {/* Option B */}
+                            <Row className="align-items-center mb-2">
+                                <Col md={10}>
+                                    <Form.Control
+                                        name="option_b"
+                                        value={formData.option_b}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter option B..."
+                                        isInvalid={!!validationErrors.option_b}
+                                        required
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {validationErrors.option_b}
+                                    </Form.Control.Feedback>
+                                </Col>
+                                <Col md={2} className="text-center">
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="correct-b"
+                                        label="Correct"
+                                        checked={formData.correct_options.includes('B')}
+                                        onChange={(e) => handleCorrectOptionChange('B', e.target.checked)}
+                                    />
+                                </Col>
+                            </Row>
+
+                            {/* Option C */}
+                            <Row className="align-items-center mb-2">
+                                <Col md={10}>
+                                    <Form.Control
+                                        name="option_c"
+                                        value={formData.option_c}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter option C..."
+                                        required
+                                    />
+                                </Col>
+                                <Col md={2} className="text-center">
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="correct-c"
+                                        label="Correct"
+                                        checked={formData.correct_options.includes('C')}
+                                        onChange={(e) => handleCorrectOptionChange('C', e.target.checked)}
+                                    />
+                                </Col>
+                            </Row>
+
+                            {/* Option D */}
+                            <Row className="align-items-center mb-2">
+                                <Col md={10}>
+                                    <Form.Control
+                                        name="option_d"
+                                        value={formData.option_d}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter option D..."
+                                        required
+                                    />
+                                </Col>
+                                <Col md={2} className="text-center">
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="correct-d"
+                                        label="Correct"
+                                        checked={formData.correct_options.includes('D')}
+                                        onChange={(e) => handleCorrectOptionChange('D', e.target.checked)}
+                                    />
+                                </Col>
+                            </Row>
+
+                            {/* Option E */}
+                            <Row className="align-items-center mb-2">
+                                <Col md={10}>
+                                    <Form.Control
+                                        name="option_e"
+                                        value={formData.option_e}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter option E..."
+                                        required
+                                    />
+                                </Col>
+                                <Col md={2} className="text-center">
+                                    <Form.Check
+                                        type="checkbox"
+                                        id="correct-e"
+                                        label="Correct"
+                                        checked={formData.correct_options.includes('E')}
+                                        onChange={(e) => handleCorrectOptionChange('E', e.target.checked)}
+                                    />
+                                </Col>
+                            </Row>
+                        </Form.Group>
+
+                        {/* Validation message */}
+                        {formData.correct_options.length === 0 && (
+                            <Alert variant="warning" className="mb-0">
+                                Please select at least one correct answer.
+                            </Alert>
+                        )}
+                    </div>
+                )}
+
+                {/* Submit Button */}
+                <div className="d-grid">
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={loading}
+                    >
+                        {loading ? 'Creating Question...' : 'Create Question'}
+                    </Button>
+                </div>
+            </Form>
+        </>
     );
 };
 

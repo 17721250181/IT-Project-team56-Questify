@@ -1,0 +1,237 @@
+/* Post Question Page Styles */
+
+/* Page Background */
+.post-question-page {
+    min-height: 100vh;
+    background: #f3f4f6;
+}
+
+/* Compact Header */
+.post-question-header {
+    background: #ffffff;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.post-question-header-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.post-question-header-icon {
+    font-size: 1.5rem;
+    color: #3b82f6;
+}
+
+.post-question-header-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #111827;
+}
+
+/* Main Content Area */
+.post-question-content {
+    padding: 2.5rem 0 4rem;
+}
+
+/* Form Card Container */
+.post-question-form-card {
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+}
+
+/* Form Styling - Consistent with LoginForm */
+.post-question-form-card .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.post-question-form-card .form-control,
+.post-question-form-card .form-select {
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.post-question-form-card .form-control:focus,
+.post-question-form-card .form-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.post-question-form-card textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Button Styling - Consistent with LoginForm */
+.post-question-form-card .btn-primary {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    font-weight: 600;
+    padding: 0.875rem 2rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.post-question-form-card .btn-primary:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+.post-question-form-card .btn-primary:disabled {
+    background-color: #93c5fd;
+    border-color: #93c5fd;
+}
+
+/* Form Sections */
+.form-section {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-section-title i {
+    color: #3b82f6;
+}
+
+/* Type Selection Cards */
+.type-selection-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.type-card {
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.type-card:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.type-card.selected {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.type-card-icon {
+    font-size: 2rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+    transition: color 0.2s ease;
+}
+
+.type-card.selected .type-card-icon {
+    color: #3b82f6;
+}
+
+.type-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.type-card-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Alert Messages */
+.post-question-form-card .alert {
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* MCQ Options Styling */
+.post-question-form-card .form-check {
+    padding: 0.5rem 0;
+}
+
+.post-question-form-card .form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: 0.125rem;
+    border: 2px solid #d1d5db;
+}
+
+.post-question-form-card .form-check-input:checked {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.post-question-form-card .form-check-label {
+    font-weight: 500;
+    color: #374151;
+    margin-left: 0.5rem;
+}
+
+/* Required Field Indicator */
+.text-danger {
+    color: #ef4444;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .post-question-header {
+        padding: 1rem 0;
+    }
+    
+    .post-question-header-title {
+        font-size: 1.25rem;
+    }
+    
+    .post-question-content {
+        padding: 1.5rem 0 3rem;
+    }
+    
+    .post-question-form-card {
+        padding: 1.5rem;
+    }
+    
+    .type-selection-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-section {
+        padding: 1rem;
+    }
+}
+
