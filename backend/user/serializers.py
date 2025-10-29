@@ -163,27 +163,26 @@ class UserRegistrationSerializer(serializers.Serializer):
         display_name = validated_data['display_name']
         student_id = validated_data['student_id']
 
+        # Create user with first_name set to prevent signal from using email
         user = User.objects.create_user(
             username=email,
             email=email,
-            password=password
+            password=password,
+            first_name=display_name,  # Set this immediately
+            last_name=""
         )
 
-        # Store display name on user for compatibility
-        user.first_name = display_name
-        user.last_name = ""
-        user.save()
-
-        # Create user profile with student_id
+        # Update or create user profile with student_id and display_name
+        # Signal handler may have already created profile, so update it
         profile, created = UserProfile.objects.get_or_create(
             user=user,
             defaults={"student_id": student_id, "display_name": display_name}
         )
 
         if not created:
+            # Profile was created by signal, update it with correct values
             profile.student_id = student_id
-            if not profile.display_name:
-                profile.display_name = display_name
+            profile.display_name = display_name
             profile.save(update_fields=["student_id", "display_name"])
 
         return user
