@@ -134,19 +134,29 @@ def _base_rows(request):
     )
     agg = list(agg_qs)  # Evaluate query
 
-    # 2) User display name map (use display_name)
+    # 2) User display name and profile picture map
     user_ids_from_attempts = [r["attempter"] for r in agg]
     users = User.objects.filter(id__in=user_ids_from_attempts).select_related('profile')
-    user_map = {
-        u.id: (u.profile.display_name if hasattr(u, 'profile') and u.profile.display_name else u.username)
-        for u in users
-    }
+    user_map = {}
+    for u in users:
+        display_name = u.profile.display_name if hasattr(u, 'profile') and u.profile.display_name else u.username
+        profile_picture_url = None
+        if hasattr(u, 'profile') and u.profile.profile_picture:
+            try:
+                profile_picture_url = request.build_absolute_uri(u.profile.profile_picture.url)
+            except Exception:
+                profile_picture_url = u.profile.profile_picture.url
+        user_map[u.id] = {
+            'display_name': display_name,
+            'profile_picture_url': profile_picture_url
+        }
 
     # 3) Build base rows
     rows = [
         {
             "user_id": r["attempter"],
-            "display_name": user_map.get(r["attempter"], "Unknown"),
+            "display_name": user_map.get(r["attempter"], {}).get('display_name', "Unknown"),
+            "profile_picture_url": user_map.get(r["attempter"], {}).get('profile_picture_url'),
             "attempts": r["attempts"],
             "correct": r["correct"],
             "points": r["points"],
@@ -181,13 +191,20 @@ def _base_rows(request):
         # - If included, they will appear in the overall ranking (implemented to include them here).
         extra_user_ids = set(count_map.keys()) - set(rows_by_id.keys())
         if extra_user_ids:
-            # Fill in display_name
+            # Fill in display_name and profile_picture_url
             missing_users = User.objects.filter(id__in=list(extra_user_ids)).select_related('profile')
             for u in missing_users:
                 display_name = u.profile.display_name if hasattr(u, 'profile') and u.profile.display_name else u.username
+                profile_picture_url = None
+                if hasattr(u, 'profile') and u.profile.profile_picture:
+                    try:
+                        profile_picture_url = request.build_absolute_uri(u.profile.profile_picture.url)
+                    except Exception:
+                        profile_picture_url = u.profile.profile_picture.url
                 rows_by_id[u.id] = {
                     "user_id": u.id,
                     "display_name": display_name,
+                    "profile_picture_url": profile_picture_url,
                     "attempts": 0,
                     "correct": 0,
                     "points": 0,
@@ -262,9 +279,16 @@ class MyLeaderboardView(RetrieveAPIView):
                 if hasattr(request.user, 'profile') and request.user.profile.display_name 
                 else request.user.username
             )
+            profile_picture_url = None
+            if hasattr(request.user, 'profile') and request.user.profile.profile_picture:
+                try:
+                    profile_picture_url = request.build_absolute_uri(request.user.profile.profile_picture.url)
+                except Exception:
+                    profile_picture_url = request.user.profile.profile_picture.url
             me = {
                 "user_id": my_id,
                 "display_name": display_name,
+                "profile_picture_url": profile_picture_url,
                 "attempts": 0,
                 "correct": 0,
                 "points": 0,

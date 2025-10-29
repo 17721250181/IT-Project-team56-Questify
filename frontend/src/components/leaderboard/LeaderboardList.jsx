@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Col, Card } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import UserAvatar from '../common/UserAvatar';
 
 /**
  * LeaderboardList Component
@@ -13,13 +14,13 @@ import PropTypes from 'prop-types';
  * @param {Function} getTabIcon - Function to get tab icon
  * @param {Function} getTabLabel - Function to get tab label
  */
-const LeaderboardList = ({ 
-    leaderboardData, 
-    myRank, 
-    activeTab, 
+const LeaderboardList = ({
+    leaderboardData,
+    myRank,
+    activeTab,
     getRankBadge,
     getTabIcon,
-    getTabLabel 
+    getTabLabel
 }) => {
     return (
         <Row>
@@ -38,8 +39,8 @@ const LeaderboardList = ({
                         ) : (
                             <div className="leaderboard-list">
                                 {leaderboardData.map((user) => (
-                                    <div 
-                                        key={user.user_id} 
+                                    <div
+                                        key={user.user_id}
                                         className={`leaderboard-item ${myRank?.user_id === user.user_id ? 'current-user' : ''}`}
                                     >
                                         <div className="rank-column">
@@ -48,9 +49,11 @@ const LeaderboardList = ({
                                             </span>
                                         </div>
                                         <div className="user-column">
-                                            <div className="user-avatar-sm">
-                                                <i className="bi bi-person-circle"></i>
-                                            </div>
+                                            <UserAvatar
+                                                avatarUrl={user.profile_picture_url}
+                                                size="large"
+                                                showBorder={false}
+                                            />
                                             <div className="user-info">
                                                 <div className="username">{user.display_name}</div>
                                                 <div className="user-stats">
@@ -87,6 +90,7 @@ LeaderboardList.propTypes = {
             rank: PropTypes.number.isRequired,
             attempts: PropTypes.number.isRequired,
             correct: PropTypes.number.isRequired,
+            profile_picture_url: PropTypes.string,
         })
     ).isRequired,
     myRank: PropTypes.shape({
@@ -94,6 +98,7 @@ LeaderboardList.propTypes = {
         rank: PropTypes.number,
         points: PropTypes.number,
         display_name: PropTypes.string,
+        profile_picture_url: PropTypes.string,
     }),
     activeTab: PropTypes.string.isRequired,
     getRankBadge: PropTypes.func.isRequired,

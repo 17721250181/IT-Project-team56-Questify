@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import '../../styles/UserAvatar.css';
@@ -24,6 +24,8 @@ const UserAvatar = ({
     className = '',
     style = {},
 }) => {
+    const [imageError, setImageError] = useState(false);
+
     // Size configurations
     const sizeMap = {
         small: { dimension: 32, iconSize: '32px' },
@@ -44,37 +46,43 @@ const UserAvatar = ({
         .filter(Boolean)
         .join(' ');
 
-    const borderClasses = showBorder 
-        ? `border border-${size === 'xlarge' ? '3' : '2'} border-${borderColor}` 
+    const borderClasses = showBorder
+        ? `border border-${size === 'xlarge' ? '3' : '2'} border-${borderColor}`
         : '';
 
+    // Check if we should try to show image
+    const shouldShowImage = avatarUrl && typeof avatarUrl === 'string' && avatarUrl.trim() !== '' && !imageError;
+
+    if (shouldShowImage) {
+        return (
+            <Image
+                src={avatarUrl}
+                roundedCircle
+                width={dimension}
+                height={dimension}
+                alt=""
+                className={`${avatarClasses} ${borderClasses}`}
+                style={{
+                    objectFit: 'cover',
+                    objectPosition: 'center 10%',
+                    ...style,
+                }}
+                onError={() => setImageError(true)}
+            />
+        );
+    }
+
+    // Fallback to icon
     return (
-        <>
-            {avatarUrl ? (
-                <Image
-                    src={avatarUrl}
-                    roundedCircle
-                    width={dimension}
-                    height={dimension}
-                    alt="User avatar"
-                    className={`${avatarClasses} ${borderClasses}`}
-                    style={{
-                        objectFit: 'cover',
-                        objectPosition: 'center 10%',
-                        ...style,
-                    }}
-                />
-            ) : (
-                <i
-                    className={`bi bi-person-circle text-secondary ${avatarClasses}`}
-                    style={{
-                        fontSize: iconSize,
-                        lineHeight: 1,
-                        ...style,
-                    }}
-                />
-            )}
-        </>
+        <i
+            className={`bi bi-person-circle text-secondary`}
+            style={{
+                fontSize: iconSize,
+                lineHeight: 1,
+                display: 'inline-block',
+                ...style,
+            }}
+        />
     );
 };
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Row, Col, Card } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import UserAvatar from '../common/UserAvatar';
 
 /**
  * Top3Podium Component
@@ -33,8 +34,13 @@ const Top3Podium = ({ leaderboardData, loading }) => {
                     <Card className="top-card rank-2">
                         <Card.Body className="text-center">
                             <div className="rank-medal">🥈</div>
-                            <div className="user-avatar mb-2">
-                                <i className="bi bi-person-circle"></i>
+                            <div className="mb-3">
+                                <UserAvatar
+                                    avatarUrl={top3[1]?.profile_picture_url}
+                                    size="large"
+                                    showBorder={true}
+                                    borderColor="secondary"
+                                />
                             </div>
                             <h5>{top3[1]?.display_name || 'User'}</h5>
                             <p className="score-text">{top3[1]?.points || 0} pts</p>
@@ -47,8 +53,13 @@ const Top3Podium = ({ leaderboardData, loading }) => {
                     <Card className="top-card rank-1">
                         <Card.Body className="text-center">
                             <div className="rank-medal">🥇</div>
-                            <div className="user-avatar mb-2">
-                                <i className="bi bi-person-circle"></i>
+                            <div className="mb-3">
+                                <UserAvatar
+                                    avatarUrl={top3[0]?.profile_picture_url}
+                                    size="large"
+                                    showBorder={true}
+                                    borderColor="warning"
+                                />
                             </div>
                             <h5>{top3[0]?.display_name || 'User'}</h5>
                             <p className="score-text">{top3[0]?.points || 0} pts</p>
@@ -61,8 +72,13 @@ const Top3Podium = ({ leaderboardData, loading }) => {
                     <Card className="top-card rank-3">
                         <Card.Body className="text-center">
                             <div className="rank-medal">🥉</div>
-                            <div className="user-avatar mb-2">
-                                <i className="bi bi-person-circle"></i>
+                            <div className="mb-3">
+                                <UserAvatar
+                                    avatarUrl={top3[2]?.profile_picture_url}
+                                    size="large"
+                                    showBorder={true}
+                                    borderColor="warning"
+                                />
                             </div>
                             <h5>{top3[2]?.display_name || 'User'}</h5>
                             <p className="score-text">{top3[2]?.points || 0} pts</p>
@@ -81,6 +97,7 @@ Top3Podium.propTypes = {
             display_name: PropTypes.string.isRequired,
             points: PropTypes.number.isRequired,
             rank: PropTypes.number.isRequired,
+            profile_picture_url: PropTypes.string,
         })
     ).isRequired,
     loading: PropTypes.bool.isRequired,
