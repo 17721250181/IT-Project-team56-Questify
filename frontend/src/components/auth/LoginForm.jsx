@@ -3,6 +3,8 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import PasswordInput from '../common/PasswordInput';
+import ErrorMessage from '../common/ErrorMessage';
 
 const LoginForm = () => {
     // State variables for inputs
@@ -132,30 +134,22 @@ const LoginForm = () => {
                         isInvalid={!!errors.email}
                         required
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.email}
-                    </Form.Control.Feedback>
+                    <ErrorMessage message={errors.email} />
                 </Form.Group>
 
                 {/* Password Field */}
-                <Form.Group className="mb-4">
-                    <Form.Label className="form-label">
-                        Password
-                    </Form.Label>
-                    <Form.Control
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={handlePasswordChange}
-                        className="form-input"
-                        disabled={loading}
-                        isInvalid={!!errors.password}
-                        required
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.password}
-                    </Form.Control.Feedback>
-                </Form.Group>
+                <PasswordInput
+                    value={password}
+                    onChange={handlePasswordChange}
+                    placeholder="Enter your password"
+                    isInvalid={!!errors.password}
+                    disabled={loading}
+                    name="password"
+                    label="Password"
+                    feedbackText={errors.password}
+                    required={true}
+                    className="mb-4"
+                />
 
                 {/* Primary Login Button */}
                 <div className="d-grid mb-3">

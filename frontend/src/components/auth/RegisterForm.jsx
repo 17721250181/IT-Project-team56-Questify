@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import PasswordInput from '../common/PasswordInput';
+import ErrorMessage from '../common/ErrorMessage';
 
 const RegisterForm = () => {
     // State variables for inputs
@@ -62,6 +64,8 @@ const RegisterForm = () => {
             newErrors.email = 'Email address is required';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
             newErrors.email = 'Please enter a valid email address';
+        } else if (!formData.email.endsWith('@student.unimelb.edu.au')) {
+            newErrors.email = 'Please use your University of Melbourne student email address (@student.unimelb.edu.au)';
         }
 
         // Password validation
@@ -150,9 +154,7 @@ const RegisterForm = () => {
                         isInvalid={!!errors.displayName}
                         disabled={loading}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.displayName}
-                    </Form.Control.Feedback>
+                    <ErrorMessage message={errors.displayName} />
                 </Form.Group>
 
                 {/* Student ID Field */}
@@ -170,9 +172,7 @@ const RegisterForm = () => {
                         isInvalid={!!errors.studentId}
                         disabled={loading}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.studentId}
-                    </Form.Control.Feedback>
+                    <ErrorMessage message={errors.studentId} />
                 </Form.Group>
 
                 {/* Email Field */}
@@ -190,50 +190,36 @@ const RegisterForm = () => {
                         isInvalid={!!errors.email}
                         disabled={loading}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.email}
-                    </Form.Control.Feedback>
+                    <ErrorMessage message={errors.email} />
                 </Form.Group>
 
                 {/* Password Field */}
-                <Form.Group className="mb-3">
-                    <Form.Label className="form-label">
-                        Password
-                    </Form.Label>
-                    <Form.Control
-                        type="password"
-                        name="password"
-                        placeholder="Create a password (min 8 characters)"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="form-input"
-                        isInvalid={!!errors.password}
-                        disabled={loading}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.password}
-                    </Form.Control.Feedback>
-                </Form.Group>
+                <PasswordInput
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Create a password (min 8 characters)"
+                    isInvalid={!!errors.password}
+                    disabled={loading}
+                    name="password"
+                    label="Password"
+                    feedbackText={errors.password}
+                    required={false}
+                    className="mb-3"
+                />
 
                 {/* Confirm Password Field */}
-                <Form.Group className="mb-3">
-                    <Form.Label className="form-label">
-                        Confirm Password
-                    </Form.Label>
-                    <Form.Control
-                        type="password"
-                        name="confirmPassword"
-                        placeholder="Confirm your password"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        className="form-input"
-                        isInvalid={!!errors.confirmPassword}
-                        disabled={loading}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.confirmPassword}
-                    </Form.Control.Feedback>
-                </Form.Group>
+                <PasswordInput
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm your password"
+                    isInvalid={!!errors.confirmPassword}
+                    disabled={loading}
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    feedbackText={errors.confirmPassword}
+                    required={false}
+                    className="mb-3"
+                />
 
                 {/* Terms Agreement */}
                 <Form.Group className="mb-3">
@@ -250,9 +236,7 @@ const RegisterForm = () => {
                             </span>
                         }
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.agreeToTerms}
-                    </Form.Control.Feedback>
+                    <ErrorMessage message={errors.agreeToTerms} />
                 </Form.Group>
 
                 {/* Primary Register Button */}

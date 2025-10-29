@@ -23,6 +23,8 @@
     border: 2px solid #e5e7eb !important;
     border-radius: 0.5rem !important;
     transition: all 0.2s ease-in-out !important;
+    /* Remove Bootstrap's default validation icons */
+    background-image: none !important;
 }
 
 .login-form .form-input:focus {
