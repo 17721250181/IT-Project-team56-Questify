@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Container, Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import Logo from './Logo';
 import UserAvatar from './UserAvatar';
@@ -20,7 +20,7 @@ const QuestifyNavBar = () => {
     };
 
     return (
-        <Navbar expand="lg" className="bg-body-tertiary p-3">
+        <Navbar expand="lg" className="questify-navbar">
             <Container fluid>
                 <Navbar.Brand as={Link} to="/">
                     <Logo />
@@ -30,22 +30,22 @@ const QuestifyNavBar = () => {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                         {user?.is_admin && (
-                            <Nav.Link as={Link} to="/admin">
+                            <NavLink to="/admin" className="nav-link">
                                 Admin
-                            </Nav.Link>
+                            </NavLink>
                         )}
-                        <Nav.Link as={Link} to="/">
+                        <NavLink to="/" end className="nav-link">
                             Home
-                        </Nav.Link>
-                        <Nav.Link as={Link} to="/questions">
+                        </NavLink>
+                        <NavLink to="/questions" className="nav-link">
                             Questions
-                        </Nav.Link>
-                        <Nav.Link as={Link} to="/post-question">
+                        </NavLink>
+                        <NavLink to="/post-question" className="nav-link">
                             Post Question
-                        </Nav.Link>
-                        <Nav.Link as={Link} to="/leaderboard">
+                        </NavLink>
+                        <NavLink to="/leaderboard" className="nav-link">
                             Leaderboard
-                        </Nav.Link>
+                        </NavLink>
                     </Nav>
                     <Nav className="ms-auto">
                         <NavDropdown

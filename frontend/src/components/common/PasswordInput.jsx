@@ -66,7 +66,7 @@ const PasswordInput = ({
                         }
                     }}
                 >
-                    <i className={showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'}></i>
+                    <i className={showPassword ? 'bi bi-eye' : 'bi bi-eye-slash'}></i>
                 </span>
             </div>
             <ErrorMessage message={isInvalid ? feedbackText : ''} />
