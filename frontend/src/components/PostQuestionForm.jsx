@@ -329,122 +329,144 @@ const PostQuestionForm = () => {
                             )}
 
                             {/* Option A */}
-                            <Row className="align-items-center mb-2">
-                                <Col md={10}>
-                                    <Form.Control
-                                        name="option_a"
-                                        value={formData.option_a}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter option A..."
-                                        isInvalid={!!validationErrors.option_a}
-                                        required
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        {validationErrors.option_a}
-                                    </Form.Control.Feedback>
-                                </Col>
-                                <Col md={2} className="text-center">
-                                    <Form.Check
-                                        type="checkbox"
-                                        id="correct-a"
-                                        label="Correct"
-                                        checked={formData.correct_options.includes('A')}
-                                        onChange={(e) => handleCorrectOptionChange('A', e.target.checked)}
-                                    />
-                                </Col>
-                            </Row>
+                            <div className={`mcq-option-row ${formData.correct_options.includes('A') ? 'is-correct' : ''}`}>
+                                <Row>
+                                    <Col md={10}>
+                                        <div className="option-input-wrapper">
+                                            <span className="option-badge">A</span>
+                                            <Form.Control
+                                                name="option_a"
+                                                value={formData.option_a}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter option A..."
+                                                isInvalid={!!validationErrors.option_a}
+                                                required
+                                            />
+                                        </div>
+                                        <Form.Control.Feedback type="invalid">
+                                            {validationErrors.option_a}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                    <Col md={2} className="option-checkbox-area">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-a"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('A')}
+                                            onChange={(e) => handleCorrectOptionChange('A', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+                            </div>
 
                             {/* Option B */}
-                            <Row className="align-items-center mb-2">
-                                <Col md={10}>
-                                    <Form.Control
-                                        name="option_b"
-                                        value={formData.option_b}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter option B..."
-                                        isInvalid={!!validationErrors.option_b}
-                                        required
-                                    />
-                                    <Form.Control.Feedback type="invalid">
-                                        {validationErrors.option_b}
-                                    </Form.Control.Feedback>
-                                </Col>
-                                <Col md={2} className="text-center">
-                                    <Form.Check
-                                        type="checkbox"
-                                        id="correct-b"
-                                        label="Correct"
-                                        checked={formData.correct_options.includes('B')}
-                                        onChange={(e) => handleCorrectOptionChange('B', e.target.checked)}
-                                    />
-                                </Col>
-                            </Row>
+                            <div className={`mcq-option-row ${formData.correct_options.includes('B') ? 'is-correct' : ''}`}>
+                                <Row>
+                                    <Col md={10}>
+                                        <div className="option-input-wrapper">
+                                            <span className="option-badge">B</span>
+                                            <Form.Control
+                                                name="option_b"
+                                                value={formData.option_b}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter option B..."
+                                                isInvalid={!!validationErrors.option_b}
+                                                required
+                                            />
+                                        </div>
+                                        <Form.Control.Feedback type="invalid">
+                                            {validationErrors.option_b}
+                                        </Form.Control.Feedback>
+                                    </Col>
+                                    <Col md={2} className="option-checkbox-area">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-b"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('B')}
+                                            onChange={(e) => handleCorrectOptionChange('B', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+                            </div>
 
                             {/* Option C */}
-                            <Row className="align-items-center mb-2">
-                                <Col md={10}>
-                                    <Form.Control
-                                        name="option_c"
-                                        value={formData.option_c}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter option C..."
-                                        required
-                                    />
-                                </Col>
-                                <Col md={2} className="text-center">
-                                    <Form.Check
-                                        type="checkbox"
-                                        id="correct-c"
-                                        label="Correct"
-                                        checked={formData.correct_options.includes('C')}
-                                        onChange={(e) => handleCorrectOptionChange('C', e.target.checked)}
-                                    />
-                                </Col>
-                            </Row>
+                            <div className={`mcq-option-row ${formData.correct_options.includes('C') ? 'is-correct' : ''}`}>
+                                <Row>
+                                    <Col md={10}>
+                                        <div className="option-input-wrapper">
+                                            <span className="option-badge">C</span>
+                                            <Form.Control
+                                                name="option_c"
+                                                value={formData.option_c}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter option C..."
+                                            />
+                                        </div>
+                                    </Col>
+                                    <Col md={2} className="option-checkbox-area">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-c"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('C')}
+                                            onChange={(e) => handleCorrectOptionChange('C', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+                            </div>
 
                             {/* Option D */}
-                            <Row className="align-items-center mb-2">
-                                <Col md={10}>
-                                    <Form.Control
-                                        name="option_d"
-                                        value={formData.option_d}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter option D..."
-                                        required
-                                    />
-                                </Col>
-                                <Col md={2} className="text-center">
-                                    <Form.Check
-                                        type="checkbox"
-                                        id="correct-d"
-                                        label="Correct"
-                                        checked={formData.correct_options.includes('D')}
-                                        onChange={(e) => handleCorrectOptionChange('D', e.target.checked)}
-                                    />
-                                </Col>
-                            </Row>
+                            <div className={`mcq-option-row ${formData.correct_options.includes('D') ? 'is-correct' : ''}`}>
+                                <Row>
+                                    <Col md={10}>
+                                        <div className="option-input-wrapper">
+                                            <span className="option-badge">D</span>
+                                            <Form.Control
+                                                name="option_d"
+                                                value={formData.option_d}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter option D..."
+                                            />
+                                        </div>
+                                    </Col>
+                                    <Col md={2} className="option-checkbox-area">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-d"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('D')}
+                                            onChange={(e) => handleCorrectOptionChange('D', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+                            </div>
 
                             {/* Option E */}
-                            <Row className="align-items-center mb-2">
-                                <Col md={10}>
-                                    <Form.Control
-                                        name="option_e"
-                                        value={formData.option_e}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter option E..."
-                                        required
-                                    />
-                                </Col>
-                                <Col md={2} className="text-center">
-                                    <Form.Check
-                                        type="checkbox"
-                                        id="correct-e"
-                                        label="Correct"
-                                        checked={formData.correct_options.includes('E')}
-                                        onChange={(e) => handleCorrectOptionChange('E', e.target.checked)}
-                                    />
-                                </Col>
-                            </Row>
+                            <div className={`mcq-option-row ${formData.correct_options.includes('E') ? 'is-correct' : ''}`}>
+                                <Row>
+                                    <Col md={10}>
+                                        <div className="option-input-wrapper">
+                                            <span className="option-badge">E</span>
+                                            <Form.Control
+                                                name="option_e"
+                                                value={formData.option_e}
+                                                onChange={handleInputChange}
+                                                placeholder="Enter option E..."
+                                            />
+                                        </div>
+                                    </Col>
+                                    <Col md={2} className="option-checkbox-area">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id="correct-e"
+                                            label="Correct"
+                                            checked={formData.correct_options.includes('E')}
+                                            onChange={(e) => handleCorrectOptionChange('E', e.target.checked)}
+                                        />
+                                    </Col>
+                                </Row>
+                            </div>
                         </Form.Group>
 
                         {/* Validation message */}
