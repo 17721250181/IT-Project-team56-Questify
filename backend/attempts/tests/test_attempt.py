@@ -111,6 +111,52 @@ class AttemptTests(APITestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["question_text"], "What is 2 + 2?")
 
+    def test_list_user_attempts_returns_latest_per_question(self):
+        """Only latest attempt per question is returned for the user"""
+        old_attempt = Attempt.objects.create(
+            attempter=self.user,
+            question=self.mcq_question,
+            answer="A",
+            is_correct=False,
+        )
+        old_attempt.submitted_at = timezone.now() - timedelta(minutes=10)
+        old_attempt.save(update_fields=["submitted_at"])
+
+        latest_attempt = Attempt.objects.create(
+            attempter=self.user,
+            question=self.mcq_question,
+            answer="D",
+            is_correct=True,
+        )
+
+        second_question = Question.objects.create(
+            creator=self.user,
+            question="Capital of France?",
+            type="SHORT",
+            week="Week3",
+            topic="Geography",
+            source="STUDENT"
+        )
+        Attempt.objects.create(
+            attempter=self.user,
+            question=second_question,
+            answer="Paris",
+            is_correct=None,
+        )
+
+        url = reverse("user-attempts")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+        returned_question_ids = {str(attempt["question"]) for attempt in response.data}
+        self.assertSetEqual(returned_question_ids, {str(self.mcq_question.id), str(second_question.id)})
+
+        mcq_entry = next(item for item in response.data if str(item["question"]) == str(self.mcq_question.id))
+        self.assertEqual(mcq_entry["id"], str(latest_attempt.id))
+        self.assertTrue(mcq_entry["is_correct"])
+
     def test_list_attempts_for_question(self):
         """List all attempts for a specific question"""
         Attempt.objects.create(attempter=self.user, question=self.mcq_question, answer="A", is_correct=False)
