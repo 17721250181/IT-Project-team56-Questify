@@ -15,6 +15,8 @@ const DoQuestion = () => {
     const [error, setError] = useState(null);
     const [showResult, setShowResult] = useState(false);
     const [isCorrect, setIsCorrect] = useState(null);
+    const [isSaved, setIsSaved] = useState(false);
+    const [savingQuestion, setSavingQuestion] = useState(false);
 
     // Fetch question data from backend
     const fetchQuestion = useCallback(async () => {
@@ -36,6 +38,7 @@ const DoQuestion = () => {
             };
 
             setQuestion(mapped);
+            setIsSaved(raw.is_saved || false);
 
             if (mapped.type === "MCQ") {
                 setSelectedAnswers([]);
@@ -108,6 +111,23 @@ const DoQuestion = () => {
         }
     };
 
+    // Handle save/unsave question
+    const handleToggleSave = async () => {
+        try {
+            setSavingQuestion(true);
+            const response = await QuestionService.toggleSaveQuestion(questionId);
+            console.log('Toggle save response:', response);
+            
+            // Toggle the saved state
+            setIsSaved(!isSaved);
+        } catch (err) {
+            console.error('Failed to save/unsave question:', err);
+            setError(err.message || 'Failed to save question.');
+        } finally {
+            setSavingQuestion(false);
+        }
+    };
+
     // Fetch question data when component mounts
     useEffect(() => {
         if (questionId) {
@@ -169,10 +189,21 @@ const DoQuestion = () => {
         <Container className="p-4 rounded shadow-sm bg-light">
             {/* Question title and type badge */}
             <Row className='mb-3'>
-                <Col className='text-center text-md-start' xs={12} md={9}>
+                <Col className='text-center text-md-start' xs={12} md={7}>
                     <h4 className="m-1">{question.title}</h4>
                 </Col>
-                <Col className='text-center text-md-end' xs={12} md={3}>
+                <Col className='text-center text-md-end' xs={12} md={5}>
+                    <Button
+                        variant={isSaved ? 'warning' : 'outline-warning'}
+                        size="sm"
+                        onClick={handleToggleSave}
+                        disabled={savingQuestion}
+                        className="me-2"
+                        title={isSaved ? 'Unsave question' : 'Save question'}
+                    >
+                        <i className={`bi ${isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
+                        {savingQuestion ? ' Saving...' : (isSaved ? ' Saved' : ' Save')}
+                    </Button>
                     <Badge bg={question.type === 'MCQ' ? 'success' : 'info'}>
                         {question.type === 'MCQ'
                             ? question.multipleAnswers

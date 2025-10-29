@@ -158,6 +158,21 @@ const UserProfilePage = () => {
                                                 isOwnProfile={isOwnProfile}
                                             />
                                         </Tab>
+                                        <Tab
+                                            eventKey="saved"
+                                            title={
+                                                <span className="profile-tab-label">
+                                                    <i className="bi bi-bookmark-fill profile-tab-icon"></i>
+                                                    Saved Questions
+                                                </span>
+                                            }
+                                        >
+                                            <QuestionGrid
+                                                type="saved"
+                                                ownerId={profileUser?.id}
+                                                isOwnProfile={isOwnProfile}
+                                            />
+                                        </Tab>
                                     </Tabs>
                                 ) : (
                                     <div>

@@ -115,6 +115,7 @@ const QuestionDisplay = ({
 
     const isAttempted = type === 'attempted';
     const isPosted = type === 'posted';
+    const isSaved = type === 'saved';
     const isAll = type === 'all';
     const hasSearchValue = searchQuery.trim().length > 0;
     const filtersApplied = isAll && hasActiveFilters(filters);
@@ -197,7 +198,7 @@ const QuestionDisplay = ({
 
     // Fetch data for attempted or posted question views
     useEffect(() => {
-        if (!isAttempted && !isPosted) return;
+        if (!isAttempted && !isPosted && !isSaved) return;
 
         let active = true;
         const load = async () => {
@@ -219,6 +220,14 @@ const QuestionDisplay = ({
                     } else {
                         data = await QuestionService.getUserQuestions();
                     }
+                } else if (isSaved) {
+                    // Fetch saved questions
+                    const savedData = await QuestionService.getSavedQuestions();
+                    // Transform saved questions to match question format
+                    data = savedData.map(saved => ({
+                        ...saved.question_detail,
+                        id: saved.question,
+                    }));
                 }
                 if (!active) return;
                 setItems(data || []);
@@ -238,7 +247,7 @@ const QuestionDisplay = ({
         return () => {
             active = false;
         };
-    }, [isAttempted, isPosted, type, ownerId, sortOption, isOwnProfile]);
+    }, [isAttempted, isPosted, isSaved, type, ownerId, sortOption, isOwnProfile]);
 
     // Client-side search for attempted/posted datasets
     useEffect(() => {

@@ -238,6 +238,46 @@ export const QuestionService = {
         }
     },
 
+    // Save/Unsave question (toggle bookmark)
+    toggleSaveQuestion: async (questionId) => {
+        try {
+            const response = await apiClient.post(`/questions/save/${questionId}/`);
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Failed to save/unsave question:', error);
+            }
+
+            if (error.response?.status === 401) {
+                throw new Error('Please login to save questions');
+            } else if (error.response?.status === 404) {
+                throw new Error('Question not found');
+            } else if (error.response?.data?.error) {
+                throw new Error(error.response.data.error);
+            } else {
+                throw new Error('Failed to save question');
+            }
+        }
+    },
+
+    // Get saved questions list
+    getSavedQuestions: async () => {
+        try {
+            const response = await apiClient.get('/questions/saved-list/');
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch saved questions:', error);
+            }
+
+            if (error.response?.status === 401) {
+                throw new Error('Please login to view saved questions');
+            } else {
+                throw new Error('Failed to fetch saved questions');
+            }
+        }
+    },
+
     // Note: Rating functions moved to ratingService.js
     // Use RatingService.getQuestionRating, RatingService.rateQuestion, RatingService.clearRating
 };

@@ -35,6 +35,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     numAttempts = serializers.IntegerField(source="num_attempts", read_only=True)
     ratingCount = serializers.IntegerField(source="rating_count", read_only=True)
     userRating = serializers.SerializerMethodField()
+    is_saved = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
@@ -57,6 +58,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "creator",
             "mcq_detail",
             "short_detail",
+            "is_saved",
         ]
 
     def get_creator(self, obj):
@@ -85,6 +87,12 @@ class QuestionSerializer(serializers.ModelSerializer):
             return prefetch_result[0].score
         rating = obj.ratings.filter(user=user).first()
         return rating.score if rating else None
+
+    def get_is_saved(self, obj):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            return False
+        return SavedQuestion.objects.filter(user=user, question=obj).exists()
 
 
 # Serializer for creating questions
@@ -209,4 +217,11 @@ class SavedQuestionSerializer(serializers.ModelSerializer):
             "verify_status": obj.question.verify_status,
             "topic": obj.question.topic,
             "week": obj.question.week,
+            "type": obj.question.type,
+            "rating": obj.question.rating,
+            "rating_count": obj.question.rating_count,
+            "num_attempts": obj.question.num_attempts,
+            "source": obj.question.source,
+            "created_at": obj.question.created_at,
+            "updated_at": obj.question.updated_at,
         }
