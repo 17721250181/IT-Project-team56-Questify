@@ -20,7 +20,7 @@ Sprint 1 focused on requirement analysis and design, while Sprints 2–4 covered
 - Enhanced Admin Panel and Leaderboard UI for better readability and visualisation.  
 - Conducted documentation cleanup for submission.  
 
-### 💬 Client Feedback  
+### Client Feedback  
 - Handover meeting to be scheduled in Weeks 12–14.  
 - Client will review the final deployed system after the handover.  
 
