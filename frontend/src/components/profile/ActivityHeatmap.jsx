@@ -139,13 +139,16 @@ const ActivityHeatmap = () => {
     const monthLabels = generateMonthLabels(heatmapCells);
 
     return (
-        <div className="card border-light shadow-sm">
-            <div className="card-body">
-                <h5 className="card-title mb-2">Activity History</h5>
-                
-                {/* Stats */}
-                <div className="mb-2 text-muted small">
-                    <strong>{activityData?.total_attempts || 0}</strong> attempts in the last year
+        <div className="activity-heatmap-container">
+            <div className="activity-heatmap-content">
+                <div className="activity-heatmap-header">
+                    <h5 className="activity-heatmap-title">
+                        <i className="bi bi-calendar3 me-2"></i>
+                        Activity History
+                    </h5>
+                    <div className="activity-heatmap-stats">
+                        <strong>{activityData?.total_attempts || 0}</strong> attempts in the last year
+                    </div>
                 </div>
 
                 {/* Heatmap Grid */}

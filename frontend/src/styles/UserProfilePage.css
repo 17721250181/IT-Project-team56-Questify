@@ -61,44 +61,60 @@
 
 /* Card containers */
 .profile-card {
-    border-radius: 12px;
-    border: none;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.3s ease;
+    transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .profile-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
 }
 
 /* ============================================
    TABS STYLING
    ============================================ */
 
-/* Unified tab styling */
+/* Unified tab styling - Modern Pills */
 .profile-tabs {
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: none;
+    background: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
 }
 
 .profile-tabs .nav-link {
     color: #6c757d;
     font-weight: 500;
     border: none;
-    border-bottom: 2px solid transparent;
-    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .profile-tabs .nav-link:hover {
     color: #212529;
-    background-color: #f8f9fa;
-    border-bottom-color: #dee2e6;
+    background-color: #e5e7eb;
 }
 
 .profile-tabs .nav-link.active {
-    color: #0d6efd;
-    background-color: transparent;
-    border-bottom-color: #0d6efd;
+    color: #ffffff;
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    box-shadow: 0 2px 8px rgba(96, 165, 250, 0.3);
+}
+
+.profile-tabs .nav-link.active .profile-tab-icon {
+    animation: iconBounce 0.5s ease;
+}
+
+@keyframes iconBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
 
 /* Tab icons */

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Row, Col, Badge, Form, Button, Spinner, Alert } from 'react-bootstrap';
+import { Row, Col, Form, Button, Spinner, Alert } from 'react-bootstrap';
 import { AuthService } from '../../services/authService';
 import { UserProfileService } from '../../services/userProfileService';
 import { UserAvatar } from '../common';
@@ -128,7 +128,7 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
     };
 
     return (
-        <div className="bg-light border rounded-3 p-4 shadow-sm">
+        <div className="profile-header-container">
             <Row className="align-items-center">
                 <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
                     <UserAvatar
@@ -223,40 +223,40 @@ const UserProfileHeader = ({ user, isEditable = false, onProfileUpdated }) => {
                             <Row>
                                 <Col xs={12} sm={6} md={3} className="mb-2">
                                     <div className="stat-card">
-                                        <Badge bg="primary" className="mb-1">
+                                        <div className="stat-label">
                                             <i className="bi bi-star-fill me-1"></i>
                                             Points
-                                        </Badge>
-                                        <div className="fw-bold fs-5">{points}</div>
+                                        </div>
+                                        <div className="stat-value">{points}</div>
                                     </div>
                                 </Col>
                                 <Col xs={12} sm={6} md={3} className="mb-2">
                                     <div className="stat-card">
-                                        <Badge bg="success" className="mb-1">
+                                        <div className="stat-label">
                                             <i className="bi bi-trophy-fill me-1"></i>
                                             Ranking
-                                        </Badge>
-                                        <div className="fw-bold fs-5">
-                                            {ranking != null ? `#${ranking}` : <span className="text-muted">Unranked</span>}
+                                        </div>
+                                        <div className="stat-value">
+                                            {ranking != null ? `#${ranking}` : <span className="text-muted">N/A</span>}
                                         </div>
                                     </div>
                                 </Col>
                                 <Col xs={12} sm={6} md={3} className="mb-2">
                                     <div className="stat-card">
-                                        <Badge bg="info" className="mb-1">
+                                        <div className="stat-label">
                                             <i className="bi bi-check-circle-fill me-1"></i>
                                             Attempted
-                                        </Badge>
-                                        <div className="fw-bold">{attemptedQuestions} questions</div>
+                                        </div>
+                                        <div className="stat-value">{attemptedQuestions}</div>
                                     </div>
                                 </Col>
                                 <Col xs={12} sm={6} md={3} className="mb-2">
                                     <div className="stat-card">
-                                        <Badge bg="warning" className="mb-1">
+                                        <div className="stat-label">
                                             <i className="bi bi-pencil-square me-1"></i>
                                             Posted
-                                        </Badge>
-                                        <div className="fw-bold">{postedQuestions} questions</div>
+                                        </div>
+                                        <div className="stat-value">{postedQuestions}</div>
                                     </div>
                                 </Col>
                             </Row>

@@ -1,13 +1,62 @@
 /**
  * ActivityHeatmap Component Styles
  * GitHub-style contribution heatmap
- * 
+ *
  * Design System:
  * - Cell size: 11px × 11px
  * - Gap: 2-3px
  * - Colors: GitHub green palette
  * - Font size: 10-11px for labels
  */
+
+/* ============================================
+   CONTAINER
+   ============================================ */
+
+.activity-heatmap-container {
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.activity-heatmap-container:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.activity-heatmap-content {
+    padding: 1.5rem;
+}
+
+.activity-heatmap-header {
+    margin-bottom: 1.5rem;
+}
+
+.activity-heatmap-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.activity-heatmap-title i {
+    color: #3b82f6;
+}
+
+.activity-heatmap-stats {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.activity-heatmap-stats strong {
+    color: #1f2937;
+    font-weight: 600;
+}
 
 /* ============================================
    LAYOUT
