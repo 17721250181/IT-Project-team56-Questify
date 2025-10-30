@@ -85,6 +85,8 @@ This approach aligns with the client’s goal of **“making students more engag
 
 ---
 
+## Project Structure
+
 ```
 IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 ├── .github/
