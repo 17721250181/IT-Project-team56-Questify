@@ -14,7 +14,7 @@ const DoQuestionMCQ = ({
     // Render multiple choice options
     const renderOptions = () => {
         return (
-            <Form className='m-1'>
+            <Form className='m-1 break-words'>
                 {question.options?.map((option, index) => (
                     <Form.Check
                         key={index}
@@ -52,7 +52,7 @@ const DoQuestionMCQ = ({
                                             <Badge bg="info" className="me-2">
                                                 {letter}
                                             </Badge>
-                                            <span>
+                                            <span className="break-words">
                                                 {question.options[index]}
                                             </span>
                                         </div>

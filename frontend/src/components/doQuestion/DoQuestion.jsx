@@ -414,7 +414,16 @@ const DoQuestion = () => {
             {/* Question title and type badge */}
             <Row className='mb-3'>
                 <Col className='text-center text-md-start' xs={12} md={isAdmin ? 9 : 7}>
-                    <h4 className="m-1">{question.title}</h4>
+                    <h4
+                        className="m-1"
+                        style={{
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word',
+                            overflowWrap: 'anywhere'
+                        }}
+                    >
+                        {question.title}
+                    </h4>
                 </Col>
                 <Col className='text-center text-md-end' xs={12} md={isAdmin ? 3 : 5}>
                     {!isAdmin && (
@@ -603,7 +612,7 @@ const DoQuestion = () => {
                         <Row className="mb-3">
                             <Col>
                                 <strong>Your Answer:</strong>
-                                <div className="mt-2 p-3 bg-light rounded">
+                                <div className="mt-2 p-3 bg-light rounded break-words">
                                     {Array.isArray(previousAttempt.answer) 
                                         ? previousAttempt.answer.join(', ')
                                         : previousAttempt.answer}
@@ -614,7 +623,7 @@ const DoQuestion = () => {
                             <Row className="mb-3">
                                 <Col>
                                     <strong>Correct Answer:</strong>
-                                    <div className="mt-2 p-3 bg-success bg-opacity-10 rounded text-success">
+                                    <div className="mt-2 p-3 bg-success bg-opacity-10 rounded text-success break-words">
                                         {question.correctOptions.join(', ')}
                                     </div>
                                 </Col>

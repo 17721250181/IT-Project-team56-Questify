@@ -31,23 +31,25 @@ const DoQuestionPage = () => {
                         {/* DoQuestion now handles both admin and user views */}
                         <DoQuestion questionId={id} />
 
-                        {/* Comment Form below DoQuestion */}
+                        {/* Rating below question */}
                         <div className="mt-4">
-                            <CommentForm 
-                                questionId={questionId} 
-                                onCommentPosted={handleCommentPosted}
-                            />
+                            <QuestionRating questionId={questionId} />
                         </div>
                     </Col>
                     <Col xs={12} md={5}>
-                        {/* Question Rating at the top */}
-                        <QuestionRating questionId={questionId} />
-                        
                         {/* Comment List below rating */}
                         <CommentList 
                             questionId={questionId} 
                             refreshTrigger={refreshTrigger}
                         />
+
+                        {/* Move Comment Form below comments on the right */}
+                        <div className="mt-3">
+                            <CommentForm 
+                                questionId={questionId} 
+                                onCommentPosted={handleCommentPosted}
+                            />
+                        </div>
                     </Col>
                 </Row>
             </Container>

@@ -151,7 +151,7 @@ const SingleComment = ({ comment, onCommentUpdate, isReply = false, parentCommen
                 </div>
 
                 {/* Comment/Reply Content */}
-                <Card.Text className={contentClassName}>{comment.content}</Card.Text>
+                <Card.Text className={`${contentClassName} break-words`}>{comment.content}</Card.Text>
 
                 {/* Comment/Reply Actions */}
                 <div className="d-flex gap-3 align-items-center">
