@@ -5,7 +5,7 @@ It allows clients or future developers to quickly locate documentation, understa
 
 ---
 
-## 1️Project Overview
+## Project Overview
 **Project Name:** Questify (IT Project Team 56 – OOSD)  
 **Purpose:** An AI-assisted question bank platform designed to enhance student engagement through question creating, attempting, and AI explanations.  
 **Team Members:**  
