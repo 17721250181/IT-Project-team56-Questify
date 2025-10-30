@@ -353,10 +353,6 @@ The CI workflow executes `pytest` on every push/PR to enforce code quality.
 ### Database (Render PostgreSQL)
 
 - Render build command already runs `python manage.py migrate --noinput`, so schema changes apply automatically on redeploy.
-- Example external connection string (keep private; rotate on handover):  
-  `postgresql://questify_database_user:jqG7dXXxhbseKlUITwmDNUQvRVJRQqF6@dpg-d41tmvv5r7bs73e14520-a.oregon-postgres.render.com/questify_database`
-- Render CLI shortcut: `render psql dpg-d41tmvv5r7bs73e14520-a`
-- For local development you may omit `DATABASE_URL` to keep using SQLite (`db.sqlite3`).
 
 ### Admin Accounts
 
