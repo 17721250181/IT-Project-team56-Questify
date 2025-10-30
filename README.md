@@ -334,15 +334,48 @@ The CI workflow executes `pytest` on every push/PR to enforce code quality.
 
 ## Deployment
 
-### Backend on Render
+### Current Hosting (Render)
 
-1. Push the repository to GitHub (or fork).
-2. In Render, choose **Blueprint** → **New Blueprint from Git**, and select this repo.
-3. Configure environment variables (`DJANGO_SECRET_KEY`, `DEBUG=False`, DB credentials, CORS/CSRF origins, optional `OPENAI_API_KEY`).
-4. Deploy – the API will be reachable at:
-   <https://your-service.onrender.com/api/>
+| Service  | URL | Notes |
+|----------|-----|-------|
+| Backend  | `https://questify-backend-wv3e.onrender.com` | Django web service created via the `render.yaml` blueprint. |
+| Frontend | `https://questify-frontend.onrender.com`      | Vite SPA served by Render. |
+| Database | `questify-database`                           | Render PostgreSQL (Free tier, expires Nov 30 2025 unless upgraded). |
 
-Alternative deployments (Docker, Heroku, or AWS ECS) follow the same environment variable setup.
+> All Render services are on free plans. Storage is limited and the database will be deleted at the expiry date unless the client upgrades.
+
+### Environment & Secrets
+
+- Configure variables in Render’s dashboard and mirror them in local `.env` files for development.
+- Backend essentials: `SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `FRONTEND_ORIGIN`, `DJANGO_CORS_ALLOWED_ORIGINS`, `DJANGO_CSRF_TRUSTED_ORIGINS`, `SESSION_COOKIE_*`, `CSRF_COOKIE_*`, `SECURE_SSL_REDIRECT`, `OPENAI_API_KEY`, `ADMIN_EMAILS`, and `DATABASE_URL` (production only).
+- Frontend: set `VITE_API_BASE_URL` to the backend API (`https://questify-backend-wv3e.onrender.com/api` in production, `http://localhost:8000/api` locally).
+
+### Database (Render PostgreSQL)
+
+- Render build command already runs `python manage.py migrate --noinput`, so schema changes apply automatically on redeploy.
+- Example external connection string (keep private; rotate on handover):  
+  `postgresql://questify_database_user:jqG7dXXxhbseKlUITwmDNUQvRVJRQqF6@dpg-d41tmvv5r7bs73e14520-a.oregon-postgres.render.com/questify_database`
+- Render CLI shortcut: `render psql dpg-d41tmvv5r7bs73e14520-a`
+- For local development you may omit `DATABASE_URL` to keep using SQLite (`db.sqlite3`).
+
+### Admin Accounts
+
+- Migration `user/0004_create_admin_superuser.py` seeds `admin@questify.com` (password `12345678q`). Change it immediately after handover.
+- Additional admins: run `python manage.py createsuperuser` (locally or via `render services shell questify-backend`) and add the email to the `ADMIN_EMAILS` environment variable.
+
+### File Storage
+
+- User profile pictures are stored under `/media/`. Render’s free filesystem is ephemeral—files disappear after each redeploy. Attach a Persistent Disk or switch to durable object storage (e.g., S3) if long-term retention is required.
+
+### Redeploy Checklist
+
+1. Commit & push changes to GitHub (Render auto-redeploys if configured).
+2. Verify environment variables, especially `DATABASE_URL`, `ADMIN_EMAILS`, and secrets.
+3. Click **Redeploy** in Render to rebuild backend and frontend.
+4. After deploy, smoke-test:  
+   - `curl https://questify-backend-wv3e.onrender.com/api/csrf/`  
+   - Visit the frontend URL and log in.
+   - Confirm leaderboard/activity pulls shared data from PostgreSQL.
 
 ---
 
