@@ -1,4 +1,4 @@
-# hangelog  
+# Changelog  
 _Questify – IT Project Team 56_  
 This changelog summarises all major feature developments, feedback, and improvements across Sprints 1 to 4.  
 Sprint 1 focused on requirement analysis and design, while Sprints 2–4 covered full implementation, integration, and final handover.
