@@ -13,6 +13,14 @@ const QListSearch = ({ onSearch }) => {
     }
   };
 
+  // Handle clear search
+  const handleClear = () => {
+    setSearchQuery('');
+    if (onSearch) {
+      onSearch('');
+    }
+  };
+
   // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -30,6 +38,13 @@ const QListSearch = ({ onSearch }) => {
             />
             <Button variant="primary" type="submit">
                 Search
+            </Button>
+            <Button 
+                variant="outline-secondary" 
+                onClick={handleClear}
+                title="Clear search"
+            >
+                <i className="bi bi-x-lg"></i>
             </Button>
         </InputGroup>
     </Form>
