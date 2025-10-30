@@ -45,17 +45,6 @@ const mergeWithDefaults = (defaults, extras = [], sortExtras) => {
     return merged;
 };
 
-const extractWeekNumber = (label = '') => {
-    const match = label.match(/\d+/);
-    return match ? parseInt(match[0], 10) : Number.POSITIVE_INFINITY;
-};
-
-const mergeWeekOptions = (extras) =>
-    mergeWithDefaults(DEFAULT_WEEK_OPTIONS, extras, (value) => [extractWeekNumber(value), value]);
-
-const mergeTopicOptions = (extras) =>
-    mergeWithDefaults(DEFAULT_TOPIC_OPTIONS, extras, (value) => value.toLowerCase());
-
 const mergeSimpleOptions = (defaults, extras) =>
     mergeWithDefaults(defaults, extras, (value) => value.toLowerCase());
 
@@ -83,14 +72,12 @@ const hasActiveFilters = (filters) => {
  * @param {string} type - Data type: 'all', 'attempted', or 'posted' (default: 'all')
  * @param {boolean} showSearch - Show search/filter/sort controls (default: false)
  * @param {boolean} usePagination - Use pagination (default: true for grid, false for list)
- * @param {string} title - Optional title for the component
  */
 const QuestionDisplay = ({
     mode = 'grid',
     type = 'all',
     showSearch = false,
     usePagination = null,
-    title = null,
     ownerId = null,
     isOwnProfile = false,
 }) => {
@@ -160,6 +147,18 @@ const QuestionDisplay = ({
             active = false;
         };
     }, [isAll]);
+
+    // Save filters and sorting to sessionStorage when they change
+    useEffect(() => {
+        if (isAll) {
+            // Save current filters
+            const filtersToSave = { ...filters };
+            console.log('Saving to sessionStorage:', { filtersToSave, sortOption, searchQuery });
+            sessionStorage.setItem('questionFilters', JSON.stringify(filtersToSave));
+            sessionStorage.setItem('questionSort', sortOption);
+            sessionStorage.setItem('questionSearch', searchQuery);
+        }
+    }, [isAll, filters, sortOption, searchQuery]);
 
     // Fetch data for "all" questions with filters/sorting/search
     useEffect(() => {
