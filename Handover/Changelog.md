@@ -56,7 +56,7 @@ Sprint 1 focused on requirement analysis and design, while Sprints 2–4 covered
 - Added **Question List View** for browsing all available questions.  
 - Team members completed technical self-learning to support development.  
 
-### 🐞 Fixes / Improvements  
+### Fixes / Improvements  
 - Established consistent GitHub workflow (one branch per user story, merge after testing).  
 - Improved frontend–backend integration via clearer API endpoint docs.  
 - Formed fixed frontend/backend pairs per feature for smooth coordination. 
