@@ -1,0 +1,50 @@
+/* HomePage visual enhancements: subtle, performant */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatY {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 300ms ease-out both; }
+.fade-in-up { animation: fadeIn 400ms ease-out both; }
+
+.home-hero {
+  background: radial-gradient(1200px 400px at 20% -10%, rgba(59,130,246,.18), transparent),
+              linear-gradient(135deg, #ebf2ff 0%, #ffffff 60%);
+  border-radius: 16px;
+}
+
+.hover-raise { transition: transform 160ms ease, box-shadow 160ms ease; }
+.hover-raise:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.10); }
+
+.icon-float { animation: floatY 4s ease-in-out infinite; }
+
+.btn-glow { position: relative; transition: box-shadow 160ms ease, transform 120ms ease; }
+.btn-glow:hover { box-shadow: 0 8px 20px rgba(59,130,246,0.32); transform: translateY(-1px); }
+
+.btn-glow-outline { transition: box-shadow 160ms ease, transform 120ms ease; }
+.btn-glow-outline:hover { box-shadow: 0 8px 20px rgba(59,130,246,0.18); transform: translateY(-1px); }
+
+/* Reduce animation on prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in, .fade-in-up, .icon-float, .hover-raise, .btn-glow, .btn-glow-outline { animation: none; transition: none; }
+}
+
+/* Compact card layout for small previews */
+.compact-card .card-body { padding: 1rem; }
+
+/* Two-line clamp helper */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
