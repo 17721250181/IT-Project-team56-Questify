@@ -1,12 +1,9 @@
-# Questify - OOSD Question Bank System
+# Questify – OOSD Question Bank System
 
-A full-stack web application built as part of the OOSD course project. It provides a collaborative platform for students to create, share, answer, and review questions while engaging in active learning.
+A full-stack web application built as part of the OOSD course project.  
+It provides a collaborative platform for students to create, share, answer, and review questions while engaging in active learning.
 
-**Tech Stack:**
-
-- **Frontend:** React (Vite)
-- **Backend:** Django REST Framework
-- **Database:** SQLite
+---
 
 ## Table of Contents
 
@@ -21,10 +18,11 @@ A full-stack web application built as part of the OOSD course project. It provid
   - [Profile Page](#profile-page)
   - [Admin & Staff Features](#admin--staff-features)
 - [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
 - [Setup Instructions](#setup-instructions)
+  - [Prerequisites](#prerequisites)
   - [Backend Setup (Django + DRF + SQLite)](#backend-setup-django--drf--sqlite)
   - [Frontend Setup (React + Vite)](#frontend-setup-react--vite)
+  - [Common Pitfalls](#common-pitfalls)
 - [Running the Project](#running-the-project)
   - [Backend](#backend)
   - [Frontend](#frontend)
@@ -32,17 +30,21 @@ A full-stack web application built as part of the OOSD course project. It provid
 - [Deployment](#deployment)
   - [Backend on Render](#backend-on-render)
 - [Security (Sessions & CSRF)](#security-sessions--csrf)
-- [Common Pitfalls](#common-pitfalls)
 - [Project Guidelines](#project-guidelines)
 - [Future Work](#future-work)
 - [.gitignore](#gitignore)
 - [Team](#team)
 
+---
+
 ## Project Overview
 
-Questify is designed to transform the way OOSD students practice and learn. Instead of passively consuming practice questions, students actively create, evaluate, and discuss them.
+Questify is designed to transform the way OOSD students practice and learn.  
+Instead of passively consuming practice questions, students actively create, evaluate, and discuss them.
 
 This approach improves retention and understanding, aligns with research on active learning, and keeps students engaged.
+
+---
 
 ## Project Structure
 
@@ -63,7 +65,7 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 │   ├── requirements.txt            # Backend dependencies
 │   ├── manage.py                   # Django entry point
 │   ├── pytest.ini                  # Pytest config
-│   └──  coverage_report.txt         # Latest test coverage summary
+│   └── coverage_report.txt         # Latest test coverage summary
 │
 ├── frontend/                       # React (Vite) frontend
 │   ├── src/
@@ -85,36 +87,33 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 └── questify-start.bat / questify-stop.bat  # Local scripts for quick start/stop
 ```
 
+---
+
 ## Key Features
 
 ### Authentication
-
-- Account creation & login
-- Forgot password/reset (via email)
-- Two-factor authentication (Google Authenticator, etc.)
-- UniMelb SSO integration (planned)
+- Account creation & login  
+- Password reset (planned; requires email integration)  
+- Two-factor authentication (planned)  
+- University of Melbourne SSO (planned)
 
 ### Main Page
-
 - Week-based content selection (12-week course)
 - Quick leaderboard stats overview
 
 ### Question Management
-
-- Students upload questions with answers & tags (week/topic based)
-- Edit/update previously created questions
-- Save favorite questions
-- View both creator's answer + AI explanation
+- Students upload questions with answers & tags (week/topic-based)
+- Edit or update previously created questions
+- Save favourite questions
+- View both creator’s answer and AI explanation
 - Comment & rate questions for quality feedback
 
 ### Practice & Feedback
-
 - AI provides rubric & explanations for verified questions
-- Peer feedback via ratings and comments
-- Short-answer and MCQ supported (no coding questions)
+- Peer feedback through ratings and comments
+- Supports both short-answer and MCQ formats
 
 ### Leaderboard & Gamification
-
 - Multi-dimensional rankings (weekly & overall)
 - Scoring breakdown:
   - Question quality (40%)
@@ -125,48 +124,60 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 - Reward system to encourage engagement
 
 ### Profile Page
-
 - Saved questions library with retry function
-- User's created questions archive
+- User’s created questions archive
 - Visual progress tracking across 12 weeks
 
 ### Admin & Staff Features
-
 - Access and verify all student-created questions
-- Staff-verified mark on approved questions
-- Activity dashboards (charts/diagrams showing student engagement)
-- Minimal staff workload — designed for student-driven participation
+- Staff-verified badge on approved questions
+- Activity dashboards (charts showing student engagement)
+- Designed to minimise staff workload
+
+---
 
 ## Tech Stack
 
-- **Frontend:** React (Vite), Axios
-- **Backend:** Django + Django REST Framework
-- **Database:** SQLite
-- **Auth:** Django sessions + optional 2FA
-- **AI Integration:** Explanations & rubric (OpenAI API, requires funding approval)
+| Layer | Technologies |
+|--------|--------------|
+| **Frontend** | React (Vite), Axios |
+| **Backend** | Django + Django REST Framework |
+| **Database** | SQLite (development), PostgreSQL (planned for production) |
+| **Authentication** | Django sessions (with CSRF protection), optional 2FA |
+| **AI Integration** | OpenAI API |
+| **Testing** | Pytest (Pytest-Cov) |
+| **CI/CD** | GitHub Actions |
+| **Deployment** | Backend – Render, Frontend – GitHub Pages |
+| **Documentation** | Atlassian Confluence |
+| **Version Control** | Git & GitHub |
 
-## Prerequisites
+> **CSRF Note:**  
+> CSRF tokens are handled automatically via Django’s middleware and React’s `CsrfService`.  
+> See [Security (Sessions & CSRF)](#security-sessions--csrf) for implementation details.
 
+---
+
+## Setup Instructions
+
+### Prerequisites
 Make sure your environment matches these versions:
 
 - Python 3.11
-- Node.js 20 LTS (Node 18 will NOT work with Vite)
+- Node.js 20 LTS (Node 18 will **not** work with Vite)
 - npm (comes with Node)
 - Python virtual environment (venv)
 
-## Backend Setup (Django + DRF + SQLite)
+---
+
+### Backend Setup (Django + DRF + SQLite)
 
 ```bash
 cd backend
 
-# 1. Create venv
-# macOS/Linux
+# 1. Create virtual environment
 python3 -m venv env
-source env/bin/activate
-
-# Windows
-python -m venv env
-env\Scripts\activate
+source env/bin/activate        # macOS/Linux
+env\Scripts\activate           # Windows
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -180,24 +191,41 @@ python manage.py runserver 8000
 
 **API runs at:** <http://localhost:8000/api>
 
-> Default admin credentials (development): `admin@questify.com` / `12345678q`
+> Default admin credentials (development):  
+> `admin@questify.com` / `12345678q`
 
-## Frontend Setup (React + Vite)
+---
+
+### Frontend Setup (React + Vite)
 
 ```bash
 cd frontend
 
-# 1. Install deps
+# 1. Install dependencies
 npm install
 
-# 2. Create .env
+# 2. Create .env file
 echo "VITE_API_BASE_URL=http://localhost:8000/api" > .env
 
-# 3. Start dev server
+# 3. Start development server
 npm run dev
 ```
 
 **Frontend runs at:** <http://localhost:5173>
+
+---
+
+### Common Pitfalls
+
+Below are the most frequent setup and deployment mistakes encountered during development.
+
+- **Wrong Node version** → use Node 20.19+  
+- **Forgot to activate venv** → always activate before running backend  
+- **Missing `.env` file** → ensure `frontend/.env` exists with `VITE_API_BASE_URL`  
+- **Cross-domain cookies blocked** → for split frontend/backend deployments, ensure `SameSite=None` and `Secure` flags are enabled (configured in `render.yaml`)  
+- **`db.sqlite3` committed** → must be added to `.gitignore` to avoid leaking local data  
+
+---
 
 ## Running the Project
 
@@ -219,92 +247,88 @@ cd frontend
 npm run dev
 ```
 
+---
+
 ## Testing
-Run automated tests (backend) with Pytest:
+
+Run automated backend tests using Pytest:
+
 ```bash
 cd backend
 pytest
 ```
 
 Generate line coverage using Python’s built-in trace module:
+
 ```bash
 python -m trace --count --summary --module pytest
 python trace_summary.py   # helper script to aggregate trace_output/*.cover
 ```
-The CI workflow executes `pytest` on every push/PR to enforce quality.
+
+The CI workflow executes `pytest` on every push/PR to enforce code quality.
+
+---
 
 ## Deployment
-### Backend on Render
-1. Push the repository to GitHub (or fork).
-2. In Render, choose **Blueprint** → **New Blueprint from Git** and select this repo; `render.yaml` provisions the service.
-3. Configure environment variables (`DJANGO_SECRET_KEY`, `DEBUG=False`, DB credentials, CORS/CSRF origins, optional `OPENAI_API_KEY`).
-4. Deploy; the API will be reachable at `https://<service>.onrender.com/api/`.
 
-Alternative deployments (Docker, Heroku, ECS) follow the same environment variable requirements.
+### Backend on Render
+
+1. Push the repository to GitHub (or fork).  
+2. In Render, choose **Blueprint** → **New Blueprint from Git**, and select this repo.  
+3. Configure environment variables (`DJANGO_SECRET_KEY`, `DEBUG=False`, DB credentials, CORS/CSRF origins, optional `OPENAI_API_KEY`).  
+4. Deploy – the API will be reachable at:  
+   <https://your-service.onrender.com/api/>
+
+Alternative deployments (Docker, Heroku, or AWS ECS) follow the same environment variable setup.
+
+---
 
 ## Security (Sessions & CSRF)
 
-- The backend issues Django session and CSRF cookies; production deployments must run behind HTTPS and a distinct frontend origin.
-- `/api/csrf/` returns JSON `{"csrfToken": "<value>"}` and refreshes the cookie so clients can safely bootstrap.
-- The React client ships with a `CsrfService` that pre-fetches the token on boot and injects it into all unsafe requests, so no manual cookie handling is required.
-- Key environment variables (see `render.yaml` for production-ready values):
-  - `FRONTEND_ORIGIN`
-  - `DJANGO_CORS_ALLOWED_ORIGINS`
-  - `DJANGO_CSRF_TRUSTED_ORIGINS`
-  - `SESSION_COOKIE_SECURE`
-  - `SESSION_COOKIE_SAMESITE`
-  - `CSRF_COOKIE_SECURE`
-  - `CSRF_COOKIE_SAMESITE`
-- Local development defaults remain `Secure=False` and `SameSite=Lax`; override them only when testing full cross-site flows.
+- The backend issues Django session and CSRF cookies; production deployments must run behind HTTPS and a distinct frontend origin.  
+- `/api/csrf/` returns JSON `{"csrfToken": "<value>"}` and refreshes the cookie so clients can safely bootstrap.  
+- The React client includes a `CsrfService` that pre-fetches the token on boot and injects it into all unsafe requests.  
+- **Key environment variables** (see `render.yaml` for production-ready values):  
+  - `FRONTEND_ORIGIN`  
+  - `DJANGO_CORS_ALLOWED_ORIGINS`  
+  - `DJANGO_CSRF_TRUSTED_ORIGINS`  
+  - `SESSION_COOKIE_SECURE`  
+  - `SESSION_COOKIE_SAMESITE`  
+  - `CSRF_COOKIE_SECURE`  
+  - `CSRF_COOKIE_SAMESITE`  
 
-## Common Pitfalls
+Local development defaults use `Secure=False` and `SameSite=Lax`; override only when testing full cross-site flows.
 
-- **Wrong Node version** → use Node 20.19+
-- **Forgot to activate venv** → always activate before running backend
-- **Missing .env file** → ensure `frontend/.env` exists with `VITE_API_BASE_URL`
-- **Cross-domain cookies blocked** — for split frontend/backends ensure `SameSite=None` and the `Secure` flags are enabled (covered in `render.yaml`)
-- **db.sqlite3 committed** → must be ignored in Git
+---
 
 ## Project Guidelines
 
-- Questions are week-based only (for now)
-- Supported types: Multiple choice & short answer (no coding questions)
-- AI use: For rubric + explanations, alongside creator answers
-- Admin page includes:
-  - Question verification
-  - Engagement statistics
-  - Activity dashboards
-- User profile includes attempt history
+- Questions are week-based (aligned with course structure).  
+- Supported question types: Multiple Choice & Short Answer.  
+- AI is used for generating rubrics and explanations, shown alongside student-created answers.  
+- Admin dashboard includes:  
+  - Question verification  
+  - Engagement statistics  
+  - Activity dashboards  
+- User profile includes attempt history and saved questions.
+
+---
 
 ## Future Work
 
-- **OAuth 2.0 / SSO Integration**
-  - Integrate University of Melbourne SSO via Azure AD to replace manual registration.
-  - Improve user security and simplify onboarding.
+See the full version in [`Handover/Future_Work.md`](./Handover/Future_Work.md).  
+Main development priorities include:
 
-- **Reward for Students**
-  - Facilitate rewards for top students on the leaderboard during the coarse.
+- OAuth 2.0 / SSO Integration (University of Melbourne)  
+- Reward system for top students  
+- Database migration to PostgreSQL  
+- Enhanced AI feedback and automatic tagging  
+- Expanded gamification (badges, streaks)  
+- Personalized question recommendation system  
+- Mobile responsiveness improvements  
+- Cloud deployment on AWS for scalability
 
-- **Database Migration**
-  - Replace SQLite with PostgreSQL or MySQL for production scalability.
-  - Add backup and restore scripts for admin use.
-
-- **Enhanced AI Assistance**
-  - Expand AI-generated feedback to include hints and difficulty analysis.
-  - Provide automatic question tagging and topic recommendation.
-
-- **Gamification Expansion**
-  - Introduce achievement badges and streak tracking to motivate consistent participation.
-  - Add a seasonal leaderboard with reset cycles.
-
-- **Question Recommendation System**
-  - Implement personalized question suggestions based on user history and performance.
-
-- **Mobile Responsiveness**
-  - Optimize React frontend for mobile and tablet users.
-
-- **Cloud Deployment**
-  - Migrate from Render to AWS (Elastic Beanstalk + RDS) for better performance and cost management.
+---
 
 ## .gitignore
 
@@ -328,16 +352,26 @@ media/
 node_modules/
 dist/
 
-# Env
+# Environment
 .env
 frontend/.env
 backend/.env
 ```
 
+---
+
 ## Team
-- **Team 56 – Questify Contributors**
-  - Product Owner / Frontend Developer: Chen Ma
-  - Frontend Lead: Chang (Jerry) Chang
-  - Testing Lead / Backend Developer: Cheolgyun (Bill) Park
-  - Scrum Master / Backend Developer: Chih-Yi Huang
-  - Backend Leader: Ziyi Zhang
+
+**Team 56 – Questify Contributors**
+
+| Role | Name |
+|------|------|
+| Product Owner / Frontend Developer | Chen Ma |
+| Frontend Lead | Chang (Jerry) Chang |
+| Testing Lead / Backend Developer | Cheolgyun (Bill) Park |
+| Scrum Master / Backend Developer | Chih-Yi Huang |
+| Backend Leader | Ziyi Zhang |
+
+---
+
+> _Last updated: November 2025_
