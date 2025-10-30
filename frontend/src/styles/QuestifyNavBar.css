@@ -2,8 +2,8 @@
 
 /* Navbar Container */
 .questify-navbar {
-    /* Slightly deepen the slate gradient for stronger presence */
-    background: linear-gradient(135deg, rgba(45, 55, 72, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%) !important; /* slighter darker */
+    /* Medium slate gradient - darker than content, lighter than auth pages */
+    background: linear-gradient(135deg, rgba(71, 85, 105, 0.96) 0%, rgba(51, 65, 85, 0.96) 100%) !important; /* slate-600 to slate-700 */
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     padding: 1rem 0 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -215,7 +215,7 @@
     }
     
     .questify-navbar .navbar-collapse {
-        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        background: linear-gradient(135deg, rgba(71, 85, 105, 0.96) 0%, rgba(51, 65, 85, 0.96) 100%);
         margin-top: 0.75rem;
         padding: 0.5rem 0;
         border-radius: 0.5rem;

@@ -45,18 +45,6 @@ const LeaderboardPage = () => {
         <div className="leaderboard-page">
             <QuestifyNavBar />
 
-            {/* Modern Compact Header */}
-            <div className="leaderboard-header">
-                <Container>
-                    <div className="leaderboard-header-content">
-                        <div className="leaderboard-header-icon">
-                            <i className="bi bi-trophy-fill"></i>
-                        </div>
-                        <h1 className="leaderboard-header-title">Leaderboard</h1>
-                    </div>
-                </Container>
-            </div>
-
             {/* Main Content */}
             <div className="leaderboard-content">
                 <Container>

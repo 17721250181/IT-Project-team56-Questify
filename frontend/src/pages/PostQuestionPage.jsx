@@ -9,18 +9,6 @@ const PostQuestionPage = () => {
         <div className="post-question-page">
             <QuestifyNavBar />
 
-            {/* Balanced Modern Header */}
-            <div className="post-question-header">
-                <Container>
-                    <div className="post-question-header-content">
-                        <div className="post-question-header-icon">
-                            <i className="bi bi-pencil-square"></i>
-                        </div>
-                        <h1 className="post-question-header-title">Post Question</h1>
-                    </div>
-                </Container>
-            </div>
-
             {/* Main Content */}
             <div className="post-question-content">
                 <Container>

@@ -1,0 +1,14 @@
+/* Global Styles - Light Theme Background for Authenticated Pages */
+
+/* Set default background for pages without specific background styles */
+body {
+    margin: 0;
+    padding: 0;
+    background: #e5e7eb;
+    min-height: 100vh;
+}
+
+/* Ensure root div takes full height */
+#root {
+    min-height: 100vh;
+}
