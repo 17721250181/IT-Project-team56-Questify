@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Row, Col, Button, Alert, Spinner, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Button, Alert, Spinner, Badge, ButtonGroup } from 'react-bootstrap';
 import { QuestionService } from '../../services/QuestionService.js';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import DoQuestionMCQ from './DoQuestionMCQ';
 import DoQuestionShort from './DoQuestionShort';
 
 const DoQuestion = () => {
     const { questionId } = useParams();
+    const navigate = useNavigate();
     const [question, setQuestion] = useState(null);
     const [selectedAnswers, setSelectedAnswers] = useState([]);
     const [userAnswer, setUserAnswer] = useState('');
@@ -17,6 +18,8 @@ const DoQuestion = () => {
     const [isCorrect, setIsCorrect] = useState(null);
     const [isSaved, setIsSaved] = useState(false);
     const [savingQuestion, setSavingQuestion] = useState(false);
+    const [questionsList, setQuestionsList] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(-1);
 
     // Fetch question data from backend
     const fetchQuestion = useCallback(async () => {
@@ -128,12 +131,98 @@ const DoQuestion = () => {
         }
     };
 
+    // Fetch all questions for navigation
+    useEffect(() => {
+        const loadQuestionsList = async () => {
+            try {
+                // Try to get saved filters and sorting from sessionStorage
+                const savedFilters = sessionStorage.getItem('questionFilters');
+                const savedSort = sessionStorage.getItem('questionSort');
+                const savedSearch = sessionStorage.getItem('questionSearch');
+                
+                console.log('Loading questions list with saved preferences:', { savedFilters, savedSort, savedSearch });
+                
+                let filters = {};
+                let sort = undefined;
+                let search = undefined;
+                
+                // Parse saved filters if they exist
+                if (savedFilters) {
+                    try {
+                        const parsedFilters = JSON.parse(savedFilters);
+                        // Use the saved filters as-is, don't override
+                        filters = { ...parsedFilters };
+                    } catch (e) {
+                        console.error('Failed to parse saved filters:', e);
+                    }
+                }
+                
+                if (savedSort) {
+                    sort = savedSort;
+                }
+                
+                if (savedSearch) {
+                    search = savedSearch;
+                }
+                
+                // Fetch questions with user's filters and sorting
+                const questions = await QuestionService.getAllQuestions({
+                    filters: filters,
+                    sort: sort,
+                    search: search
+                });
+                
+                setQuestionsList(questions);
+                
+                // Find current question index
+                const index = questions.findIndex(q => q.id === questionId);
+                setCurrentIndex(index);
+            } catch (err) {
+                console.error('Failed to load questions list:', err);
+            }
+        };
+
+        loadQuestionsList();
+    }, [questionId]);
+
     // Fetch question data when component mounts
     useEffect(() => {
         if (questionId) {
             fetchQuestion();
+            // Reset submission state when changing questions
+            setSubmitted(false);
+            setShowResult(false);
+            setIsCorrect(null);
         }
     }, [questionId, fetchQuestion]);
+
+    // Navigation functions
+    const navigateToQuestion = (newQuestionId) => {
+        navigate(`/question/${newQuestionId}`);
+    };
+
+    const handlePrevious = () => {
+        if (currentIndex > 0 && questionsList.length > 0) {
+            navigateToQuestion(questionsList[currentIndex - 1].id);
+        }
+    };
+
+    const handleNext = () => {
+        if (currentIndex < questionsList.length - 1 && questionsList.length > 0) {
+            navigateToQuestion(questionsList[currentIndex + 1].id);
+        }
+    };
+
+    const handleRandom = () => {
+        if (questionsList.length > 0) {
+            // Get a random question that's not the current one
+            const availableQuestions = questionsList.filter(q => q.id !== questionId);
+            if (availableQuestions.length > 0) {
+                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                navigateToQuestion(availableQuestions[randomIndex].id);
+            }
+        }
+    };
 
     // Check if answer can be submitted
     const canSubmit = () => {
@@ -187,6 +276,38 @@ const DoQuestion = () => {
 
     return (
         <Container className="p-4 rounded shadow-sm bg-light">
+            {/* Question Navigation */}
+            <Row className='mb-3'>
+                <Col className='d-flex justify-content-center'>
+                    <ButtonGroup size="sm">
+                        <Button
+                            variant="outline-primary"
+                            onClick={handlePrevious}
+                            disabled={currentIndex <= 0 || questionsList.length === 0}
+                            title="Previous question"
+                        >
+                            <i className="bi bi-chevron-left"></i> Previous
+                        </Button>
+                        <Button
+                            variant="outline-primary"
+                            onClick={handleRandom}
+                            disabled={questionsList.length <= 1}
+                            title="Random question"
+                        >
+                            <i className="bi bi-shuffle"></i> Random
+                        </Button>
+                        <Button
+                            variant="outline-primary"
+                            onClick={handleNext}
+                            disabled={currentIndex >= questionsList.length - 1 || questionsList.length === 0}
+                            title="Next question"
+                        >
+                            Next <i className="bi bi-chevron-right"></i>
+                        </Button>
+                    </ButtonGroup>
+                </Col>
+            </Row>
+
             {/* Question title and type badge */}
             <Row className='mb-3'>
                 <Col className='text-center text-md-start' xs={12} md={7}>
