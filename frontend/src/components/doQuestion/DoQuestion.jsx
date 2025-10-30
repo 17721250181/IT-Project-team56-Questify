@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container, Row, Col, Button, Alert, Spinner, Badge, ButtonGroup, Card } from 'react-bootstrap';
+import { Container, Row, Col, Button, Alert, Spinner, Badge, ButtonGroup, Card, Form } from 'react-bootstrap';
 import { QuestionService } from '../../services/QuestionService.js';
 import { AttemptService } from '../../services/attemptService.js';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import DoQuestionMCQ from './DoQuestionMCQ';
 import DoQuestionShort from './DoQuestionShort';
 
 const DoQuestion = () => {
     const { questionId } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const isAdmin = user?.is_staff || user?.is_superuser || false;
+    
     const [question, setQuestion] = useState(null);
     const [selectedAnswers, setSelectedAnswers] = useState([]);
     const [userAnswer, setUserAnswer] = useState('');
@@ -23,6 +27,11 @@ const DoQuestion = () => {
     const [currentIndex, setCurrentIndex] = useState(-1);
     const [previousAttempt, setPreviousAttempt] = useState(null);
     const [showAttemptView, setShowAttemptView] = useState(true);
+    
+    // Admin verification states
+    const [verificationStatus, setVerificationStatus] = useState(null);
+    const [submittingVerification, setSubmittingVerification] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState('');
 
     // Fetch question data from backend
     const fetchQuestion = useCallback(async () => {
@@ -41,10 +50,22 @@ const DoQuestion = () => {
                 multipleAnswers: raw.mcq_detail ? raw.mcq_detail.correct_options.length > 1 : false,
                 answer: raw.short_detail?.answer ?? "",
                 aiAnswer: raw.short_detail?.ai_answer ?? "",
+                verifyStatus: raw.verify_status,
+                adminFeedback: raw.admin_feedback ?? "",
             };
 
             setQuestion(mapped);
             setIsSaved(raw.is_saved || false);
+
+            // Set verification status for admin users
+            if (isAdmin) {
+                if (mapped.verifyStatus === 'APPROVED') {
+                    setVerificationStatus('approved');
+                } else if (mapped.verifyStatus === 'REJECTED') {
+                    setVerificationStatus('rejected');
+                    setRejectionReason(mapped.adminFeedback);
+                }
+            }
 
             if (mapped.type === "MCQ") {
                 setSelectedAnswers([]);
@@ -57,7 +78,7 @@ const DoQuestion = () => {
         } finally {
             setLoading(false);
         }
-    }, [questionId]);
+    }, [questionId, isAdmin]);
 
     // Check if user has previously attempted this question
     const checkPreviousAttempt = useCallback(async () => {
@@ -165,6 +186,37 @@ const DoQuestion = () => {
         setUserAnswer('');
     };
 
+    // Handle question verification (Admin only)
+    const handleVerifyQuestion = async (approved) => {
+        try {
+            setSubmittingVerification(true);
+            setError(null);
+
+            const response = await QuestionService.verifyQuestion(questionId, approved, rejectionReason);
+            
+            console.log('Question verification submitted:', {
+                questionId,
+                approved,
+                rejectionReason: approved ? '' : rejectionReason
+            });
+
+            setVerificationStatus(approved ? 'approved' : 'rejected');
+            
+            // Update local state with response data
+            setQuestion({
+                ...question,
+                verifyStatus: response.verify_status,
+                adminFeedback: response.admin_feedback ?? ""
+            });
+
+        } catch (err) {
+            console.error('Failed to submit verification:', err);
+            setError(err.message || 'Failed to submit verification.');
+        } finally {
+            setSubmittingVerification(false);
+        }
+    };
+
     // Fetch all questions for navigation
     useEffect(() => {
         const loadQuestionsList = async () => {
@@ -223,13 +275,16 @@ const DoQuestion = () => {
     useEffect(() => {
         if (questionId) {
             fetchQuestion();
-            checkPreviousAttempt();
+            // Only check previous attempts for regular users, not admins
+            if (!isAdmin) {
+                checkPreviousAttempt();
+            }
             // Reset submission state when changing questions
             setSubmitted(false);
             setShowResult(false);
             setIsCorrect(null);
         }
-    }, [questionId, fetchQuestion, checkPreviousAttempt]);
+    }, [questionId, fetchQuestion, checkPreviousAttempt, isAdmin]);
 
     // Navigation functions
     const navigateToQuestion = (newQuestionId) => {
@@ -313,7 +368,17 @@ const DoQuestion = () => {
         <Container className="p-4 rounded shadow-sm bg-light">
             {/* Question Navigation */}
             <Row className='mb-3'>
-                <Col className='d-flex justify-content-center'>
+                <Col xs={12} md={3} className='d-flex justify-content-start mb-2 mb-md-0'>
+                    <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => navigate('/questions')}
+                        title="Back to question list"
+                    >
+                        <i className="bi bi-arrow-left"></i>
+                    </Button>
+                </Col>
+                <Col xs={12} md={6} className='d-flex justify-content-center mb-2 mb-md-0'>
                     <ButtonGroup size="sm">
                         <Button
                             variant="outline-primary"
@@ -341,25 +406,30 @@ const DoQuestion = () => {
                         </Button>
                     </ButtonGroup>
                 </Col>
+                <Col xs={12} md={3}>
+                    {/* Empty column for layout balance */}
+                </Col>
             </Row>
 
             {/* Question title and type badge */}
             <Row className='mb-3'>
-                <Col className='text-center text-md-start' xs={12} md={7}>
+                <Col className='text-center text-md-start' xs={12} md={isAdmin ? 9 : 7}>
                     <h4 className="m-1">{question.title}</h4>
                 </Col>
-                <Col className='text-center text-md-end' xs={12} md={5}>
-                    <Button
-                        variant={isSaved ? 'warning' : 'outline-warning'}
-                        size="sm"
-                        onClick={handleToggleSave}
-                        disabled={savingQuestion}
-                        className="me-2"
-                        title={isSaved ? 'Unsave question' : 'Save question'}
-                    >
-                        <i className={`bi ${isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
-                        {savingQuestion ? ' Saving...' : (isSaved ? ' Saved' : ' Save')}
-                    </Button>
+                <Col className='text-center text-md-end' xs={12} md={isAdmin ? 3 : 5}>
+                    {!isAdmin && (
+                        <Button
+                            variant={isSaved ? 'warning' : 'outline-warning'}
+                            size="sm"
+                            onClick={handleToggleSave}
+                            disabled={savingQuestion}
+                            className="me-2"
+                            title={isSaved ? 'Unsave question' : 'Save question'}
+                        >
+                            <i className={`bi ${isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
+                            {savingQuestion ? ' Saving...' : (isSaved ? ' Saved' : ' Save')}
+                        </Button>
+                    )}
                     <Badge bg={question.type === 'MCQ' ? 'success' : 'info'}>
                         {question.type === 'MCQ'
                             ? question.multipleAnswers
@@ -371,8 +441,145 @@ const DoQuestion = () => {
             </Row>
             <hr />
             
-            {/* Show previous attempt if exists and user hasn't clicked retry */}
-            {previousAttempt && showAttemptView ? (
+            {/* Admin View: Show question details with correct answers */}
+            {isAdmin ? (
+                <>
+                    {/* Question options/answers */}
+                    <Row className="mb-3 text-start">
+                        <Col>
+                            <h5 className="mb-3">Question Details:</h5>
+                            {question.type === 'MCQ' ? (
+                                <DoQuestionMCQ
+                                    question={question}
+                                    selectedAnswers={[]}
+                                    onAnswerChange={() => {}}
+                                    submitted={true}
+                                    readOnly={true}
+                                />
+                            ) : (
+                                <DoQuestionShort
+                                    question={question}
+                                    userAnswer="Admin view - See expected answer below."
+                                    onAnswerChange={() => {}}
+                                    submitted={true}
+                                    readOnly={true}
+                                />
+                            )}
+                        </Col>
+                    </Row>
+
+                    {/* Verification status */}
+                    {verificationStatus && verificationStatus !== 'pending' && (
+                        <Alert variant={verificationStatus === 'approved' ? 'success' : 'danger'}>
+                            <Alert.Heading>
+                                {verificationStatus === 'approved' ? '✓ Question Approved' : '✗ Question Rejected'}
+                            </Alert.Heading>
+                            <p>
+                                {verificationStatus === 'approved' 
+                                    ? 'This question has been verified and approved for use.'
+                                    : 'This question has been rejected and will not appear in the question pool.'}
+                            </p>
+                            {question.adminFeedback && verificationStatus === 'rejected' && (
+                                <div className="mt-2">
+                                    <strong>Rejection Reason:</strong>
+                                    <p className="mb-0 mt-1">{question.adminFeedback}</p>
+                                </div>
+                            )}
+                        </Alert>
+                    )}
+
+                    {/* Pending verification notice */}
+                    {(!verificationStatus || verificationStatus === 'pending') && (
+                        <Alert variant="warning">
+                            <Alert.Heading>⏳ Pending Verification</Alert.Heading>
+                            <p className="mb-0">This question is awaiting admin verification. Please review and approve or reject below.</p>
+                        </Alert>
+                    )}
+
+                    {/* Error message */}
+                    {error && (
+                        <Alert variant="danger" className="mb-3">
+                            {error}
+                        </Alert>
+                    )}
+
+                    {/* Verification controls (only show if not yet verified) */}
+                    {(!verificationStatus || verificationStatus === 'pending') && (
+                        <Row className="mb-3">
+                            <Col>
+                                <Form.Group className="mb-3">
+                                    <Form.Label><strong>Rejection Reason (Required if rejecting):</strong></Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={3}
+                                        placeholder="Explain why this question is invalid (e.g., incorrect answer, unclear wording, duplicate, etc.)..."
+                                        value={rejectionReason}
+                                        onChange={(e) => setRejectionReason(e.target.value)}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                    )}
+
+                    {/* Action buttons */}
+                    {(!verificationStatus || verificationStatus === 'pending') && (
+                        <Row className="align-items-center">
+                            <Col xs="auto">
+                                <Button
+                                    variant="success"
+                                    size="md"
+                                    disabled={submittingVerification}
+                                    onClick={() => handleVerifyQuestion(true)}
+                                    className="me-2"
+                                >
+                                    {submittingVerification ? (
+                                        <>
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                className="me-2"
+                                            />
+                                            Verifying...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-check-circle me-1"></i>
+                                            Approve Question
+                                        </>
+                                    )}
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    size="md"
+                                    disabled={submittingVerification || (!rejectionReason.trim())}
+                                    onClick={() => handleVerifyQuestion(false)}
+                                >
+                                    {submittingVerification ? (
+                                        'Verifying...'
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-x-circle me-1"></i>
+                                            Reject Question
+                                        </>
+                                    )}
+                                </Button>
+                            </Col>
+                            {!rejectionReason.trim() && (
+                                <Col xs={12} className="mt-2">
+                                    <small className="text-muted">
+                                        * Rejection reason is required to reject a question
+                                    </small>
+                                </Col>
+                            )}
+                        </Row>
+                    )}
+                </>
+            ) : (
+                <>
+                    {/* Regular User View: Show previous attempt if exists and user hasn't clicked retry */}
+                    {previousAttempt && showAttemptView ? (
                 <Card className="mb-3">
                     <Card.Header className="bg-info text-white">
                         <h5 className="mb-0">
@@ -525,6 +732,8 @@ const DoQuestion = () => {
                             </Button>
                         </Col>
                     </Row>
+                    </>
+                )}
                 </>
             )}
         </Container>
