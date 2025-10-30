@@ -95,6 +95,10 @@ class UserSerializer(serializers.ModelSerializer):
             return None
         request = self.context.get("request")
         url = profile.profile_picture.url
+        if getattr(profile, "updated_at", None):
+            version = int(profile.updated_at.timestamp())
+            separator = "&" if "?" in url else "?"
+            url = f"{url}{separator}v={version}"
         if request:
             return request.build_absolute_uri(url)
         return url
@@ -242,6 +246,10 @@ class ProfilePictureSerializer(serializers.ModelSerializer):
         if not obj.profile_picture:
             return None
         url = obj.profile_picture.url
+        if getattr(obj, "updated_at", None):
+            version = int(obj.updated_at.timestamp())
+            separator = "&" if "?" in url else "?"
+            url = f"{url}{separator}v={version}"
         if request:
             return request.build_absolute_uri(url)
         return url
