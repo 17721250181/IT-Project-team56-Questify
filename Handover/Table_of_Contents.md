@@ -33,12 +33,13 @@ It allows clients or future developers to quickly locate documentation, understa
 | Sprint 3 | Profile page, comments system, leaderboard integration |
 | Sprint 4 | Admin Panel, save question, integration testing, handover preparation |
 
-For detailed progress and bug fixes, see [Changelog.md](./Changelog.md).
+For the complete feature set, refer to **[README.md – Key Features](../README.md#key-features)**.  
+For detailed progress and bug fixes, see **[Changelog.md](./Changelog.md)**.
 
 ---
 
 ## Documentation (PDF Exports)
-Located in `/Docs/` folder  
+Located in `/Docs/` folder.  
 | Document | Description |
 |-----------|-------------|
 | [System Architecture Design Model](../Docs/System_Architecture_Design_Model.pdf) | Detailed architecture and component diagrams |
@@ -52,13 +53,13 @@ Located in `/Docs/` folder
 ## System Setup & Requirements
 | Component | Description |
 |------------|-------------|
-| **Frontend:** | React (Node v18+) |
-| **Backend:** | Django REST Framework (Python 3.12) |
+| **Frontend:** | React (Node v20+) |
+| **Backend:** | Django REST Framework (Python 3.11) |
 | **Database:** | SQLite (default), can migrate to PostgreSQL |
-| **External APIs:** | OpenAI API (explanations), Pinecone (vector storage) |
+| **External APIs:** | OpenAI API (AI explanations) |
 | **Deployment:** | Backend – Render / Frontend – GitHub Pages |
 
-To run locally, follow [Deployment_Guide.md].
+For setup, environment variables, and deployment instructions, see **[README.md](../README.md#setup-instructions)**.
 
 ---
 
@@ -75,6 +76,14 @@ To run locally, follow [Deployment_Guide.md].
 |-----------|-------------|
 | [Changelog.md](./Changelog.md) | Feature development and fixes per sprint |
 | [Traceability_Matrix.xlsx](./Traceability_Matrix.xlsx) | Mapping between user stories, sprints, and implemented features |
+
+---
+
+## License
+| Document | Description |
+|-----------|-------------|
+| [License.md](./License.md) | Describes project license terms and third-party dependencies |
+| [LICENSE](../LICENSE) | Full MIT License text |
 
 ---
 
