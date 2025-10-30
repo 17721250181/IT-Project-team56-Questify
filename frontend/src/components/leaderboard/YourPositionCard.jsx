@@ -87,7 +87,9 @@ const YourPositionCard = ({ myRank, getRankBadge }) => {
                                 {rankData.loading ? (
                                     <Spinner animation="border" size="sm" />
                                 ) : rankData.daily ? (
-                                    `#${rankData.daily}`
+                                    <>
+                                        #{rankData.daily} <span className="stat-badge">{getRankBadge(rankData.daily)}</span>
+                                    </>
                                 ) : (
                                     <span className="text-muted">--</span>
                                 )}
@@ -108,7 +110,9 @@ const YourPositionCard = ({ myRank, getRankBadge }) => {
                                 {rankData.loading ? (
                                     <Spinner animation="border" size="sm" />
                                 ) : rankData.weekly ? (
-                                    `#${rankData.weekly}`
+                                    <>
+                                        #{rankData.weekly} <span className="stat-badge">{getRankBadge(rankData.weekly)}</span>
+                                    </>
                                 ) : (
                                     <span className="text-muted">--</span>
                                 )}
@@ -129,7 +133,9 @@ const YourPositionCard = ({ myRank, getRankBadge }) => {
                                 {rankData.loading ? (
                                     <Spinner animation="border" size="sm" />
                                 ) : rankData.monthly ? (
-                                    `#${rankData.monthly}`
+                                    <>
+                                        #{rankData.monthly} <span className="stat-badge">{getRankBadge(rankData.monthly)}</span>
+                                    </>
                                 ) : (
                                     <span className="text-muted">--</span>
                                 )}

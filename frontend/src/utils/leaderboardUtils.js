@@ -36,13 +36,13 @@ export const getTabIcon = (tab) => {
 /**
  * Get rank badge/emoji for a given rank
  * @param {number} rank - User's rank position
- * @returns {string|number} Medal emoji for top 3, rank number otherwise
+ * @returns {string} Medal emoji for top 3, empty string otherwise
  */
 export const getRankBadge = (rank) => {
     if (rank === 1) return '🥇';
     if (rank === 2) return '🥈';
     if (rank === 3) return '🥉';
-    return rank;
+    return '';
 };
 
 /**
