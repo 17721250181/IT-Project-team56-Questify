@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -288,6 +289,10 @@ LEADERBOARD_ACTIVITY_MODELS = {
     # Note: "questions.Like" removed - it's a M2M field, not a separate model
 }
 
-# Admin-facing email safelist (lowercase). Update this list manually or via ADMIN_EMAILS env var.
-_admin_email_default = {"admin@questify.com"}
-ADMIN_EMAILS = {email.lower() for email in env_list("ADMIN_EMAILS")} or _admin_email_default
+# Admin-facing email safelist (lowercase). Must be managed through ADMIN_EMAILS env var.
+_admin_email_env = {email.lower() for email in env_list("ADMIN_EMAILS")}
+if not _admin_email_env and not DEBUG:
+    raise ImproperlyConfigured(
+        "ADMIN_EMAILS environment variable must be set in production to grant admin access."
+    )
+ADMIN_EMAILS = _admin_email_env
