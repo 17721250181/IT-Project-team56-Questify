@@ -485,15 +485,8 @@ const QuestionDisplay = ({
         <div>
             {showSearch && mode === 'list' && (
                 <div className="ql-toolbar card p-2 mb-3">
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                        <div className="text-muted small">
-                            {filteredItems.length} results{activeSummary ? ` · ${activeSummary}` : ''}
-                        </div>
-                        <Link to="/post-question" className="btn btn-outline-primary btn-sm">
-                            <i className="bi bi-plus-circle me-1"></i> Post Question
-                        </Link>
-                    </div>
-                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    {/* First row: Filter/Sort + Search */}
+                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-0 px-2 py-2">
                         <div className="d-flex flex-wrap gap-2">
                             {isAll && (
                                 <>
@@ -512,23 +505,28 @@ const QuestionDisplay = ({
                         </div>
                     </div>
 
-                    {/* Non-interactive chips to reflect active filters */}
-                    {isAll && (filtersApplied || hasSearchValue) && (
-                        <div className="ql-chips mt-2 d-flex flex-wrap gap-2">
-                            {filters?.week && (
-                                <span className="badge rounded-pill text-body-secondary border bg-light">{filters.week}</span>
-                            )}
-                            {filters?.type && (
-                                <span className="badge rounded-pill text-body-secondary border bg-light">{filters.type}</span>
-                            )}
-                            {filters?.topic && (
-                                <span className="badge rounded-pill text-body-secondary border bg-light">{filters.topic}</span>
-                            )}
-                            {hasSearchValue && (
-                                <span className="badge rounded-pill text-body-secondary border bg-light">Search: {searchQuery}</span>
-                            )}
+                    {/* Second row: Results count + Active filter chips on the same line */}
+                    <div className="d-flex align-items-center flex-wrap gap-2 mt-0 px-2 py-2">
+                        <div className="text-muted small me-2">
+                            {filteredItems.length} results{activeSummary ? ` · ${activeSummary}` : ''}
                         </div>
-                    )}
+                        {isAll && (filtersApplied || hasSearchValue) && (
+                            <div className="ql-chips d-flex flex-wrap gap-2">
+                                {filters?.week && (
+                                    <span className="badge rounded-pill text-body-secondary border bg-light">{filters.week}</span>
+                                )}
+                                {filters?.type && (
+                                    <span className="badge rounded-pill text-body-secondary border bg-light">{filters.type}</span>
+                                )}
+                                {filters?.topic && (
+                                    <span className="badge rounded-pill text-body-secondary border bg-light">{filters.topic}</span>
+                                )}
+                                {hasSearchValue && (
+                                    <span className="badge rounded-pill text-body-secondary border bg-light">Search: {searchQuery}</span>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
