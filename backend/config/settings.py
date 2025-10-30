@@ -34,7 +34,7 @@ def env_list(name: str, default=None):
         return list(default or [])
     parts = []
     for chunk in value.replace(",", " ").split():
-        cleaned = chunk.strip()
+        cleaned = chunk.strip().strip("[]\"'")
         if cleaned:
             parts.append(cleaned)
     return parts
