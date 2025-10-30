@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "attempts",
     "leaderboard",
     "adminpanel",
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
