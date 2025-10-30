@@ -8,6 +8,7 @@ vi.mock("./contexts/AuthContext", () => ({
 vi.mock("./components/common", () => ({
   ProtectedRoute: ({ children }) => <>{children}</>,
   PublicRoute: ({ children }) => <>{children}</>,
+  AdminRoute: ({ children }) => <>{children}</>,
   ErrorBoundary: ({ children }) => <>{children}</>,
 }));
 
@@ -20,6 +21,7 @@ vi.mock("./pages", () => ({
   DoQuestionPage: () => <div>Do Question Page</div>,
   PostQuestionPage: () => <div>Post Question Page</div>,
   UserProfilePage: () => <div>User Profile Page</div>,
+  AdminDashboardPage: () => <div>Admin Dashboard Page</div>,
 }));
 
 vi.mock("./pages/LeaderboardPage", () => ({
