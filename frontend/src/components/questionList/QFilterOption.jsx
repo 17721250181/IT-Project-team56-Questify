@@ -44,11 +44,35 @@ const QFilterOption = ({ filters = QUESTION_FILTER_DEFAULTS, onApply, onClear, o
     const typeOptions = options?.types ?? [];
     const sourceOptions = options?.sources ?? [];
 
+    // Check if any filters are active
+    const hasActiveFilters = () => {
+        return (
+            localFilters.week !== '' ||
+            localFilters.topic !== '' ||
+            localFilters.type !== '' ||
+            localFilters.source !== '' ||
+            localFilters.verified !== false ||
+            localFilters.minRating > 0 ||
+            localFilters.maxRating > 0
+        );
+    };
+
     return (
         <>
-            <Button className="m-1" onClick={handleShow}>
-                Filter
-            </Button>
+            <div className="btn-group m-1" role="group">
+                <Button onClick={handleShow}>
+                    <i className="bi bi-funnel"></i> Filter
+                </Button>
+                {hasActiveFilters() && (
+                    <Button 
+                        variant="outline-secondary"
+                        onClick={handleClear}
+                        title="Clear all filters"
+                    >
+                        <i className="bi bi-x-circle"></i>
+                    </Button>
+                )}
+            </div>
             <Modal show={show} onHide={handleClose} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Filter Questions</Modal.Title>

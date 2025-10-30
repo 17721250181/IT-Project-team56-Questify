@@ -81,14 +81,37 @@ const QuestionDisplay = ({
     ownerId = null,
     isOwnProfile = false,
 }) => {
+    // Initialize state from sessionStorage if available
+    const getInitialFilters = () => {
+        try {
+            const savedFilters = sessionStorage.getItem('questionFilters');
+            if (savedFilters) {
+                return { ...QUESTION_FILTER_DEFAULTS, ...JSON.parse(savedFilters) };
+            }
+        } catch (e) {
+            console.error('Failed to parse saved filters:', e);
+        }
+        return { ...QUESTION_FILTER_DEFAULTS };
+    };
+
+    const getInitialSort = () => {
+        const savedSort = sessionStorage.getItem('questionSort');
+        return savedSort || SORT_DEFAULT;
+    };
+
+    const getInitialSearch = () => {
+        const savedSearch = sessionStorage.getItem('questionSearch');
+        return savedSearch || '';
+    };
+
     const [items, setItems] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filters, setFilters] = useState({ ...QUESTION_FILTER_DEFAULTS });
-    const [sortOption, setSortOption] = useState(SORT_DEFAULT);
+    const [searchQuery, setSearchQuery] = useState(getInitialSearch());
+    const [filters, setFilters] = useState(getInitialFilters());
+    const [sortOption, setSortOption] = useState(getInitialSort());
     const [filterOptions, setFilterOptions] = useState({
         weeks: DEFAULT_WEEK_OPTIONS,
         topics: DEFAULT_TOPIC_OPTIONS,
@@ -153,7 +176,6 @@ const QuestionDisplay = ({
         if (isAll) {
             // Save current filters
             const filtersToSave = { ...filters };
-            console.log('Saving to sessionStorage:', { filtersToSave, sortOption, searchQuery });
             sessionStorage.setItem('questionFilters', JSON.stringify(filtersToSave));
             sessionStorage.setItem('questionSort', sortOption);
             sessionStorage.setItem('questionSearch', searchQuery);
