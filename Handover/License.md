@@ -33,4 +33,4 @@ This project makes use of the following open-source libraries and frameworks:
 ## Notice
 
 This project was developed as part of the *Object-Oriented Software Development (OOSD)* course at  
-**The University of Melbourne (Semester 2, 2025)** for educational purposes only.
+**The University of Melbourne** for educational purposes only.
