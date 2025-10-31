@@ -176,15 +176,19 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 - *(Future work)* Report function for inappropriate comments. 
 
 ### Leaderboard & Gamification
-- Overall ranking: Paginated leaderboard and a “My rank” view.
-- Scoring breakdown:
-  - Attempts 10%
-  - Practice performance & Correctness 90%
-    - Encourage practice and putting in effort to each question
-  - Number of comments
-- Recognition for top 3 students
-- Reward system to encourage engagement
-
+- Base quiz points:
+  - points = attempts × 1 + correct × 9 (defaults; can be changed in settings).
+- Optional activity points:
+   - comments → LEADERBOARD_POINTS_PER_COMMENT
+   - ratings → LEADERBOARD_POINTS_PER_RATING
+   - likes → LEADERBOARD_POINTS_PER_LIKE
+- See Ranking
+  - Students are ordered by total points. More points = higher on the board.
+  - If two students have the same points, the one with more correct answers goes higher.
+  - If they’re still tied, the one who worked more recently (latest activity) goes higher.
+  - If they’re still tied after that, the lower user_id goes first (just a stable tiebreak).
+  - People with exactly the same stats share the same rank number (they tie, and we don’t skip numbers).
+    
 ### Admin & Staff Features
 - Access and verify all student-created questions
 - Staff-verified badge on approved questions
