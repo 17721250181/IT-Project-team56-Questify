@@ -176,13 +176,13 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 - *(Future work)* Report function for inappropriate comments. 
 
 ### Leaderboard & Gamification
-- Multi-dimensional rankings (weekly & overall)
+- Overall ranking: Paginated leaderboard and a “My rank” view.
 - Scoring breakdown:
-  - Question quality (40%)
-  - Daily consistency (30%)
-  - Community contributions (20%)
-  - Practice performance (10%)
-- Recognition for top 3 students each week
+  - Attempts 10%
+  - Practice performance & Correctness 90%
+    - Encourage practice and putting in effort to each question
+  - Number of comments
+- Recognition for top 3 students
 - Reward system to encourage engagement
 
 ### Admin & Staff Features
