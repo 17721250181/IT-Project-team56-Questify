@@ -191,7 +191,6 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
     
 ### Admin & Staff Features
 - Access and verify all student-created questions
-- Staff-verified badge on approved questions
 - Activity dashboards (charts showing student engagement)
 - Designed to minimise staff workload
 
