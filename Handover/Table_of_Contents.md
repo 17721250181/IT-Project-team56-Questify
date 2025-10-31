@@ -20,8 +20,8 @@ It allows clients or future developers to quickly locate documentation, understa
 ## Demo
 | Type | Link |
 |------|------|
-| **Live Frontend** | [Questify Frontend (GitHub Pages)](https://questify-frontend.onrender.com/) |
-| **Backend API (Render)** | [Questify API – Render Deployment](https://questify-backend.onrender.com/) |
+| **Live Frontend** | [Questify Frontend (GitHub Pages)]([https://questify-frontend.onrender.com/](https://questify-frontend.onrender.com)) |
+| **Backend API (Render)** | [Questify API – Render Deployment]([https://questify-backend.onrender.com/](https://questify-backend-wv3e.onrender.com)) |
 
 ---
 
