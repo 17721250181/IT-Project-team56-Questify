@@ -89,6 +89,20 @@ class QuestionAttemptListView(generics.ListAPIView):
         return Attempt.objects.filter(question_id=question_id).order_by('-submitted_at')
 
 
+class UserQuestionAttemptListView(generics.ListAPIView):
+    """Get all attempts for a specific question by the current user"""
+    serializer_class = AttemptSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        question_id = self.kwargs['question_id']
+        user = self.request.user
+        return Attempt.objects.filter(
+            question_id=question_id,
+            attempter=user
+        ).order_by('-submitted_at')
+
+
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
 def user_activity_heatmap(request):

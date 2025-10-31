@@ -83,10 +83,14 @@ const DoQuestion = () => {
     // Check if user has previously attempted this question
     const checkPreviousAttempt = useCallback(async () => {
         try {
-            const attempts = await AttemptService.getQuestionAttempts(questionId);
+            // Use the API that filters by both question_id and current user
+            const attempts = await AttemptService.getUserQuestionAttempts(questionId);
+            console.log('User attempts for this question:', attempts);
+            
             if (attempts && attempts.length > 0) {
-                // Get the most recent attempt (assuming they're sorted by date, newest first)
+                // Get the most recent attempt (backend returns sorted by date, newest first)
                 const latestAttempt = attempts[0];
+                console.log('Latest attempt:', latestAttempt);
                 setPreviousAttempt(latestAttempt);
                 setShowAttemptView(true);
             } else {

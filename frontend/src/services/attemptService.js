@@ -22,7 +22,7 @@ export const AttemptService = {
     },
 
     /**
-     * Get all attempts for a specific question
+     * Get all attempts for a specific question (all users)
      * @param {string} questionId - Question UUID
      * @returns {Promise<Array>} List of attempts for the question
      */
@@ -33,6 +33,23 @@ export const AttemptService = {
         } catch (error) {
             if (import.meta.env.DEV) {
                 console.error(`Failed to fetch attempts for question ${questionId}:`, error);
+            }
+            throw error;
+        }
+    },
+
+    /**
+     * Get current user's attempts for a specific question
+     * @param {string} questionId - Question UUID
+     * @returns {Promise<Array>} List of current user's attempts for the question
+     */
+    getUserQuestionAttempts: async (questionId) => {
+        try {
+            const response = await apiClient.get(`/attempts/user/question/${questionId}/`);
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error(`Failed to fetch user attempts for question ${questionId}:`, error);
             }
             throw error;
         }
