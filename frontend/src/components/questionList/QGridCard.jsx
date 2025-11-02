@@ -99,8 +99,19 @@ const QGridCard = ({
             >
                 <Card.Body>
                     {/* Question Title */}
-                    <div className="d-flex justify-content-between align-items-start mb-2">
-                        <h6 className="card-title mb-0" style={{ fontSize: '0.9rem' }}>
+                    <div className="mb-2">
+                        <h6
+                            className="card-title mb-0"
+                            style={{
+                                fontSize: '0.9rem',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                wordBreak: 'break-word'
+                            }}
+                        >
                             {title}
                         </h6>
                     </div>
