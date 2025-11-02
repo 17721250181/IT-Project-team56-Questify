@@ -367,6 +367,7 @@ const QuestionDisplay = ({
                     isCorrect={item.is_correct}
                     date={isAttempted ? item.submitted_at : item.created_at}
                     numAttempts={numAttempts}
+                    rating={rating}
                     displayMode={type}
                     onClick={handleQuestionClick}
                     borderClass={getBorderClass(item)}

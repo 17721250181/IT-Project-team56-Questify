@@ -4,7 +4,7 @@ import { Badge, Card } from 'react-bootstrap';
 /**
  * Grid Card Component
  * Card layout for displaying questions in grid mode
- * 
+ *
  * @param {string} id - Question ID
  * @param {string} title - Question text/title
  * @param {string} type - Question type ('MCQ', 'SHORT', etc.)
@@ -14,6 +14,7 @@ import { Badge, Card } from 'react-bootstrap';
  * @param {boolean|null} isCorrect - For attempted questions: true/false/null
  * @param {string} date - Date string (created_at or submitted_at)
  * @param {number} numAttempts - Number of attempts (for posted/all questions)
+ * @param {number} rating - Question rating (for posted/all questions)
  * @param {string} displayMode - 'attempted', 'posted', or 'all'
  * @param {function} onClick - Click handler
  * @param {string} borderClass - CSS class for border styling
@@ -28,6 +29,7 @@ const QGridCard = ({
     isCorrect,
     date,
     numAttempts,
+    rating = 0,
     displayMode,
     onClick,
     borderClass = 'border-secondary'
@@ -132,37 +134,49 @@ const QGridCard = ({
                     {(isPosted || isAll) && (
                         <>
                             {topic && (
-                                <div className="mb-2">
+                                <div className="mt-2">
                                     <small className="text-muted">
                                         <i className="bi bi-tag me-1"></i>
                                         {topic}
                                     </small>
                                 </div>
                             )}
-                            {week && (
-                                <div className="mb-2">
-                                    <small className="text-muted">
-                                        <i className="bi bi-calendar-week me-1"></i>
-                                        {week}
-                                    </small>
+
+                            {/* Bottom Row: Week on left, Rating and Attempts on right */}
+                            <div className="d-flex justify-content-between align-items-center mt-2">
+                                <div>
+                                    {week && (
+                                        <small className="text-muted">
+                                            <i className="bi bi-calendar-week me-1"></i>
+                                            {week}
+                                        </small>
+                                    )}
                                 </div>
-                            )}
+
+                                {/* Right: Rating and Attempts */}
+                                <div className="d-flex align-items-center gap-2 text-muted small">
+                                    <span title="Rating">
+                                        <i className="bi bi-star-fill text-warning me-1"></i>
+                                        {Number(rating).toFixed(1)}
+                                    </span>
+                                    <span title="Attempts">
+                                        <i className="bi bi-pencil-square me-1"></i>
+                                        {numAttempts ?? 0}
+                                    </span>
+                                </div>
+                            </div>
                         </>
                     )}
 
-                    {/* Footer Info */}
-                    <div className={`mt-2 ${(isPosted || isAll) ? 'd-flex justify-content-between align-items-center' : ''}`}>
-                        <small className="text-muted">
-                            <i className="bi bi-clock me-1"></i>
-                            {formatDate(date)}
-                        </small>
-                        {(isPosted || isAll) && numAttempts !== undefined && (
+                    {/* Date for Attempted Questions */}
+                    {isAttempted && date && (
+                        <div className="mt-2">
                             <small className="text-muted">
-                                <i className="bi bi-pencil-square me-1"></i>
-                                {numAttempts} attempts
+                                <i className="bi bi-clock me-1"></i>
+                                {formatDate(date)}
                             </small>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </Card.Body>
             </Card>
         </div>
