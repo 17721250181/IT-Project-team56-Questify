@@ -118,6 +118,14 @@ const HomeDynamicBlocks = () => {
     const [recommended, setRecommended] = useState([]);
     const [loadingRecommended, setLoadingRecommended] = useState(true);
 
+    // Format week to ensure consistent display (remove spaces)
+    const formatWeek = (weekString) => {
+        if (!weekString) return '';
+        // Remove spaces between "Week" and number to ensure consistency
+        // "Week 5" -> "Week5", "Week 10" -> "Week10"
+        return weekString.replace(/^Week\s+(\d+)$/, 'Week$1');
+    };
+
     const lastAttempt = useMemo(() => {
         if (!attempts || attempts.length === 0) return null;
         // assume attempts sorted by submitted_at desc; if not, sort defensively
@@ -215,7 +223,7 @@ const HomeDynamicBlocks = () => {
                                             </div>
                                             <div className="mb-2 small text-muted">
                                                 {q.topic && <span className="me-2">{q.topic}</span>}
-                                                {q.week && <span>{q.week}</span>}
+                                                {q.week && <span>{formatWeek(q.week)}</span>}
                                             </div>
                                             <div className="mb-2 break-words" style={{ minHeight: '3em' }}>
                                                 {q.question}
@@ -263,7 +271,7 @@ const HomeDynamicBlocks = () => {
                                         </div>
                                         <div className="mb-2 small text-muted">
                                             {(lastQuestion?.topic || lastAttempt.topic) && <span className="me-2">{lastQuestion?.topic || lastAttempt.topic}</span>}
-                                            {(lastQuestion?.week || lastAttempt.week) && <span>{lastQuestion?.week || lastAttempt.week}</span>}
+                                            {(lastQuestion?.week || lastAttempt.week) && <span>{formatWeek(lastQuestion?.week || lastAttempt.week)}</span>}
                                         </div>
                                         <div className="mb-2 break-words line-clamp-2" style={{ minHeight: '3em' }}>
                                             {lastQuestion?.question || lastAttempt.question_text || 'Recent question'}

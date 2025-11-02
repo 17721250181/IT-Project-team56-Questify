@@ -15,7 +15,7 @@ import { Badge, Card } from 'react-bootstrap';
  * @param {string} date - Date string (created_at or submitted_at)
  * @param {number} numAttempts - Number of attempts (for posted/all questions)
  * @param {number} rating - Question rating (for posted/all questions)
- * @param {string} displayMode - 'attempted', 'posted', or 'all'
+ * @param {string} displayMode - 'attempted', 'posted', 'saved', or 'all'
  * @param {function} onClick - Click handler
  * @param {string} borderClass - CSS class for border styling
  */
@@ -36,16 +36,25 @@ const QGridCard = ({
 }) => {
     const isAttempted = displayMode === 'attempted';
     const isPosted = displayMode === 'posted';
+    const isSaved = displayMode === 'saved';
     const isAll = displayMode === 'all';
 
     // Format date
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
         });
+    };
+
+    // Format week to ensure consistent display (remove spaces)
+    const formatWeek = (weekString) => {
+        if (!weekString) return '';
+        // Remove spaces between "Week" and number to ensure consistency
+        // "Week 5" -> "Week5", "Week 10" -> "Week10"
+        return weekString.replace(/^Week\s+(\d+)$/, 'Week$1');
     };
 
     // Badge helper functions
@@ -127,11 +136,17 @@ const QGridCard = ({
                                 {getStatusBadge(verifyStatus)}
                             </>
                         )}
+                        {isSaved && (
+                            <>
+                                {getTypeBadge(type)}
+                                {getStatusBadge(verifyStatus)}
+                            </>
+                        )}
                         {isAll && getTypeBadge(type)}
                     </div>
 
                     {/* Additional Info */}
-                    {(isPosted || isAll) && (
+                    {(isPosted || isAll || isSaved) && (
                         <>
                             {topic && (
                                 <div className="mt-2">
@@ -148,7 +163,7 @@ const QGridCard = ({
                                     {week && (
                                         <small className="text-muted">
                                             <i className="bi bi-calendar-week me-1"></i>
-                                            {week}
+                                            {formatWeek(week)}
                                         </small>
                                     )}
                                 </div>

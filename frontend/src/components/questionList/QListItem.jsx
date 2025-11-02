@@ -16,6 +16,14 @@ const QListItem = ({
 }) => {
     const navigate = useNavigate();
 
+    // Format week to ensure consistent display (remove spaces)
+    const formatWeek = (weekString) => {
+        if (!weekString) return '';
+        // Remove spaces between "Week" and number to ensure consistency
+        // "Week 5" -> "Week5", "Week 10" -> "Week10"
+        return weekString.replace(/^Week\s+(\d+)$/, 'Week$1');
+    };
+
     // Handle click to navigate to DoQuestion page
     const handleQuestionClick = () => {
         // Navigate to DoQuestion page with question ID as URL parameter
@@ -45,7 +53,7 @@ const QListItem = ({
             <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 {/* Left chips (Week / Type / Topic optional) */}
                 <div className="d-flex align-items-center flex-wrap gap-2">
-                    <span className="badge rounded-pill text-body-secondary border bg-light">{week}</span>
+                    <span className="badge rounded-pill text-body-secondary border bg-light">{formatWeek(week)}</span>
                     <span className="badge rounded-pill text-body-secondary border bg-light">{questionType}</span>
                     <span className="badge rounded-pill text-body-secondary border bg-light d-none d-md-inline">{topic}</span>
                     {verifyStatus === 'APPROVED' && (
