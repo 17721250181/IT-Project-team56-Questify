@@ -106,8 +106,12 @@ const QGridCard = ({
     return (
         <div className="col-12 col-md-6 col-lg-4">
             <Card
-                className={`h-100 ${borderClass} cursor-pointer`}
-                style={{ cursor: 'pointer' }}
+                className={`h-100 ${borderClass} cursor-pointer shadow-sm`}
+                style={{
+                    cursor: 'pointer',
+                    borderRadius: '12px',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
                 onClick={() => onClick(id)}
             >
                 <Card.Body className="d-flex flex-column">

@@ -524,7 +524,7 @@ const QuestionDisplay = ({
                             )}
                         </div>
                         <div className="align-self-start align-self-md-center">
-                            <QListSearch onSearch={handleSearch} />
+                            <QListSearch onSearch={handleSearch} currentSearch={searchQuery} />
                         </div>
                     </div>
 
@@ -555,7 +555,7 @@ const QuestionDisplay = ({
 
             {showSearch && mode === 'grid' && (
                 <div className="mb-3">
-                    <QListSearch onSearch={handleSearch} />
+                    <QListSearch onSearch={handleSearch} currentSearch={searchQuery} />
                 </div>
             )}
 
