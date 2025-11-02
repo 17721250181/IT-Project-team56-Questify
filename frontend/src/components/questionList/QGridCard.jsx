@@ -82,8 +82,10 @@ const QGridCard = ({
     };
 
     const getCorrectnessBadge = (correct) => {
+        // Only show correctness badge for MCQ (correct is boolean)
+        // For Short Answer (correct is null), don't show badge here
         if (correct === null) {
-            return <Badge bg="secondary" className="small">Short Answer</Badge>;
+            return null;
         } else if (correct) {
             return (
                 <Badge bg="success" className="small">
@@ -108,7 +110,7 @@ const QGridCard = ({
                 style={{ cursor: 'pointer' }}
                 onClick={() => onClick(id)}
             >
-                <Card.Body>
+                <Card.Body className="d-flex flex-column">
                     {/* Question Title */}
                     <div className="mb-2">
                         <h6
@@ -129,7 +131,12 @@ const QGridCard = ({
 
                     {/* Badges */}
                     <div className="d-flex gap-2 flex-wrap mb-2">
-                        {isAttempted && getCorrectnessBadge(isCorrect)}
+                        {isAttempted && (
+                            <>
+                                {getCorrectnessBadge(isCorrect)}
+                                {type && getTypeBadge(type)}
+                            </>
+                        )}
                         {isPosted && (
                             <>
                                 {getTypeBadge(type)}
@@ -147,7 +154,7 @@ const QGridCard = ({
 
                     {/* Additional Info */}
                     {(isPosted || isAll || isSaved) && (
-                        <>
+                        <div className="mt-auto">
                             {topic && (
                                 <div className="mt-2">
                                     <small className="text-muted">
@@ -180,16 +187,42 @@ const QGridCard = ({
                                     </span>
                                 </div>
                             </div>
-                        </>
+                        </div>
                     )}
 
-                    {/* Date for Attempted Questions */}
-                    {isAttempted && date && (
-                        <div className="mt-2">
-                            <small className="text-muted">
-                                <i className="bi bi-clock me-1"></i>
-                                {formatDate(date)}
-                            </small>
+                    {/* Additional Info for Attempted Questions */}
+                    {isAttempted && (
+                        <div className="mt-auto">
+                            {topic && (
+                                <div className="mt-2">
+                                    <small className="text-muted">
+                                        <i className="bi bi-tag me-1"></i>
+                                        {topic}
+                                    </small>
+                                </div>
+                            )}
+
+                            {/* Bottom Row: Week on left, Date on right */}
+                            <div className="d-flex justify-content-between align-items-center mt-2">
+                                <div>
+                                    {week && (
+                                        <small className="text-muted">
+                                            <i className="bi bi-calendar-week me-1"></i>
+                                            {formatWeek(week)}
+                                        </small>
+                                    )}
+                                </div>
+
+                                {/* Right: Date */}
+                                {date && (
+                                    <div>
+                                        <small className="text-muted">
+                                            <i className="bi bi-clock me-1"></i>
+                                            {formatDate(date)}
+                                        </small>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </Card.Body>
