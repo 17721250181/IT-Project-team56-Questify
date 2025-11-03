@@ -395,6 +395,7 @@ The following environment variables must be configured before running or deployi
 | `DJANGO_CSRF_TRUSTED_ORIGINS` / `CSRF_TRUSTED_ORIGINS` | Required | CSRF trusted origins | `https://questify-frontend.github.io` |
 | `DATABASE_URL` | Optional | PostgreSQL URL (Render) | `postgres://user:pass@host:5432/dbname` |
 | `OPENAI_API_KEY` | Required | OpenAI API key (AI explanations) | `sk-xxxx` |
+| `OPENAI_PROJECT_ID` | Optional | Needed when using project-scoped OpenAI keys (`sk-proj-…`) | `proj_abc123` |
 | `ADMIN_EMAILS` | Optional | Comma-separated admin email list | `alice@student.unimelb.edu.au,bob@student.unimelb.edu.au` |
 
 #### Frontend (React + Vite)

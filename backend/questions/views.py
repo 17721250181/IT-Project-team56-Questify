@@ -180,8 +180,11 @@ class QuestionCreateView(generics.CreateAPIView):
         try:
             headers = {
                 "Authorization": f"Bearer {os.environ.get('OPENAI_API_KEY') or settings.OPENAI_API_KEY}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
+            project_id = os.environ.get("OPENAI_PROJECT_ID") or getattr(settings, "OPENAI_PROJECT_ID", None)
+            if project_id:
+                headers["OpenAI-Project"] = project_id
             payload = {
                 "model": "gpt-4o-mini",
                 "messages": [{"role": "user", "content": prompt}],

@@ -56,6 +56,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_PROJECT_ID = os.getenv("OPENAI_PROJECT_ID")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_flag("DJANGO_DEBUG", env_flag("DEBUG", True))
