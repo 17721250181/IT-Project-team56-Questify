@@ -11,53 +11,47 @@ Additionally, the current database uses **SQLite** for simplicity; migrating to 
 
 ---
 
-### 2. Reset Password Functionality
-The password reset feature was not implemented in this phase because it requires integration with an email service (e.g., SMTP or a dummy testing account).  
-Future work could add full **password reset via email verification**, using secure token-based reset links and service providers such as SendGrid or AWS SES.
-
----
-
-### 3. University SSO Authentication
+### 2. University SSO Authentication
 At present, authentication is handled by the default Django system.  
 In the future, **University of Melbourne Single Sign-On (SSO)** could be integrated to simplify login and improve security.  
 This would require institutional approval and configuration with the university’s Identity Provider (IdP).
 
 ---
 
-### 4. Gamification and Rewards
+### 3. Gamification and Rewards
 The current leaderboard awards points for general activities (posting, attempting, commenting).  
 To further boost engagement, **course instructors could introduce small tangible rewards**, such as chocolates or public announcements, periodically recognising top performers.  
 Additionally, expanding the gamification layer with badges, activity streaks, and weekly challenges would encourage sustained participation.
 
 ---
 
-### 5. Leaderboard Enhancements
+### 4. Leaderboard Enhancements
 At present, leaderboard ranking is calculated based on total activity points.  
 Future improvements could introduce more **metrics**, such as quiz accuracy rate, number of verified questions, or most-liked comments.  
 This would make ranking fairer and reflect both participation and quality.
 
 ---
 
-### 6. Peer Profile Visibility
+### 5. Peer Profile Visibility
 Currently, students can only view their own profile page.  
 Future iterations could allow **students to view each other’s profiles**, including information such as posted questions, total attempts, accuracy, and engagement level.  
 This would foster peer learning and friendly competition within the course community.
 
 ---
 
-### 7. AI-Powered Question Recommendation
+### 6. AI-Powered Question Recommendation
 Implement a **personalised question recommendation system** that suggests relevant questions to each student based on their past performance, topics of interest, and difficulty levels.  
 This would help students focus on their weak areas and enhance the adaptive learning experience.
 
 ---
 
-### 8. Improved AI Feedback Quality
+### 7. Improved AI Feedback Quality
 The current OpenAI integration generates explanations for questions, but prompts are general-purpose.  
 Future work could explore **fine-tuned educational prompts** or custom-trained models to provide more accurate and pedagogically aligned feedback.
 
 ---
 
-### 9. Mobile Responsiveness
+### 8. Mobile Responsiveness
 Although the system works well on desktop browsers, the React frontend could be further **optimised for mobile and tablet users**, improving accessibility and convenience for students engaging on different devices.
 
 ## Development Priority Table
@@ -65,7 +59,6 @@ Although the system works well on desktop browsers, the React frontend could be 
 | Priority | Future Work Item | Rationale |
 |-----------|------------------|------------|
 | **High** | Cloud deployment (AWS/Azure) & PostgreSQL migration | Essential for scalability, stability, and real-world deployment. |
-| **High** | Reset password functionality | Improves usability and account recovery reliability. |
 | **High** | University SSO integration | Strengthens security and aligns with institutional authentication. |
 | **Medium** | Gamification & tangible course rewards | Directly enhances student motivation and engagement. |
 | **Medium** | Leaderboard metric expansion | Encourages fairer, multi-dimensional ranking. |
