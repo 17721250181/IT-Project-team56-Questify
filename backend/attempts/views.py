@@ -138,3 +138,83 @@ def user_activity_heatmap(request):
         'activity': activity_dict,
         'total_attempts': sum(activity_dict.values())
     })
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_streak(request):
+    """
+    Calculate user's current streak (consecutive days with attempts)
+    Returns current streak, longest streak, and today's attempt count
+    """
+    user = request.user
+    today = datetime.now().date()
+    
+    # Get all unique dates where user made attempts (descending order)
+    attempt_dates = (
+        Attempt.objects
+        .filter(attempter=user)
+        .annotate(date=TruncDate('submitted_at'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('-date')
+    )
+    
+    if not attempt_dates:
+        return Response({
+            'current_streak': 0,
+            'longest_streak': 0,
+            'today_count': 0,
+            'has_attempted_today': False
+        })
+    
+    # Convert to list of dates
+    dates_with_counts = [(item['date'], item['count']) for item in attempt_dates]
+    dates = [item['date'] for item in attempt_dates]
+    
+    # Check today's attempts
+    today_count = 0
+    has_attempted_today = False
+    if dates and dates[0] == today:
+        today_count = dates_with_counts[0][1]
+        has_attempted_today = True
+    
+    # Calculate current streak
+    current_streak = 0
+    check_date = today
+    
+    # If user hasn't attempted today, check from yesterday
+    if not has_attempted_today:
+        check_date = today - timedelta(days=1)
+    
+    for date in dates:
+        if date == check_date:
+            current_streak += 1
+            check_date -= timedelta(days=1)
+        elif date < check_date:
+            # Gap found, stop counting
+            break
+    
+    # Calculate longest streak
+    longest_streak = 0
+    temp_streak = 0
+    prev_date = None
+    
+    for date in reversed(dates):
+        if prev_date is None:
+            temp_streak = 1
+        elif (date - prev_date).days == 1:
+            temp_streak += 1
+        else:
+            longest_streak = max(longest_streak, temp_streak)
+            temp_streak = 1
+        prev_date = date
+    
+    longest_streak = max(longest_streak, temp_streak)
+    
+    return Response({
+        'current_streak': current_streak,
+        'longest_streak': longest_streak,
+        'today_count': today_count,
+        'has_attempted_today': has_attempted_today
+    })

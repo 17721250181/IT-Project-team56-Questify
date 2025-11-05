@@ -278,6 +278,24 @@ export const QuestionService = {
         }
     },
 
+    // Get recommended questions based on user's activity
+    getRecommendedQuestions: async () => {
+        try {
+            const response = await apiClient.get('/questions/recommended/');
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch recommended questions:', error);
+            }
+
+            if (error.response?.status === 401) {
+                throw new Error('Please login to get recommendations');
+            } else {
+                throw new Error('Failed to fetch recommended questions');
+            }
+        }
+    },
+
     // Note: Rating functions moved to ratingService.js
     // Use RatingService.getQuestionRating, RatingService.rateQuestion, RatingService.clearRating
 };

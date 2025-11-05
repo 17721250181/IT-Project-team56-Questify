@@ -96,5 +96,21 @@ export const AttemptService = {
             }
             throw new Error('Failed to fetch activity data');
         }
+    },
+
+    /**
+     * Get user's streak data (consecutive days with attempts)
+     * @returns {Promise<Object>} Streak data including current and longest streak
+     */
+    getUserStreak: async () => {
+        try {
+            const response = await apiClient.get('/attempts/user/streak/');
+            return response.data;
+        } catch (error) {
+            if (import.meta.env.DEV) {
+                console.error('Failed to fetch user streak:', error);
+            }
+            throw error;
+        }
     }
 };

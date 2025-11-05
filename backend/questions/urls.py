@@ -10,11 +10,13 @@ from .views import (
     SaveQuestionView,
     SavedQuestionListView,
     QuestionVerifyView,
+    RecommendedQuestionsView,
 )
 urlpatterns = [
     path("create/", QuestionCreateView.as_view(), name="question-create"),
     path("user/", UserQuestionsView.as_view(), name="user-questions"),
     path("metadata/", QuestionMetadataView.as_view(), name="question-metadata"),
+    path("recommended/", RecommendedQuestionsView.as_view(), name="recommended-questions"),
     path("", QuestionListView.as_view(), name="question-list"),
     path("<uuid:pk>/", QuestionDetailView.as_view(), name="question-detail"),
     path("<uuid:pk>/verify/", QuestionVerifyView.as_view(), name="question-verify"),

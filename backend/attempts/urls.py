@@ -4,13 +4,15 @@ from .views import (
     UserAttemptListView, 
     QuestionAttemptListView, 
     UserQuestionAttemptListView,
-    user_activity_heatmap
+    user_activity_heatmap,
+    user_streak
 )
 
 urlpatterns = [
     path("create/", AttemptCreateView.as_view(), name="attempt-create"),
     path("user/", UserAttemptListView.as_view(), name="user-attempts"),
     path("user/activity/", user_activity_heatmap, name="user-activity-heatmap"),
+    path("user/streak/", user_streak, name="user-streak"),
     path("question/<uuid:question_id>/", QuestionAttemptListView.as_view(), name="question-attempts"),
     path("user/question/<uuid:question_id>/", UserQuestionAttemptListView.as_view(), name="user-question-attempts"),
 ]

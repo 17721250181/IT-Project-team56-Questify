@@ -3,15 +3,17 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.views import APIView
-from django.db.models import Q, Prefetch, Value
+from django.db.models import Q, Prefetch, Value, Case, When, IntegerField, Count
 from django.db.models.functions import Lower, Replace
 from .models import Question, ShortAnswerQuestion, MCQQuestion, Comment, QuestionRating, SavedQuestion
 from .serializers import QuestionCreateSerializer, QuestionSerializer, CommentSerializer, ReplySerializer, SavedQuestionSerializer
+from attempts.models import Attempt
 import os
 import re
 import requests
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from random import sample
 
 
 DEFAULT_WEEK_OPTIONS = [
@@ -537,4 +539,135 @@ class QuestionVerifyView(APIView):
 
         # Return updated question data
         serializer = QuestionSerializer(question, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class RecommendedQuestionsView(APIView):
+    """
+    Smart recommendation system for questions based on:
+    - 50% same topic as user's recent attempts
+    - 30% high-rated questions from other topics
+    - 20% popular questions (high attempt count)
+    - Excludes questions the user has already attempted
+    - Prioritizes verified questions with weighted scoring
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Get questions user has already attempted
+        attempted_question_ids = Attempt.objects.filter(
+            attempter=user
+        ).values_list('question_id', flat=True).distinct()
+
+        # Get user's most recent topic
+        last_attempt = Attempt.objects.filter(attempter=user).select_related('question').order_by('-submitted_at').first()
+        recent_topic = last_attempt.question.topic if last_attempt and last_attempt.question.topic else None
+
+        # Base queryset: exclude already attempted questions
+        base_queryset = Question.objects.exclude(
+            id__in=attempted_question_ids
+        ).select_related("creator").prefetch_related("mcq_detail", "short_detail")
+
+        # Add weighted score annotation
+        # Verified questions get +1000 points, approved get +500
+        base_queryset = base_queryset.annotate(
+            priority_score=Case(
+                When(verify_status='APPROVED', then=Value(1000)),
+                When(verify_status='PENDING', then=Value(100)),
+                default=Value(0),
+                output_field=IntegerField(),
+            )
+        )
+
+        recommendations = []
+        
+        # Strategy 1: 50% same topic (3 questions)
+        if recent_topic:
+            same_topic_qs = base_queryset.filter(topic=recent_topic).order_by(
+                '-priority_score',  # Verified first
+                '-rating',           # Then by rating
+                '-num_attempts',     # Then by popularity
+                '-created_at'        # Then by newness
+            )[:10]  # Get top 10 to have variety
+            same_topic_list = list(same_topic_qs)
+            # Randomly sample 3 from top 10 for diversity
+            if len(same_topic_list) >= 3:
+                recommendations.extend(sample(same_topic_list, 3))
+            else:
+                recommendations.extend(same_topic_list)
+
+        # Strategy 2: 30% high-rated questions (2 questions)
+        high_rated_qs = base_queryset.filter(
+            rating__gte=3.5  # Only good questions
+        ).exclude(
+            id__in=[q.id for q in recommendations]
+        )
+        
+        if recent_topic:
+            high_rated_qs = high_rated_qs.exclude(topic=recent_topic)
+        
+        high_rated_qs = high_rated_qs.order_by(
+            '-priority_score',
+            '-rating',
+            '-num_attempts'
+        )[:8]
+        high_rated_list = list(high_rated_qs)
+        if len(high_rated_list) >= 2:
+            recommendations.extend(sample(high_rated_list, 2))
+        else:
+            recommendations.extend(high_rated_list)
+
+        # Strategy 3: 20% popular questions (1 question)
+        popular_qs = base_queryset.filter(
+            num_attempts__gte=5  # At least 5 attempts
+        ).exclude(
+            id__in=[q.id for q in recommendations]
+        ).order_by(
+            '-priority_score',
+            '-num_attempts',
+            '-rating'
+        )[:5]
+        popular_list = list(popular_qs)
+        if popular_list:
+            recommendations.extend(sample(popular_list, min(1, len(popular_list))))
+
+        # If we don't have 6 questions yet, fill with best available
+        if len(recommendations) < 6:
+            remaining_needed = 6 - len(recommendations)
+            filler_qs = base_queryset.exclude(
+                id__in=[q.id for q in recommendations]
+            ).order_by(
+                '-priority_score',
+                '-rating',
+                '-num_attempts',
+                '-created_at'
+            )[:remaining_needed * 2]  # Get extra for sampling
+            filler_list = list(filler_qs)
+            if filler_list:
+                sample_size = min(remaining_needed, len(filler_list))
+                recommendations.extend(sample(filler_list, sample_size))
+
+        # Prefetch user ratings
+        if recommendations:
+            question_ids = [q.id for q in recommendations]
+            queryset_with_ratings = Question.objects.filter(
+                id__in=question_ids
+            ).prefetch_related(
+                Prefetch(
+                    "ratings",
+                    queryset=QuestionRating.objects.filter(user=user),
+                    to_attr="user_rating_for_requester",
+                )
+            )
+            # Create a mapping for efficient lookup
+            rating_map = {q.id: q for q in queryset_with_ratings}
+            # Update recommendations with rating info
+            for q in recommendations:
+                if q.id in rating_map:
+                    q.user_rating_for_requester = rating_map[q.id].user_rating_for_requester
+
+        # Serialize and return
+        serializer = QuestionSerializer(recommendations, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)

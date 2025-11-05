@@ -69,17 +69,21 @@ const HomeDynamicContent = () => {
         };
     }, [lastAttempt?.question]);
 
-    // Load recommended questions based on last attempt topic
+    // Load recommended questions using smart recommendation API
     useEffect(() => {
         let active = true;
         const loadRecommended = async () => {
             try {
                 setLoadingRecommended(true);
-                const topic = lastAttempt?.topic || null;
-                const filters = topic ? { topic, verified: true } : { verified: true };
-                const data = await QuestionService.getAllQuestions({ filters });
+                // Use new recommendation API that considers:
+                // - User's recent topic (50%)
+                // - High-rated questions (30%)
+                // - Popular questions (20%)
+                // - Excludes already attempted questions
+                // - Prioritizes verified questions
+                const data = await QuestionService.getRecommendedQuestions();
                 if (!active) return;
-                const list = Array.isArray(data) ? data.slice(0, 6) : [];
+                const list = Array.isArray(data) ? data : [];
                 setRecommended(list);
             } catch {
                 if (!active) return;
@@ -92,7 +96,7 @@ const HomeDynamicContent = () => {
         return () => {
             active = false;
         };
-    }, [lastAttempt?.topic]);
+    }, [lastAttempt?.question]); // Reload when user attempts a question
 
     return (
         <>
