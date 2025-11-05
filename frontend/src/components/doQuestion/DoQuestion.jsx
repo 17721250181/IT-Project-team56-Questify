@@ -371,8 +371,8 @@ const DoQuestion = () => {
     return (
         <Container className="p-4 rounded shadow-sm bg-light">
             {/* Question Navigation */}
-            <Row className='mb-3'>
-                <Col xs={12} md={3} className='d-flex justify-content-start mb-2 mb-md-0'>
+            <Row className="mb-3">
+                <Col xs={12} md={3} className="d-flex justify-content-start mb-2 mb-md-0">
                     <Button
                         variant="outline-secondary"
                         size="sm"
@@ -382,7 +382,7 @@ const DoQuestion = () => {
                         <i className="bi bi-arrow-left"></i>
                     </Button>
                 </Col>
-                <Col xs={12} md={6} className='d-flex justify-content-center mb-2 mb-md-0'>
+                <Col xs={12} md={6} className="d-flex justify-content-center mb-2 mb-md-0">
                     <ButtonGroup size="sm">
                         <Button
                             variant="outline-primary"
@@ -403,10 +403,13 @@ const DoQuestion = () => {
                         <Button
                             variant="outline-primary"
                             onClick={handleNext}
-                            disabled={currentIndex >= questionsList.length - 1 || questionsList.length === 0}
+                            disabled={
+                                currentIndex >= questionsList.length - 1 ||
+                                questionsList.length === 0
+                            }
                             title="Next question"
                         >
-                            Next <i className="bi bi-chevron-right"></i>
+                            <i className="bi bi-chevron-right"></i> Next
                         </Button>
                     </ButtonGroup>
                 </Col>
@@ -416,20 +419,20 @@ const DoQuestion = () => {
             </Row>
 
             {/* Question title and type badge */}
-            <Row className='mb-3'>
-                <Col className='text-center text-md-start' xs={12} md={isAdmin ? 9 : 7}>
+            <Row className="mb-3">
+                <Col className="text-center text-md-start" xs={12} md={isAdmin ? 9 : 7}>
                     <h4
                         className="m-1"
                         style={{
                             whiteSpace: 'normal',
                             wordBreak: 'break-word',
-                            overflowWrap: 'anywhere'
+                            overflowWrap: 'anywhere',
                         }}
                     >
                         {question.title}
                     </h4>
                 </Col>
-                <Col className='text-center text-md-end' xs={12} md={isAdmin ? 3 : 5}>
+                <Col className="text-center text-md-end" xs={12} md={isAdmin ? 3 : 5}>
                     {!isAdmin && (
                         <Button
                             variant={isSaved ? 'warning' : 'outline-warning'}
@@ -440,7 +443,7 @@ const DoQuestion = () => {
                             title={isSaved ? 'Unsave question' : 'Save question'}
                         >
                             <i className={`bi ${isSaved ? 'bi-bookmark-fill' : 'bi-bookmark'}`}></i>
-                            {savingQuestion ? ' Saving...' : (isSaved ? ' Saved' : ' Save')}
+                            {savingQuestion ? ' Saving...' : isSaved ? ' Saved' : ' Save'}
                         </Button>
                     )}
                     <Badge bg={question.type === 'MCQ' ? 'success' : 'info'}>
@@ -453,7 +456,7 @@ const DoQuestion = () => {
                 </Col>
             </Row>
             <hr />
-            
+
             {/* Admin View: Show question details with correct answers */}
             {isAdmin ? (
                 <>
@@ -485,10 +488,12 @@ const DoQuestion = () => {
                     {verificationStatus && verificationStatus !== 'pending' && (
                         <Alert variant={verificationStatus === 'approved' ? 'success' : 'danger'}>
                             <Alert.Heading>
-                                {verificationStatus === 'approved' ? '✓ Question Approved' : '✗ Question Rejected'}
+                                {verificationStatus === 'approved'
+                                    ? '✓ Question Approved'
+                                    : '✗ Question Rejected'}
                             </Alert.Heading>
                             <p>
-                                {verificationStatus === 'approved' 
+                                {verificationStatus === 'approved'
                                     ? 'This question has been verified and approved for use.'
                                     : 'This question has been rejected and will not appear in the question pool.'}
                             </p>
@@ -505,7 +510,10 @@ const DoQuestion = () => {
                     {(!verificationStatus || verificationStatus === 'pending') && (
                         <Alert variant="warning">
                             <Alert.Heading>⏳ Pending Verification</Alert.Heading>
-                            <p className="mb-0">This question is awaiting admin verification. Please review and approve or reject below.</p>
+                            <p className="mb-0">
+                                This question is awaiting admin verification. Please review and
+                                approve or reject below.
+                            </p>
                         </Alert>
                     )}
 
@@ -521,7 +529,9 @@ const DoQuestion = () => {
                         <Row className="mb-3">
                             <Col>
                                 <Form.Group className="mb-3">
-                                    <Form.Label><strong>Rejection Reason (Required if rejecting):</strong></Form.Label>
+                                    <Form.Label>
+                                        <strong>Rejection Reason (Required if rejecting):</strong>
+                                    </Form.Label>
                                     <Form.Control
                                         as="textarea"
                                         rows={3}
@@ -566,7 +576,7 @@ const DoQuestion = () => {
                                 <Button
                                     variant="danger"
                                     size="md"
-                                    disabled={submittingVerification || (!rejectionReason.trim())}
+                                    disabled={submittingVerification || !rejectionReason.trim()}
                                     onClick={() => handleVerifyQuestion(false)}
                                 >
                                     {submittingVerification ? (
@@ -593,160 +603,176 @@ const DoQuestion = () => {
                 <>
                     {/* Regular User View: Show previous attempt if exists and user hasn't clicked retry */}
                     {previousAttempt && showAttemptView ? (
-                <Card className="mb-3">
-                    <Card.Header className="bg-info text-white">
-                        <h5 className="mb-0">
-                            <i className="bi bi-clock-history me-2"></i>
-                            Previous Attempt
-                        </h5>
-                    </Card.Header>
-                    <Card.Body>
-                        <Row className="mb-3">
-                            <Col>
-                                <strong>Attempted on:</strong> {new Date(previousAttempt.submitted_at).toLocaleString()}
-                            </Col>
-                            {previousAttempt.is_correct !== null && (
-                                <Col xs="auto">
-                                    <Badge bg={previousAttempt.is_correct ? 'success' : 'danger'} className="ms-2">
-                                        {previousAttempt.is_correct ? '✓ Correct' : '✗ Incorrect'}
-                                    </Badge>
-                                </Col>
-                            )}
-                        </Row>
-                        <Row className="mb-3">
-                            <Col>
-                                <strong>Your Answer:</strong>
-                                <div className="mt-2 p-3 bg-light rounded break-words">
-                                    {Array.isArray(previousAttempt.answer) 
-                                        ? previousAttempt.answer.join(', ')
-                                        : previousAttempt.answer}
-                                </div>
-                            </Col>
-                        </Row>
-                        {question.type === 'MCQ' && (
-                            <Row className="mb-3">
-                                <Col>
-                                    <strong>Correct Answer:</strong>
-                                    <div className="mt-2 p-3 bg-success bg-opacity-10 rounded text-success break-words">
-                                        {question.correctOptions.join(', ')}
-                                    </div>
-                                </Col>
+                        <Card className="mb-3">
+                            <Card.Header className="bg-info text-white">
+                                <h5 className="mb-0">
+                                    <i className="bi bi-clock-history me-2"></i>
+                                    Previous Attempt
+                                </h5>
+                            </Card.Header>
+                            <Card.Body>
+                                <Row className="mb-3">
+                                    <Col>
+                                        <strong>Attempted on:</strong>{' '}
+                                        {new Date(previousAttempt.submitted_at).toLocaleString()}
+                                    </Col>
+                                    {previousAttempt.is_correct !== null && (
+                                        <Col xs="auto">
+                                            <Badge
+                                                bg={
+                                                    previousAttempt.is_correct
+                                                        ? 'success'
+                                                        : 'danger'
+                                                }
+                                                className="ms-2"
+                                            >
+                                                {previousAttempt.is_correct
+                                                    ? '✓ Correct'
+                                                    : '✗ Incorrect'}
+                                            </Badge>
+                                        </Col>
+                                    )}
+                                </Row>
+                                <Row className="mb-3">
+                                    <Col>
+                                        <strong>Your Answer:</strong>
+                                        <div className="mt-2 p-3 bg-light rounded break-words">
+                                            {Array.isArray(previousAttempt.answer)
+                                                ? previousAttempt.answer.join(', ')
+                                                : previousAttempt.answer}
+                                        </div>
+                                    </Col>
+                                </Row>
+                                {question.type === 'MCQ' && (
+                                    <Row className="mb-3">
+                                        <Col>
+                                            <strong>Correct Answer:</strong>
+                                            <div className="mt-2 p-3 bg-success bg-opacity-10 rounded text-success break-words">
+                                                {question.correctOptions.join(', ')}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                )}
+                                {question.type === 'SHORT' && question.answer && (
+                                    <Row className="mb-3">
+                                        <Col>
+                                            <strong>Sample Answer:</strong>
+                                            <div className="mt-2 p-3 bg-success bg-opacity-10 rounded">
+                                                {question.answer}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                )}
+                                {question.type === 'SHORT' && question.aiAnswer && (
+                                    <Row className="mb-3">
+                                        <Col>
+                                            <strong>AI-Generated Answer:</strong>
+                                            <div className="mt-2 p-3 bg-info bg-opacity-10 rounded">
+                                                {question.aiAnswer}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                )}
+                                <Row>
+                                    <Col>
+                                        <Button
+                                            variant="primary"
+                                            onClick={handleRetry}
+                                            className="w-100"
+                                        >
+                                            <i className="bi bi-arrow-clockwise me-2"></i>
+                                            Retry Question
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            </Card.Body>
+                        </Card>
+                    ) : (
+                        <>
+                            {/* Answer area */}
+                            <Row className="mb-3 text-start">
+                                {question.type === 'MCQ' ? (
+                                    <DoQuestionMCQ
+                                        question={question}
+                                        selectedAnswers={selectedAnswers}
+                                        onAnswerChange={handleOptionChange}
+                                        submitted={submitted}
+                                    />
+                                ) : (
+                                    <DoQuestionShort
+                                        question={question}
+                                        userAnswer={userAnswer}
+                                        onAnswerChange={setUserAnswer}
+                                        submitted={submitted}
+                                    />
+                                )}
                             </Row>
-                        )}
-                        {question.type === 'SHORT' && question.answer && (
-                            <Row className="mb-3">
-                                <Col>
-                                    <strong>Sample Answer:</strong>
-                                    <div className="mt-2 p-3 bg-success bg-opacity-10 rounded">
-                                        {question.answer}
-                                    </div>
-                                </Col>
-                            </Row>
-                        )}
-                        {question.type === 'SHORT' && question.aiAnswer && (
-                            <Row className="mb-3">
-                                <Col>
-                                    <strong>AI-Generated Answer:</strong>
-                                    <div className="mt-2 p-3 bg-info bg-opacity-10 rounded">
-                                        {question.aiAnswer}
-                                    </div>
-                                </Col>
-                            </Row>
-                        )}
-                        <Row>
-                            <Col>
-                                <Button 
-                                    variant="primary" 
-                                    onClick={handleRetry}
-                                    className="w-100"
+
+                            {/* Submit result */}
+                            {showResult && submitted && (
+                                <Alert
+                                    variant={
+                                        question.type === 'MCQ'
+                                            ? isCorrect
+                                                ? 'success'
+                                                : 'danger'
+                                            : 'info'
+                                    }
                                 >
-                                    <i className="bi bi-arrow-clockwise me-2"></i>
-                                    Retry Question
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Card.Body>
-                </Card>
-            ) : (
-                <>
-                    {/* Answer area */}
-                    <Row className="mb-3 text-start">
-                        {question.type === 'MCQ' ? (
-                            <DoQuestionMCQ
-                                question={question}
-                                selectedAnswers={selectedAnswers}
-                                onAnswerChange={handleOptionChange}
-                                submitted={submitted}
-                            />
-                        ) : (
-                            <DoQuestionShort
-                                question={question}
-                                userAnswer={userAnswer}
-                                onAnswerChange={setUserAnswer}
-                                submitted={submitted}
-                            />
-                        )}
-                    </Row>
+                                    <Alert.Heading>
+                                        {question.type === 'MCQ'
+                                            ? isCorrect
+                                                ? 'Correct!'
+                                                : 'Incorrect'
+                                            : 'Submitted Successfully!'}
+                                    </Alert.Heading>
+                                    <p>
+                                        {question.type === 'MCQ'
+                                            ? isCorrect
+                                                ? 'Great job! Your answer is correct.'
+                                                : "Your answer doesn't match the correct answer."
+                                            : 'Your answer has been submitted successfully.'}
+                                    </p>
+                                </Alert>
+                            )}
 
-                    {/* Submit result */}
-                    {showResult && submitted && (
-                        <Alert variant={
-                            question.type === 'MCQ' 
-                                ? (isCorrect ? 'success' : 'danger')
-                                : 'info'
-                        }>
-                            <Alert.Heading>
-                                {question.type === 'MCQ' 
-                                    ? (isCorrect ? 'Correct!' : 'Incorrect')
-                                    : 'Submitted Successfully!'}
-                            </Alert.Heading>
-                            <p>
-                                {question.type === 'MCQ' 
-                                    ? (isCorrect 
-                                        ? 'Great job! Your answer is correct.' 
-                                        : "Your answer doesn't match the correct answer.")
-                                    : 'Your answer has been submitted successfully.'}
-                            </p>
-                        </Alert>
-                    )}
-
-                    {/* Error message */}
-                    {/* {error && (
+                            {/* Error message */}
+                            {/* {error && (
                         <Alert variant="danger" className="mb-3">
                             {error}
                         </Alert>
                     )} */}
 
-                    {/* Submit button */}
-                    <Row className="align-items-center">
-                        <Col xs="auto">
-                            <Button
-                                variant="primary"
-                                size="md"
-                                disabled={!canSubmit() || loading}
-                                onClick={handleSubmitAnswer}
-                            >
-                                {loading ? (
-                                    <>
-                                        <Spinner
-                                            as="span"
-                                            animation="border"
-                                            size="sm"
-                                            role="status"
-                                            className="me-2"
-                                        />
-                                        Submitting...
-                                    </>
-                                ) : submitted ? (
-                                    'Submitted'
-                                ) : (
-                                    'Submit Answer'
-                                )}
-                            </Button>
-                        </Col>
-                    </Row>
-                    </>
-                )}
+                            {/* Submit button */}
+                            <Row className="align-items-center">
+                                <Col xs="auto">
+                                    <Button
+                                        variant="primary"
+                                        size="md"
+                                        disabled={!canSubmit() || loading}
+                                        onClick={handleSubmitAnswer}
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <Spinner
+                                                    as="span"
+                                                    animation="border"
+                                                    size="sm"
+                                                    role="status"
+                                                    className="me-2"
+                                                />
+                                                Submitting...
+                                            </>
+                                        ) : submitted ? (
+                                            'Submitted'
+                                        ) : (
+                                            'Submit Answer'
+                                        )}
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </>
+                    )}
                 </>
             )}
         </Container>
