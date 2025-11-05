@@ -149,7 +149,6 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 - **Saved questions:** users can bookmark and revisit questions. 
 
 - **Activity Heatmap (Engagement Visualization):** displays a GitHub-style contribution chart showing the number of attempts per day across the semester.
-- *(Future work)* Password reset (requires dummy email configuration). 
 
 ### Create Questions
 - **Create questions:** students can choose from two types of questions MCQ and short answer questions, write question stem, answer, choices for MCQ and explanation.
