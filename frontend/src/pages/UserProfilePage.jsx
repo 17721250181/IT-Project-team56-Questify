@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Row, Col, Card, Tabs, Tab, Spinner, Alert } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { QuestifyNavBar } from '../components/common';
 import { UserProfileHeader, ActivityHeatmap } from '../components/profile';
 import QuestionGrid from '../components/questionList/QuestionGrid';
@@ -11,6 +11,10 @@ import '../styles/UserProfilePage.css';
 const UserProfilePage = () => {
     const { user: currentUser, checkAuthStatus } = useAuth();
     const { userId } = useParams();
+    const [searchParams] = useSearchParams();
+    
+    // Get initial tab from URL query parameter (e.g., ?tab=saved)
+    const initialTab = searchParams.get('tab') || 'attempted';
 
     const viewingUserId = userId ? Number(userId) : currentUser?.id ?? null;
     const isOwnProfile = !userId || (currentUser && Number(userId) === currentUser.id);
@@ -18,6 +22,7 @@ const UserProfilePage = () => {
     const [profileUser, setProfileUser] = useState(isOwnProfile ? currentUser : null);
     const [loading, setLoading] = useState(!isOwnProfile);
     const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState(initialTab);
 
     const refreshCurrentUser = useCallback(async () => {
         await checkAuthStatus();
@@ -57,6 +62,20 @@ const UserProfilePage = () => {
             setProfileUser(currentUser);
         }
     }, [currentUser, isOwnProfile]);
+
+    // Scroll to tabs section when tab parameter is present
+    useEffect(() => {
+        const tabParam = searchParams.get('tab');
+        if (tabParam && !loading) {
+            // Wait for content to render
+            setTimeout(() => {
+                const tabsSection = document.getElementById('questions-tabs-section');
+                if (tabsSection) {
+                    tabsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+    }, [searchParams, loading]);
 
     const handleProfileUpdated = async (updatedUser) => {
         if (isOwnProfile) {
@@ -122,12 +141,18 @@ const UserProfilePage = () => {
                     </Row>
                 )}
 
-                <Row>
+                <Row id="questions-tabs-section">
                     <Col>
                         <Card className="profile-card">
                             <Card.Body>
                                 {isOwnProfile ? (
-                                    <Tabs defaultActiveKey="attempted" id="questions-tabs" className="profile-tabs mb-3" fill>
+                                    <Tabs 
+                                        activeKey={activeTab} 
+                                        onSelect={(k) => setActiveTab(k)} 
+                                        id="questions-tabs" 
+                                        className="profile-tabs mb-3" 
+                                        fill
+                                    >
                                         <Tab
                                             eventKey="attempted"
                                             title={
