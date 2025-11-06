@@ -38,15 +38,16 @@ For detailed progress and bug fixes, see **[Changelog.md](./Changelog.md)**.
 
 ---
 
-## Documentation (PDF Exports)
-Located in `/Docs/` folder.  
-| Document | Description |
-|-----------|-------------|
-| [System Architecture Design Model](../Docs/System_Architecture_Design_Model.pdf) | Detailed architecture and component diagrams |
-| [Requirements Specification](../Docs/Requirements.pdf) | User stories, personas, motivational model |
-| [Testing Plan and Report](../Docs/Testing_Report.pdf) | Test design, coverage, and results |
-| [Ethics and Security Report](../Docs/Ethics_and_Security_Report.pdf) | Ethical and security considerations |
-| [Sprint Reviews](../Docs/Sprint1.pdf – Sprint4.pdf) | Planning and outcomes for each sprint |
+## Documents
+All detailed artefacts and design records are consolidated in the Confluence export located under
+**[/Handover/documents/](./documents/)**.
+
+This export contains the complete project documentation, including:
+- Planning and Requirements – sprint plans, user stories, personas, and motivational models.
+- System Design – architecture diagrams, domain and data models, and API reference.
+- Development Process – coding standards, workflows, and role responsibilities.
+- Testing and Quality Assurance – test cases, results, coverage, and review reports.
+- Meeting Notes and Reviews – stand-up records, client meeting notes, and retrospective summaries.
 
 ---
 
@@ -68,6 +69,8 @@ For setup, environment variables, and deployment instructions, see **[README.md]
 |------|-------------|
 | [Architecture_Diagram.png](./Architecture_Diagram.png) | High-level overview of system components |
 | [ERD_Database_Structure.png](./ERD_Database_Structure.png) | Entity Relationship Diagram of database schema |
+| [Description_of_Key_Classes_and_Layers.md](./Description_of_Key_Classes_and_Layers.md) | Detailed description of key backend classes, frontend structure, and how each application layer interacts |
+
 
 ---
 
