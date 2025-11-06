@@ -13,7 +13,7 @@ import LoadingSpinner from './LoadingSpinner';
  * @returns {React.ReactElement} Public content, loading state, or redirect
  */
 const PublicRoute = ({ children }) => {
-    const { isAuthenticated, loading, user } = useAuth();
+    const { isAuthenticated, loading, isAdmin } = useAuth();
 
     // Show loading spinner while authentication status is being checked
     if (loading) {
@@ -26,7 +26,7 @@ const PublicRoute = ({ children }) => {
 
     // If already authenticated, redirect to home page
     if (isAuthenticated) {
-        const target = user?.is_admin ? '/admin' : '/';
+        const target = isAdmin ? '/admin' : '/';
         return <Navigate to={target} replace />;
     }
 

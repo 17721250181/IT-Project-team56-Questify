@@ -30,6 +30,8 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
+    // Derived roles
+    const isAdmin = !!(user?.is_admin || user?.is_staff || user?.is_superuser);
 
     /**
      * Update auth state
@@ -197,6 +199,7 @@ export const AuthProvider = ({ children }) => {
         user,
         isAuthenticated,
         loading,
+        isAdmin,
 
         // Methods
         login,

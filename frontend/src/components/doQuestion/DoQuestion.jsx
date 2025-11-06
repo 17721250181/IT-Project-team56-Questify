@@ -10,8 +10,7 @@ import DoQuestionShort from './DoQuestionShort';
 const DoQuestion = () => {
     const { questionId } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
-    const isAdmin = user?.is_staff || user?.is_superuser || false;
+    const { isAdmin } = useAuth();
     
     const [question, setQuestion] = useState(null);
     const [selectedAnswers, setSelectedAnswers] = useState([]);

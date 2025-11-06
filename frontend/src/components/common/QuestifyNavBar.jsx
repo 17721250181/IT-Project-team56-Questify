@@ -8,7 +8,7 @@ import '../../styles/QuestifyNavBar.css';
 
 const QuestifyNavBar = () => {
     const navigate = useNavigate();
-    const { logout, user } = useAuth();
+    const { logout, isAdmin, user } = useAuth();
 
     const handleLogout = async () => {
         try {
@@ -29,7 +29,7 @@ const QuestifyNavBar = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        {user?.is_admin && (
+                        {isAdmin && (
                             <NavLink to="/admin" className="nav-link">
                                 Admin
                             </NavLink>

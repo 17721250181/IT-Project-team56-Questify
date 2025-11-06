@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
 
 const AdminRoute = ({ children }) => {
-    const { isAuthenticated, loading, user } = useAuth();
+    const { isAuthenticated, loading, isAdmin } = useAuth();
 
     if (loading) {
         return (
@@ -18,7 +18,7 @@ const AdminRoute = ({ children }) => {
         return <Navigate to="/login" replace />;
     }
 
-    if (!user?.is_admin) {
+    if (!isAdmin) {
         return <Navigate to="/" replace />;
     }
 
