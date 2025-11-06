@@ -209,7 +209,7 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 |--------|--------------|
 | **Frontend** | React (Vite), Axios |
 | **Backend** | Django + Django REST Framework |
-| **Database** | SQLite (development), PostgreSQL (planned for production) |
+| **Database** | SQLite (development), PostgreSQL (production) |
 | **Authentication** | Django sessions (with CSRF protection), optional 2FA |
 | **AI Integration** | OpenAI API |
 | **Testing** | Pytest (Pytest-Cov) |
@@ -236,7 +236,7 @@ Make sure your environment matches these versions:
 
 ---
 
-### Backend Setup (Django + DRF + SQLite)
+### Backend Setup (Django + DRF + PostgreSQL)
 
 ```bash
 cd backend
@@ -447,7 +447,6 @@ Main development priorities include:
 
 - OAuth 2.0 / SSO Integration (University of Melbourne)
 - Reward system for top students
-- Database migration to PostgreSQL
 - Enhanced AI feedback and automatic tagging
 - Expanded gamification (badges, streaks)
 - Personalized question recommendation system
