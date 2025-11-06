@@ -637,9 +637,35 @@ const DoQuestion = () => {
                                     <Col>
                                         <strong>Your Answer:</strong>
                                         <div className="mt-2 p-3 bg-light rounded break-words">
-                                            {Array.isArray(previousAttempt.answer)
-                                                ? previousAttempt.answer.join(', ')
-                                                : previousAttempt.answer}
+                                            {(() => {
+                                                let answerData = previousAttempt.answer;
+                                                
+                                                // Only parse array format for MCQ questions
+                                                if (question.type === 'MCQ') {
+                                                    // If answer is a string that looks like an array, parse it
+                                                    if (typeof answerData === 'string' && answerData.startsWith('[')) {
+                                                        try {
+                                                            answerData = JSON.parse(answerData.replace(/'/g, '"'));
+                                                        } catch (e) {
+                                                            console.error('Failed to parse answer:', e);
+                                                        }
+                                                    }
+                                                    
+                                                    // Convert letter answers to option text
+                                                    if (Array.isArray(answerData) && question.options) {
+                                                        return answerData
+                                                            .map(letter => {
+                                                                // Convert letter (A, B, C, D) to index (0, 1, 2, 3)
+                                                                const idx = letter.charCodeAt(0) - 65;
+                                                                return question.options[idx] || letter;
+                                                            })
+                                                            .join(', ');
+                                                    }
+                                                }
+                                                
+                                                // For SHORT questions or if parsing failed, return as-is
+                                                return Array.isArray(answerData) ? answerData.join(', ') : answerData;
+                                            })()}
                                         </div>
                                     </Col>
                                 </Row>
@@ -648,7 +674,13 @@ const DoQuestion = () => {
                                         <Col>
                                             <strong>Correct Answer:</strong>
                                             <div className="mt-2 p-3 bg-success bg-opacity-10 rounded text-success break-words">
-                                                {question.correctOptions.join(', ')}
+                                                {question.correctOptions
+                                                    .map(letter => {
+                                                        // Convert letter (A, B, C, D) to index (0, 1, 2, 3)
+                                                        const idx = letter.charCodeAt(0) - 65;
+                                                        return question.options[idx] || letter;
+                                                    })
+                                                    .join(', ')}
                                             </div>
                                         </Col>
                                     </Row>

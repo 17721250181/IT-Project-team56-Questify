@@ -54,7 +54,7 @@ const RegisterPage = () => {
       <Container fluid className="min-vh-100 p-0">
         <Row className="min-vh-100 g-0 m-0">
           {/* Left Side - Introduction */}
-          <Col lg={7} md={6} className="register-intro-section d-flex flex-column">
+          <Col xxl={6} lg={7} md={6} className="register-intro-section d-flex flex-column">
             <div className="intro-header">
               <div className="brand-section">
                 <Link to="/" className="brand-link">
@@ -119,7 +119,7 @@ const RegisterPage = () => {
           </Col>
 
           {/* Right Side - Register Form */}
-          <Col lg={5} md={6} className="register-form-section d-flex align-items-start justify-content-center">
+          <Col xxl={6} lg={5} md={6} className="register-form-section d-flex align-items-start justify-content-center">
             <div className="register-form-wrapper">
               <div className="text-center mb-4">
                 <h3 className="form-title">Create your account</h3>
