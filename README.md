@@ -214,7 +214,7 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 | **AI Integration** | OpenAI API |
 | **Testing** | Pytest (Pytest-Cov) |
 | **CI/CD** | GitHub Actions |
-| **Deployment** | Backend – Render, Frontend – GitHub Pages |
+| **Deployment** | Render |
 | **Documentation** | Atlassian Confluence |
 | **Version Control** | Git & GitHub |
 
