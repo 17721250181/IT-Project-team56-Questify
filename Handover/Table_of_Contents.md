@@ -56,7 +56,7 @@ This export contains the complete project documentation, including:
 |------------|-------------|
 | **Frontend:** | React (Node v20+) |
 | **Backend:** | Django REST Framework (Python 3.11) |
-| **Database:** | SQLite (default), can migrate to PostgreSQL |
+| **Database:** | SQLite (during development), PostgreSQL (production) |
 | **External APIs:** | OpenAI API (AI explanations) |
 | **Deployment:** | Backend – Render / Frontend – GitHub Pages |
 
