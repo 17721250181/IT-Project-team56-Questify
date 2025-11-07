@@ -195,5 +195,94 @@ export const AuthService = {
                 message: 'Logged out successfully'
             };
         }
+    },
+
+    /**
+     * Request Password Reset - Send verification code to email
+     * @param {string} email - User email address
+     * @returns {Promise<Object>} Response with success message
+     */
+    requestPasswordReset: async (email) => {
+        try {
+            const response = await apiClient.post('/auth/password-reset/request/', {
+                email: email.trim().toLowerCase()
+            });
+            return response.data;
+        } catch (error) {
+            if (error.response?.data) {
+                throw new Error(error.response.data.message || 'Failed to send verification code');
+            }
+            if (error.request) {
+                throw new Error('Network error - please check your connection');
+            }
+            throw new Error('Failed to send verification code');
+        }
+    },
+
+    /**
+     * Verify Password Reset Code
+     * @param {string} email - User email address
+     * @param {string} code - Verification code
+     * @returns {Promise<Object>} Response with verification result
+     */
+    verifyResetCode: async (email, code) => {
+        try {
+            const response = await apiClient.post('/auth/password-reset/verify/', {
+                email: email.trim().toLowerCase(),
+                code: code.trim()
+            });
+            return response.data;
+        } catch (error) {
+            if (error.response?.data) {
+                throw new Error(error.response.data.message || 'Invalid verification code');
+            }
+            if (error.request) {
+                throw new Error('Network error - please check your connection');
+            }
+            throw new Error('Failed to verify code');
+        }
+    },
+
+    /**
+     * Reset Password with Verification Code
+     * @param {string} email - User email address
+     * @param {string} code - Verification code
+     * @param {string} newPassword - New password
+     * @returns {Promise<Object>} Response with reset result
+     */
+    resetPassword: async (email, code, newPassword) => {
+        try {
+            const response = await apiClient.post('/auth/password-reset/confirm/', {
+                email: email.trim().toLowerCase(),
+                code: code.trim(),
+                new_password: newPassword
+            });
+            return response.data;
+        } catch (error) {
+            if (error.response?.data) {
+                const errorData = error.response.data;
+                
+                // Handle validation errors
+                if (errorData.errors && typeof errorData.errors === 'object') {
+                    const errorMessages = [];
+                    Object.entries(errorData.errors).forEach(([, messages]) => {
+                        if (Array.isArray(messages)) {
+                            errorMessages.push(...messages);
+                        } else if (typeof messages === 'string') {
+                            errorMessages.push(messages);
+                        }
+                    });
+                    if (errorMessages.length > 0) {
+                        throw new Error(errorMessages.join('; '));
+                    }
+                }
+                
+                throw new Error(errorData.message || 'Failed to reset password');
+            }
+            if (error.request) {
+                throw new Error('Network error - please check your connection');
+            }
+            throw new Error('Failed to reset password');
+        }
     }
 };
