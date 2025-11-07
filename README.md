@@ -139,15 +139,11 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 ### Authentication & Profile
 
 - **User registration and login** with university email format validation. 
-
+- **Password reset** with E-mail security code.
 - **Profile management:** user can set profile name and image. 
-
 - **Created questions tracking:** shows all created questions.
-
 - **Attempt history tracking:** shows all attempted questions with results. 
-
 - **Saved questions:** users can bookmark and revisit questions. 
-
 - **Activity Heatmap (Engagement Visualization):** displays a GitHub-style contribution chart showing the number of attempts per day across the semester.
 
 ### Create Questions
@@ -169,6 +165,7 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 - **Search bar:** search questions by keywords or tags. 
 - **Sort options:** sort by creation time, popularity, or week. 
 - **Bookmark questions:** save to personal list for later attempts. 
+- **Question recommendation system** personalized based on activity history.
 
 ### Comments & Discussion
 - **Comment system:** users can post comments under each question. 
@@ -449,7 +446,6 @@ Main development priorities include:
 - Reward system for top students
 - Enhanced AI feedback and automatic tagging
 - Expanded gamification (badges, streaks)
-- Personalized question recommendation system
 - Mobile responsiveness improvements
 - Cloud deployment on AWS for scalability
 
