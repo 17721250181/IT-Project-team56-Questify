@@ -200,17 +200,36 @@ class UserLoginSerializer(serializers.Serializer):
         return value.strip().lower()
 
 class PasswordResetRequestSerializer(serializers.Serializer):
-    # Serializer for password reset request
+    """Serializer for requesting password reset code via email"""
     email = serializers.EmailField(required=True)
 
     def validate_email(self, value):
         return value.strip().lower()
 
+
+class PasswordResetVerifyCodeSerializer(serializers.Serializer):
+    """Serializer for verifying the password reset code"""
+    email = serializers.EmailField(required=True)
+    code = serializers.CharField(required=True, max_length=10)
+
+    def validate_email(self, value):
+        return value.strip().lower()
+    
+    def validate_code(self, value):
+        return value.strip()
+
+
 class PasswordResetConfirmSerializer(serializers.Serializer):
-    # Serializer for password reset confirmation
-    uid = serializers.CharField(required=True)
-    token = serializers.CharField(required=True)
+    """Serializer for confirming password reset with code"""
+    email = serializers.EmailField(required=True)
+    code = serializers.CharField(required=True, max_length=10)
     new_password = serializers.CharField(write_only=True, required=True)
+
+    def validate_email(self, value):
+        return value.strip().lower()
+    
+    def validate_code(self, value):
+        return value.strip()
 
     def validate_new_password(self, value):
         try:
