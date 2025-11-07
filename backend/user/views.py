@@ -6,7 +6,7 @@ from django.middleware.csrf import get_token, rotate_token
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -177,6 +177,7 @@ class MeView(APIView):
         )
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class PasswordResetRequestView(APIView):
     """
     Request password reset - sends verification code to email
@@ -213,6 +214,7 @@ class PasswordResetRequestView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class PasswordResetVerifyView(APIView):
     """
     Verify password reset code
@@ -249,6 +251,7 @@ class PasswordResetVerifyView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class PasswordResetConfirmView(APIView):
     """
     Confirm password reset with verification code
