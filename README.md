@@ -5,7 +5,7 @@ It provides a collaborative platform for students to create, share, answer, and 
 
 > For a live demo, deployment link, and user guide, please refer to the [Handover Package](./Handover/Table_of_Contents.md).
 
-## Deployed Website URL: https://questify-frontend.onrender.com
+## Deployed Website URL: <https://questify-frontend.onrender.com>
 
 ---
 
@@ -49,7 +49,9 @@ Questify is an AI-assisted, student-driven question bank system developed for th
 The system aims to make students more engaged with the subject throughout the semester, addressing long-standing issues of passive learning and last-minute exam cramming.
 
 ### Background
+
 In previous deliveries of OOSD, the teaching team observed that:
+
 - Students tended to **only study intensively near exams**, rather than engaging consistently throughout the semester.
 - Most students **focused on memorising past-paper questions** instead of developing a genuine understanding of the content.
 - The subject was **still taught in a relatively traditional way**, with limited interactive tools to motivate ongoing participation.
@@ -61,7 +63,9 @@ To address this contradiction, the project team made a key design decision:
 instead of simply building a static question bank, we **redesigned the system into a student-driven question creation platform** that encourages critical thinking, collaboration, and continuous learning.
 
 ### Our product - Questify
+
 In Questify, students take an active role as both **learners and content creators**:
+
 - Students design their own questions based on weekly topics, provide answers, and write explanations.
 - Their peers can attempt these questions, **rate their quality**, and **leave comments for discussion**.
 - The system thus transforms question practice into an **interactive and reflective learning process**: students not only solve problems but also evaluate and improve each other’s work.
@@ -71,6 +75,7 @@ In Questify, students take an active role as both **learners and content creator
 This approach aligns with the client’s goal of **“making students more engaging to the subject”** and introduces a sustainable, student-led enhancement to the OOSD learning experience.
 
 ### Objectives
+
 - **O1 – Active learning:** transform students from passive consumers of questions into active creators and reviewers.
 - **O2 – Continuous engagement:** encourage week-by-week participation rather than exam-period cramming.
 - **O3 – Peer learning:** enable students to give and receive feedback through ratings and comments.
@@ -78,6 +83,7 @@ This approach aligns with the client’s goal of **“making students more engag
 - **O5 – Teaching support:** reduce instructor workload by crowdsourcing question creation while retaining moderation control.
 
 ### Client / Stakeholders
+
 - **Client:** Shanika Karunasekera, Subject Coordinator of *COMP30022 Object-Oriented Software Development*, University of Melbourne
 - **Admin role:** OOSD teaching team (tutors, demonstrators, and coordinators)
 - **End users:** all future OOSD students (as question authors and solvers)
@@ -138,68 +144,72 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 
 ### Authentication & Profile
 
-- **User registration and login** with university email format validation. 
-
-- **Profile management:** user can set profile name and image. 
-
+- **User registration and login** with university email format validation.
+- **Password reset** with E-mail security code.
+- **Profile management:** user can set profile name and image.
 - **Created questions tracking:** shows all created questions.
-
-- **Attempt history tracking:** shows all attempted questions with results. 
-
-- **Saved questions:** users can bookmark and revisit questions. 
-
+- **Attempt history tracking:** shows all attempted questions with results.
+- **Saved questions:** users can bookmark and revisit questions.
 - **Activity Heatmap (Engagement Visualization):** displays a GitHub-style contribution chart showing the number of attempts per day across the semester.
 
 ### Create Questions
+
 - **Create questions:** students can choose from two types of questions MCQ and short answer questions, write question stem, answer, choices for MCQ and explanation.
-- Students create questions based on tags 
-- **AI-assisted explanation:** OpenAI API provides explanation for short answer questinos. 
-- **Teaching team verification:** questions are submitted to the teaching team for verification. 
-- **Status display:** authors and all attempters can view whether their questions are *Pending*, *Approved*, or *Rejected*. 
+- Students create questions based on tags
+- **AI-assisted explanation:** OpenAI API provides explanation for short answer questinos.
+- **Teaching team verification:** questions are submitted to the teaching team for verification.
+- **Status display:** authors and all attempters can view whether their questions are *Pending*, *Approved*, or *Rejected*.
 
 ### Question Solving
-- **Attempt questions:** users can answer both MCQ and short-answer types. 
-- **View AI explanations** and creator’s answer after submission. 
-- **Progress recording:** each attempt is stored for review in the user profile. 
+
+- **Attempt questions:** users can answer both MCQ and short-answer types.
+- **View AI explanations** and creator’s answer after submission.
+- **Progress recording:** each attempt is stored for review in the user profile.
 - Comment & rate questions for quality feedback
 
 ### Question List & Discovery
-- **Browse all approved questions** in a centralized list view. 
-- **Filter by week or topic** (aligned with OOSD weekly schedule). 
-- **Search bar:** search questions by keywords or tags. 
-- **Sort options:** sort by creation time, popularity, or week. 
-- **Bookmark questions:** save to personal list for later attempts. 
+
+- **Browse all approved questions** in a centralized list view.
+- **Filter by week or topic** (aligned with OOSD weekly schedule).
+- **Search bar:** search questions by keywords or tags.
+- **Sort options:** sort by creation time, popularity, or week.
+- **Bookmark questions:** save to personal list for later attempts.
+- **Question recommendation system** personalized based on activity history.
 
 ### Comments & Discussion
-- **Comment system:** users can post comments under each question. 
-- **Replies and likes:** enable interaction among students. 
-- **Threaded display:** nested comments shown in order. 
-- *(Future work)* Report function for inappropriate comments. 
+
+- **Comment system:** users can post comments under each question.
+- **Replies and likes:** enable interaction among students.
+- **Threaded display:** nested comments shown in order.
+- *(Future work)* Report function for inappropriate comments.
 
 ### Leaderboard & Gamification
+
 - Base quiz points:
   - points = attempts × 1 + correct × 9 (defaults; can be changed in settings).
 - Optional activity points:
-   - comments → LEADERBOARD_POINTS_PER_COMMENT
-   - ratings → LEADERBOARD_POINTS_PER_RATING
-   - likes → LEADERBOARD_POINTS_PER_LIKE
+  - comments → LEADERBOARD_POINTS_PER_COMMENT
+  - ratings → LEADERBOARD_POINTS_PER_RATING
+  - likes → LEADERBOARD_POINTS_PER_LIKE
 - See Ranking
   - Students are ordered by total points. More points = higher on the board.
   - If two students have the same points, the one with more correct answers goes higher.
   - If they’re still tied, the one who worked more recently (latest activity) goes higher.
   - If they’re still tied after that, the lower user_id goes first (just a stable tiebreak).
   - People with exactly the same stats share the same rank number (they tie, and we don’t skip numbers).
-    
+
 ### Admin & Staff Features
+
 - Access and verify all student-created questions
 - Activity dashboards (charts showing student engagement)
 - Designed to minimise staff workload
 
 ### System & Deployment
-- **Deployed backend:** Django REST API on Render. 
-- **Deployed frontend:** React (Vite) on GitHub Pages. 
-- **SQLite database (development):** lightweight and fast; can migrate to PostgreSQL for production. 
-- **Automated testing:** Pytest and GitHub Actions CI/CD. 
+
+- **Deployed backend:** Django REST API on Render.
+- **Deployed frontend:** React (Vite) on GitHub Pages.
+- **SQLite database (development):** lightweight and fast; can migrate to PostgreSQL for production.
+- **Automated testing:** Pytest and GitHub Actions CI/CD.
 
 ---
 
@@ -227,6 +237,7 @@ IT-PROJECT-TEAM56-OOSD-QUESTION-BANK/
 ## Setup Instructions
 
 ### Prerequisites
+
 Make sure your environment matches these versions:
 
 - Python 3.11
@@ -288,7 +299,7 @@ Below are the most frequent setup and deployment mistakes encountered during dev
 
 - **Wrong Node version** → use Node 20.19+
 - **Forgot to activate venv** → always activate before running backend
-- **Missing `.env` file** → ensure `frontend/.env` exists with `VITE_API_BASE_URL` 
+- **Missing `.env` file** → ensure `frontend/.env` exists with `VITE_API_BASE_URL`
 - **Cross-domain cookies blocked** → for split frontend/backend deployments, ensure `SameSite=None` and `Secure` flags are enabled (configured in `render.yaml`)
 - **`db.sqlite3` committed** → must be added to `.gitignore` to avoid leaking local data
 
@@ -384,6 +395,7 @@ The CI workflow executes `pytest` on every push/PR to enforce code quality.
 The following environment variables must be configured before running or deploying Questify.
 
 #### Backend (Django)
+
 | Variable | Required | Description | Example |
 |-----------|-----------|-------------|----------|
 | `SECRET_KEY` | Required | Django secret key | `django-insecure-xxxx` |
@@ -398,6 +410,7 @@ The following environment variables must be configured before running or deployi
 | `ADMIN_EMAILS` | Optional | Comma-separated admin email list | `alice@student.unimelb.edu.au,bob@student.unimelb.edu.au` |
 
 #### Frontend (React + Vite)
+
 | Variable | Required | Description | Example |
 |-----------|-----------|-------------|----------|
 | `VITE_API_BASE_URL` | Required | Backend API base URL | `https://questify-api.onrender.com/api` |
@@ -442,14 +455,13 @@ Local development defaults use `Secure=False` and `SameSite=Lax`; override only 
 
 ## Future Work
 
-See the full version in [`Handover/Future_Work.md`](./Handover/Future_Work.md). 
+See the full version in [`Handover/Future_Work.md`](./Handover/Future_Work.md).
 Main development priorities include:
 
 - OAuth 2.0 / SSO Integration (University of Melbourne)
 - Reward system for top students
 - Enhanced AI feedback and automatic tagging
 - Expanded gamification (badges, streaks)
-- Personalized question recommendation system
 - Mobile responsiveness improvements
 - Cloud deployment on AWS for scalability
 
@@ -508,4 +520,4 @@ Thumbs.db
 
 ---
 
-> _Last updated: November 2025_
+> *Last updated: November 2025*

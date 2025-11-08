@@ -223,7 +223,7 @@ def test_password_reset_request_existing_user():
     assert response.status_code == 200
     data = response.json()
     assert data["ok"] is True
-    assert "reset link has been sent" in data["message"]
+    assert "verification code has been sent" in data["message"]
 
 
 @pytest.mark.django_db
@@ -239,7 +239,7 @@ def test_password_reset_request_nonexistent_user():
     assert response.status_code == 200
     data = response.json()
     assert data["ok"] is True
-    assert "reset link has been sent" in data["message"]
+    assert "verification code has been sent" in data["message"]
 
 
 @override_settings(ADMIN_EMAILS={"admin@questify.com"})

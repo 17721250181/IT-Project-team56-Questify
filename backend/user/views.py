@@ -6,7 +6,7 @@ from django.middleware.csrf import get_token, rotate_token
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,8 +21,14 @@ from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
     PasswordResetRequestSerializer,
+    PasswordResetVerifyCodeSerializer,
     PasswordResetConfirmSerializer,
     CSRFTokenSerializer
+)
+from .password_reset import (
+    create_reset_code,
+    verify_reset_code,
+    reset_password_with_code
 )
 
 
@@ -171,8 +177,13 @@ class MeView(APIView):
         )
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class PasswordResetRequestView(APIView):
-    """Request password reset"""
+    """
+    Request password reset - sends verification code to email
+    POST /auth/password-reset/request/
+    Body: { "email": "user@example.com" }
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -181,28 +192,19 @@ class PasswordResetRequestView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data['email']
 
-            try:
-                user = User.objects.get(email=email)
+            # Create reset code and send email
+            reset_code, error = create_reset_code(email)
+            
+            if error:
+                return Response({
+                    "ok": False,
+                    "message": error
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-                frontend_origin = getattr(settings, "FRONTEND_ORIGIN", None) or "http://localhost:5173"
-                reset_url = f"{frontend_origin.rstrip('/')}/password-reset-confirm?uid={uid}&token={token}"
-
-                send_mail(
-                    subject="Password Reset - Questify",
-                    message=f"Click the following link to reset your password: {reset_url}",
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[email],
-                    fail_silently=False,
-                )
-            except User.DoesNotExist:
-                pass  # Don't reveal if email exists or not
-
+            # Always return success message (for security, don't reveal if email exists)
             return Response({
                 "ok": True,
-                "message": "If the email exists, a password reset link has been sent"
+                "message": "If the email exists, a verification code has been sent"
             }, status=status.HTTP_200_OK)
 
         return Response({
@@ -212,35 +214,68 @@ class PasswordResetRequestView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
+class PasswordResetVerifyView(APIView):
+    """
+    Verify password reset code
+    POST /auth/password-reset/verify/
+    Body: { "email": "user@example.com", "code": "123456" }
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetVerifyCodeSerializer(data=request.data)
+
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            code = serializer.validated_data['code']
+
+            # Verify the code
+            is_valid, error = verify_reset_code(email, code)
+            
+            if not is_valid:
+                return Response({
+                    "ok": False,
+                    "message": error
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({
+                "ok": True,
+                "message": "Verification code is valid"
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            "ok": False,
+            "message": "Invalid data",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
 class PasswordResetConfirmView(APIView):
-    """Confirm password reset with token"""
+    """
+    Confirm password reset with verification code
+    POST /auth/password-reset/confirm/
+    Body: { "email": "user@example.com", "code": "123456", "new_password": "newpass123" }
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
 
         if serializer.is_valid():
-            uid = serializer.validated_data['uid']
-            token = serializer.validated_data['token']
+            email = serializer.validated_data['email']
+            code = serializer.validated_data['code']
             new_password = serializer.validated_data['new_password']
 
-            try:
-                user_id = force_str(urlsafe_base64_decode(uid))
-                user = User.objects.get(pk=user_id)
-            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            # Reset password with code
+            success, error = reset_password_with_code(email, code, new_password)
+            
+            if not success:
                 return Response({
                     "ok": False,
-                    "message": "Invalid reset link"
+                    "message": error
                 }, status=status.HTTP_400_BAD_REQUEST)
-
-            if not default_token_generator.check_token(user, token):
-                return Response({
-                    "ok": False,
-                    "message": "Invalid or expired reset link"
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            user.set_password(new_password)
-            user.save()
 
             return Response({
                 "ok": True,
