@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IT Project Team56 OOSD-Questify : Deployment Document</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="IT-Project-Team56-OOSD-Questify_34668805.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="Coding_34768128.html">Coding</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            IT Project Team56 OOSD-Questify : Deployment Document
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                            
+        
+    
+        
+    
+        
+        
+            Created by <span class='author'> Ziyi Zhang</span> on Sep 28, 2025
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <h2 id="DeploymentDocument-1.Backend">1. Backend</h2><h3 id="DeploymentDocument-Deployment">Deployment</h3><ul><li><p>Runs on <strong>Render Web Service</strong> with <strong>PostgreSQL</strong></p></li><li><p>Automated via <strong>GitHub Actions</strong></p></li><li><p>Separate branches:</p><ul><li><p><strong>Staging</strong> → <code>TestMainBranch</code></p></li><li><p><strong>Production</strong> → <code>main</code></p></li></ul></li></ul><h3 id="DeploymentDocument-RenderSetup">Render Setup</h3><p><strong>Service (</strong><code>render.yaml</code><strong>)</strong></p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">services:
+  - type: web
+    name: questify-backend
+    runtime: python3
+    buildCommand: |
+      cd backend &amp;&amp; pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate --noinput
+    startCommand: |
+      cd backend &amp;&amp; gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+</pre>
+</div></div><p><strong>Database</strong></p><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">databases:
+  - name: questify-db
+    databaseName: questify
+    user: questify_user
+</pre>
+</div></div><p><strong>Environment Variables</strong></p><ul><li><p><code>PYTHON_VERSION=3.11.0</code></p></li><li><p><code>SECRET_KEY</code> (secure)</p></li><li><p><code>DEBUG=false</code></p></li><li><p><code>ALLOWED_HOSTS=questify-backend.onrender.com</code></p></li><li><p><code>DATABASE_URL</code> (auto from Render)</p></li></ul><h3 id="DeploymentDocument-DjangoSettings">Django Settings</h3><ul><li><p><strong>Database</strong>: Uses <code>DATABASE_URL</code> if set, else SQLite for local dev</p></li><li><p><strong>Security</strong>:</p><ul><li><p><code>SECRET_KEY</code> from env var</p></li><li><p><code>DEBUG=false</code> in production</p></li><li><p><code>ALLOWED_HOSTS</code> + <code>CSRF_TRUSTED_ORIGINS</code> → Render domain</p></li></ul></li></ul><h3 id="DeploymentDocument-CI/CD">CI/CD</h3><ul><li><p><strong>Staging</strong>: Deploys on push to <code>TestMainBranch</code></p></li><li><p><strong>Production</strong>: Deploys on push to <code>main</code></p></li></ul><p><strong>GitHub Secrets</strong></p><ul><li><p><code>RENDER_STAGING_DEPLOY_HOOK</code></p></li><li><p><code>RENDER_PRODUCTION_DEPLOY_HOOK</code></p></li><li><p><code>OPENAI_API_KEY</code> (optional)</p></li></ul><p><strong>Pipeline Flow</strong><br/><code>CI tests → webhook trigger → build → migrate → Gunicorn start</code></p>
+                    </div>
+
+                    
+                                                      
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Nov 08, 2025 13:21</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>

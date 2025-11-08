@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IT Project Team56 OOSD-Questify : Coding Standard</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="IT-Project-Team56-OOSD-Questify_34668805.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="Coding_34768128.html">Coding</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            IT Project Team56 OOSD-Questify : Coding Standard
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                            
+        
+    
+        
+    
+        
+        
+            Created by <span class='author'> Bill Park</span>, last modified on Sep 26, 2025
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <h3 id="CodingStandard-CodingStandards"><strong>Coding Standards</strong></h3><p>To ensure maintainability, readability, and consistency across the OOSD Questify System, the following coding standards will be enforced throughout development:</p><h3 id="CodingStandard-1GeneralPython/DjangoStandards">1 General Python/Django Standards</h3><ul><li><p>Follow PEP 8 for formatting (4-space indentation, 100-character line limit).</p></li><li><p>Organize imports into three blocks: standard library → third-party → local modules.</p></li><li><p>Use type hints and meaningful docstrings (Google or reST style) for all functions and classes.</p></li><li><p>All secrets (e.g., API keys) must be stored in environment variables and loaded via settings.py — never hardcoded.</p></li></ul><h3 id="CodingStandard-2ProjectStructure">2 Project Structure</h3><ul><li><p>Keep a clear separation of concerns:</p><ul><li><p>models.py: business rules and data representation.</p></li><li><p>serializers.py: input/output validation and transformation.</p></li><li><p>views.py: thin controllers delegating validation to serializers.</p></li><li><p>urls.py: REST-style endpoints, resource-based (e.g., POST /questions/ instead of /create/).</p></li><li><p>admin.py: register all models with ModelAdmin for visibility.</p></li></ul></li><li><p>Maintain migrations under migrations/ with descriptive names.</p></li></ul><h3 id="CodingStandard-3Models">3 Models</h3><ul><li><p>Use UUIDField for primary keys.</p></li><li><p>Include created_at and updated_at timestamps for all major models.</p></li><li><p>Use TextChoices for enums (e.g., Source, VerifyStatus) to avoid hardcoded strings.</p></li><li><p>__str__ methods must reference existing fields (fixing current bug: Question.__str__ should use question not content).</p></li><li><p>Enforce integrity constraints (e.g., MCQ must always have 5 options and one valid correct answer).</p></li></ul><h3 id="CodingStandard-4Serializers">4 Serializers</h3><ul><li><p>Separate read and create/update serializers (QuestionSerializer vs. QuestionCreateSerializer).</p></li><li><p>Ensure serializer field names match model fields exactly (fixing current mismatch: content → question).</p></li><li><p>Move validation logic (e.g., checking MCQ options) into serializers instead of views.</p></li></ul><h3 id="CodingStandard-5Views&amp;Permissions">5 Views &amp; Permissions</h3><ul><li><p>Keep views thin and delegate validation/business logic to serializers/services.</p></li><li><p>Apply IsAuthenticated for write operations, and AllowAny or IsAuthenticatedOrReadOnly for reads.</p></li><li><p>Standardize response formats:</p><ul><li><p>Success: return 201 with resource body.</p></li><li><p>Errors: return structured JSON (e.g., {&quot;error&quot;: {&quot;field&quot;: &quot;message&quot;}}).</p></li></ul></li></ul><h3 id="CodingStandard-6API&amp;URLDesign">6 API &amp; URL Design</h3><ul><li><p>Follow REST conventions: resource-based URLs without verbs.</p></li><li><p>Example:</p><ul><li><p>POST /api/questions/ → create question.</p></li><li><p>POST /api/questions/{id}/mcq/ → add MCQ details.</p></li><li><p>POST /api/questions/{id}/short/ → add short-answer details.</p></li></ul></li></ul><h3 id="CodingStandard-7AIIntegration">7 AI Integration</h3><ul><li><p>OpenAI calls must:</p><ul><li><p>Use requests or SDK with a timeout.</p></li><li><p>Be retried up to 2 times with exponential backoff.</p></li><li><p>Fail gracefully with user-friendly messages (e.g., “AI explanation unavailable”).</p></li></ul></li><li><p>Prompts/templates for AI should be centralized, not hardcoded in views.</p></li></ul><h3 id="CodingStandard-8Testing&amp;CI/CD">8 Testing &amp; CI/CD</h3><ul><li><p>All new code must have unit tests (PyTest for backend, Vitest for frontend).</p></li><li><p>MCQ/SAQ rules must be explicitly tested (missing options, invalid correct answers).</p></li><li><p>External API calls (OpenAI) must be mocked in tests.</p></li><li><p>GitHub Actions CI will enforce test execution, linting, and coverage (≥80%).</p></li></ul><p /><p /><p /><p>– Should add things like how often do i add spaces,</p><p>Comments, commit to github,etc.</p>
+                    </div>
+
+                    
+                                                      
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Nov 08, 2025 13:21</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>

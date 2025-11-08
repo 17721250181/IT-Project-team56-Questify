@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IT Project Team56 OOSD-Questify : JSON Data Structure</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="IT-Project-Team56-OOSD-Questify_34668805.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="Architecture-Documents_34768165.html">Architecture Documents</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            IT Project Team56 OOSD-Questify : JSON Data Structure
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                            
+        
+    
+        
+    
+        
+        
+            Created by <span class='author'> Ziyi Zhang</span> on Sep 26, 2025
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <h2 id="JSONDataStructure-Enums">Enums</h2><ul><li><p><strong>Question.type:</strong> <code>&quot;MCQ&quot; | &quot;SHORT&quot;</code></p></li><li><p><strong>Question.source:</strong> <code>&quot;STUDENT&quot; | &quot;TEACHING_TEAM&quot;</code></p></li><li><p><strong>Question.verify_status:</strong> <code>&quot;PENDING&quot; | &quot;APPROVED&quot; | &quot;REJECTED&quot;</code></p></li></ul><h2 id="JSONDataStructure-Common">Common</h2><ul><li><p><strong>UUID:</strong> <code>&quot;550e8400-e29b-41d4-a716-446655440000&quot;</code></p></li><li><p><strong>Datetime:</strong> ISO 8601 <code>&quot;YYYY-MM-DDTHH:MM:SSZ&quot;</code></p></li></ul><hr/><h2 id="JSONDataStructure-User">User</h2><h3 id="JSONDataStructure-Object:User">Object: <code>User</code></h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{
+  &quot;id&quot;: 1,
+  &quot;email&quot;: &quot;john.doe@example.com&quot;,
+  &quot;name&quot;: &quot;John Doe&quot;,
+  &quot;student_id&quot;: &quot;STUD12345&quot;,
+  &quot;is_staff&quot;: false,
+  &quot;date_joined&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;last_login&quot;: &quot;2024-01-15T10:35:00Z&quot;
+}
+</pre>
+</div></div><hr/><h2 id="JSONDataStructure-Question(normalizedAPIrepresentation)">Question (normalized API representation)</h2><blockquote><p>Requests may use <code>option_a</code>…<code>option_e</code>; responses normalize as below.</p></blockquote><h3 id="JSONDataStructure-Object:Question">Object: <code>Question</code></h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{
+  &quot;id&quot;: &quot;uuid-here&quot;,
+  &quot;type&quot;: &quot;MCQ&quot;,
+  &quot;question&quot;: &quot;Which is the largest planet?&quot;,
+  &quot;source&quot;: &quot;STUDENT&quot;,
+  &quot;verify_status&quot;: &quot;PENDING&quot;,
+  &quot;created_at&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;updated_at&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;creator&quot;: &quot;john.doe&quot;,
+  &quot;mcq_detail&quot;: {
+    &quot;id&quot;: 2,
+    &quot;question&quot;: &quot;uuid-here&quot;,
+    &quot;explanation&quot;: null,
+    &quot;options&quot;: {
+      &quot;A&quot;: &quot;Earth&quot;,
+      &quot;B&quot;: &quot;Jupiter&quot;,
+      &quot;C&quot;: &quot;Mars&quot;,
+      &quot;D&quot;: &quot;Saturn&quot;,
+      &quot;E&quot;: &quot;Venus&quot;
+    },
+    &quot;correct_option&quot;: &quot;B&quot;
+  },
+  &quot;short_detail&quot;: null
+}
+</pre>
+</div></div><h3 id="JSONDataStructure-Object:Question(SHORTvariant)">Object: <code>Question</code> (SHORT variant)</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{
+  &quot;id&quot;: &quot;uuid-here&quot;,
+  &quot;type&quot;: &quot;SHORT&quot;,
+  &quot;question&quot;: &quot;What is the capital of Japan?&quot;,
+  &quot;source&quot;: &quot;STUDENT&quot;,
+  &quot;verify_status&quot;: &quot;PENDING&quot;,
+  &quot;created_at&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;updated_at&quot;: &quot;2024-01-15T10:30:00Z&quot;,
+  &quot;creator&quot;: &quot;john.doe&quot;,
+  &quot;mcq_detail&quot;: null,
+  &quot;short_detail&quot;: {
+    &quot;id&quot;: 5,
+    &quot;question&quot;: &quot;uuid-here&quot;,
+    &quot;answer&quot;: &quot;Tokyo&quot;,
+    &quot;ai_answer&quot;: &quot;Tokyo is the capital and largest city of Japan...&quot;
+  }
+}
+</pre>
+</div></div><h3 id="JSONDataStructure-Request:CreateMCQ">Request: Create MCQ</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{
+  &quot;type&quot;: &quot;MCQ&quot;,
+  &quot;question&quot;: &quot;Which of the following is a prime number?&quot;,
+  &quot;option_a&quot;: &quot;4&quot;,
+  &quot;option_b&quot;: &quot;7&quot;,
+  &quot;option_c&quot;: &quot;9&quot;,
+  &quot;option_d&quot;: &quot;12&quot;,
+  &quot;option_e&quot;: &quot;15&quot;,
+  &quot;correct_option&quot;: &quot;B&quot;
+}
+</pre>
+</div></div><h3 id="JSONDataStructure-Request:CreateSHORT">Request: Create SHORT</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{
+  &quot;type&quot;: &quot;SHORT&quot;,
+  &quot;question&quot;: &quot;What is the capital of France?&quot;,
+  &quot;answer&quot;: &quot;Paris&quot;
+}
+</pre>
+</div></div><h3 id="JSONDataStructure-ErrorExamples">Error Examples</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{ &quot;error&quot;: &quot;MCQ must include 5 options and a correct_option&quot; }
+</pre>
+</div></div><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{ &quot;error&quot;: &quot;Invalid type (must be &#39;SHORT&#39; or &#39;MCQ&#39;)&quot; }
+</pre>
+</div></div><hr/><h2 id="JSONDataStructure-Attempt">Attempt</h2><h3 id="JSONDataStructure-Request:SubmitAttempt">Request: Submit Attempt</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{
+  &quot;question&quot;: &quot;uuid-of-question&quot;,
+  &quot;answer&quot;: &quot;B&quot;
+}
+</pre>
+</div></div><h3 id="JSONDataStructure-Response:Attempt(MCQ)">Response: Attempt (MCQ)</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{
+  &quot;id&quot;: &quot;attempt-uuid&quot;,
+  &quot;question&quot;: &quot;question-uuid&quot;,
+  &quot;question_text&quot;: &quot;Which is the largest planet?&quot;,
+  &quot;answer&quot;: &quot;B&quot;,
+  &quot;is_correct&quot;: true,
+  &quot;submitted_at&quot;: &quot;2024-01-15T10:35:00Z&quot;,
+  &quot;attempter&quot;: &quot;john.doe&quot;
+}
+</pre>
+</div></div><h3 id="JSONDataStructure-Response:Attempt(SHORT)">Response: Attempt (SHORT)</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{
+  &quot;id&quot;: &quot;attempt-uuid&quot;,
+  &quot;question&quot;: &quot;question-uuid&quot;,
+  &quot;question_text&quot;: &quot;What is the capital of France?&quot;,
+  &quot;answer&quot;: &quot;Paris&quot;,
+  &quot;is_correct&quot;: null,
+  &quot;submitted_at&quot;: &quot;2024-01-15T10:35:00Z&quot;,
+  &quot;attempter&quot;: &quot;john.doe&quot;
+}
+</pre>
+</div></div><h3 id="JSONDataStructure-Errors">Errors</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{ &quot;question&quot;: [&quot;This field is required.&quot;], &quot;answer&quot;: [&quot;This field is required.&quot;] }
+</pre>
+</div></div><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">{ &quot;error&quot;: &quot;Question not found&quot; }
+</pre>
+</div></div><hr/><h2 id="JSONDataStructure-ErrorShapes(reference)">Error Shapes (reference)</h2><ul><li><p><strong>Standard:</strong> <code>{ &quot;detail&quot;: &quot;Not found.&quot; }</code></p></li><li><p><strong>Validation:</strong> <code>{ &quot;field&quot;: [&quot;Error message&quot;] }</code></p></li><li><p><strong>Auth:</strong> <code>{ &quot;ok&quot;: false, &quot;message&quot;: &quot;Invalid email or password&quot; }</code></p></li></ul>
+                    </div>
+
+                    
+                                                      
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Nov 08, 2025 13:21</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>

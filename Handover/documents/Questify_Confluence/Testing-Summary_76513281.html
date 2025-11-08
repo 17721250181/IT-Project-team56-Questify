@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IT Project Team56 OOSD-Questify : Testing Summary</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="IT-Project-Team56-OOSD-Questify_34668805.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="Testing_34768111.html">Testing</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            IT Project Team56 OOSD-Questify : Testing Summary
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                            
+        
+    
+        
+    
+        
+        
+            Created by <span class='author'> Bill Park</span>, last modified by <span class='editor'> Chih-Yi Huang</span> on Nov 05, 2025
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <h1 id="TestingSummary-1.TestingMethodology">1. Testing Methodology</h1><h2 id="TestingSummary-1.1Purpose">1.1 Purpose</h2><p>We verified system reliability with a layered approach: unit → integration → end-to-end → exploratory/manual, to catch defects early, validate interfaces, and confirm real-world user flows in production-like conditions.</p><hr/><h1 id="TestingSummary-2.TestTypesandScope">2. Test Types and Scope</h1><h2 id="TestingSummary-2.1UnitTesting">2.1 Unit Testing</h2><ul><li><p><strong>Tools</strong>: <strong>PyTest</strong> for the Django backend. (For small, isolated checks on React components we additionally used Vitest, but the primary harness for this project is PyTest.)</p></li><li><p><strong>Scope</strong>: Smallest units of logic such as Django models, serializers, utilities, and view logic in isolation.</p></li></ul><h2 id="TestingSummary-2.2IntegrationTesting">2.2 Integration Testing</h2><ul><li><p><strong>Tools</strong>: <strong>PyTest</strong> (with <code>pytest-django</code>).</p></li><li><p><strong>Scope</strong>: Interactions between the backend and the database, and backend ↔ external AI API via mocks/fakes. Focused on interface contracts, error propagation, and transaction boundaries.</p></li></ul><h2 id="TestingSummary-2.3End-to-EndTesting">2.3 End-to-End Testing</h2><ul><li><p><strong>Approach</strong>: Manual testing, did not use the tool Playwright.</p></li><li><p><strong>Scope</strong>: Full user journeys: sign in, create a question, receive an answer, run in a realistic environment. We validated navigation, session handling, and expected system responses by following written test scripts.</p></li></ul><h2 id="TestingSummary-2.4Manual/ExploratoryTesting">2.4 Manual / Exploratory Testing</h2><ul><li><p><strong>Scope</strong>: Acceptance checks, usability and responsiveness, accessibility spot checks (keyboard navigation, basic ARIA expectations), and error/edge-case validation beyond scripted paths.</p></li></ul><hr/><h1 id="TestingSummary-3.TestExecutionResults">3. Test Execution Results</h1><div class="table-wrap"><table data-table-width="760" data-layout="default" data-local-id="d027fe06-1d9f-4461-8628-0087ffc5c072" class="confluenceTable"><tbody><tr><th class="confluenceTh"><p>Metric</p></th><th class="confluenceTh"><p>Result</p></th></tr><tr><td class="confluenceTd"><p>Total Tests Executed</p></td><td class="confluenceTd"><p>61</p></td></tr><tr><td class="confluenceTd"><p>Tests Passed</p></td><td class="confluenceTd"><p>61 / 61</p></td></tr><tr><td class="confluenceTd"><p>Tests Failed</p></td><td class="confluenceTd"><p>0</p></td></tr><tr><td class="confluenceTd"><p>Warnings</p></td><td class="confluenceTd"><p>0</p></td></tr><tr><td class="confluenceTd"><p>Total Coverage</p></td><td class="confluenceTd"><p>89%</p></td></tr><tr><td class="confluenceTd"><p>Execution Time</p></td><td class="confluenceTd"><p>46.70 s</p></td></tr></tbody></table></div><hr/><h1 id="TestingSummary-4.CoverageandQualityAssessment">4. Coverage and Quality Assessment</h1><p>Overall code coverage is 89%, indicating that the critical paths and failure branches in the backend are well exercised. Unit and integration suites both run with PyTest and it provides strong confidence in core logic and service boundaries. The manual end-to-end runs confirm that the main user flows behave as intended in a production-like context.</p><p />
+                    </div>
+
+                                        <div class="pageSection group">
+                        <div class="pageSectionHeader">
+                            <h2 id="attachments" class="pageSectionTitle">Attachments:</h2>
+                        </div>
+
+                        <div class="greybox" align="left">
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/76513281/75268100.png">image-20251031-071447.png</a> (image/png)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/76513281/75989001.png">image-20251031-071551.png</a> (image/png)
+                                <br/>
+                                                    </div>
+                    </div>
+                    
+                                                      
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Nov 08, 2025 13:21</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>

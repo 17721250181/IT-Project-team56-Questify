@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IT Project Team56 OOSD-Questify : Test Coverage Results and Summary</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="IT-Project-Team56-OOSD-Questify_34668805.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="Testing_34768111.html">Testing</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            IT Project Team56 OOSD-Questify : Test Coverage Results and Summary
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                            
+        
+    
+        
+    
+        
+        
+            Created by <span class='author'> Chih-Yi Huang</span>, last modified on Oct 29, 2025
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <h1 id="TestCoverageResultsandSummary-Environment"><strong>Environment</strong></h1><ul><li><p><strong>Python:</strong> 3.12.2</p></li><li><p><strong>Django:</strong> 5.2.5</p></li><li><p><strong>Pytest:</strong> 7.4.4</p></li><li><p><strong>Pytest-Django:</strong> 4.11.1</p></li><li><p><strong>Pytest-Cov:</strong> 7.0.0</p></li><li><p><strong>Platform:</strong> macOS (Darwin)</p></li></ul><h3 id="TestCoverageResultsandSummary-CommandExecuted:">Command Executed:</h3><div class="code panel pdl" style="border-width: 1px;"><div class="codeContent panelContent pdl">
+<pre class="syntaxhighlighter-pre" data-syntaxhighlighter-params="brush: java; gutter: false; theme: Confluence" data-theme="Confluence">pytest --cov=. --cov-report=term &gt; coverage_report.txt</pre>
+</div></div><h3 id="TestCoverageResultsandSummary-Fulltestresult:">Full test result: </h3><blockquote><p>backend/coverage_report.txt</p></blockquote><hr/><h1 id="TestCoverageResultsandSummary-TestExecutionResult"><strong>Test Execution Result</strong></h1><div class="table-wrap"><table data-layout="default" data-local-id="31e6d815-3594-426f-94c2-24576831d3bd" class="confluenceTable"><tbody><tr><th class="confluenceTh"><p><strong>Metric</strong></p></th><th class="confluenceTh"><p><strong>Result</strong></p></th></tr><tr><td class="confluenceTd"><p><strong>Total Tests Executed</strong></p></td><td class="confluenceTd"><p>61</p></td></tr><tr><td class="confluenceTd"><p><strong>Tests Passed</strong></p></td><td class="confluenceTd"><p>61 / 61</p></td></tr><tr><td class="confluenceTd"><p><strong>Tests Failed</strong></p></td><td class="confluenceTd"><p>0</p></td></tr><tr><td class="confluenceTd"><p><strong>Warnings</strong></p></td><td class="confluenceTd"><p>0</p></td></tr><tr><td class="confluenceTd"><p><strong>Total Coverage</strong></p></td><td class="confluenceTd"><p><strong>89%</strong></p></td></tr><tr><td class="confluenceTd"><p><strong>Execution Time</strong></p></td><td class="confluenceTd"><p>38.63 seconds</p></td></tr></tbody></table></div><hr/><h1 id="TestCoverageResultsandSummary-Module-WiseCoverageSummary"><strong>Module-Wise Coverage Summary</strong></h1><div class="table-wrap"><table data-layout="default" data-local-id="ef7fbb48-9b48-46ff-aac0-2d090a22f0ad" class="confluenceTable"><tbody><tr><th class="confluenceTh"><p><strong>Module</strong></p></th><th class="confluenceTh"><p><strong>Statements</strong></p></th><th class="confluenceTh"><p><strong>Missed</strong></p></th><th class="confluenceTh"><p><strong>Coverage</strong></p></th><th class="confluenceTh"><p><strong>Key Notes</strong></p></th></tr><tr><td class="confluenceTd"><p><strong>adminpanel/</strong></p></td><td class="confluenceTd"><p>148</p></td><td class="confluenceTd"><p>5</p></td><td class="confluenceTd"><p>97%</p></td><td class="confluenceTd"><p>Admin overview, AI usage, and verify endpoints fully tested; only minor permission branches missing</p></td></tr><tr><td class="confluenceTd"><p><strong>attempts/</strong></p></td><td class="confluenceTd"><p>186</p></td><td class="confluenceTd"><p>2</p></td><td class="confluenceTd"><p>98%</p></td><td class="confluenceTd"><p>Excellent coverage; almost every branch tested</p></td></tr><tr><td class="confluenceTd"><p><strong>leaderboard/</strong></p></td><td class="confluenceTd"><p>227</p></td><td class="confluenceTd"><p>17</p></td><td class="confluenceTd"><p>87%</p></td><td class="confluenceTd"><p>Leaderboard ranking &amp; filtering tested; edge cases (time filters) partially untested</p></td></tr><tr><td class="confluenceTd"><p><strong>questions/</strong></p></td><td class="confluenceTd"><p>824</p></td><td class="confluenceTd"><p>74</p></td><td class="confluenceTd"><p>91%</p></td><td class="confluenceTd"><p>Comprehensive coverage of creation, listing, rating, comment, and save features; minor missing error paths</p></td></tr><tr><td class="confluenceTd"><p><strong>user/</strong></p></td><td class="confluenceTd"><p>564</p></td><td class="confluenceTd"><p>90</p></td><td class="confluenceTd"><p>84%</p></td><td class="confluenceTd"><p>Authentication, registration, CSRF, and password flows tested; some serializer logic uncovered</p></td></tr><tr><td class="confluenceTd"><p><strong>config/</strong></p></td><td class="confluenceTd"><p>128</p></td><td class="confluenceTd"><p>24</p></td><td class="confluenceTd"><p>81%</p></td><td class="confluenceTd"><p>Settings, ASGI/WSGI entry files partially excluded (non-functional code paths)</p></td></tr><tr><td class="confluenceTd"><p><strong>TOTAL</strong></p></td><td class="confluenceTd"><p><strong>2205</strong></p></td><td class="confluenceTd"><p><strong>245</strong></p></td><td class="confluenceTd"><p><strong>89%</strong></p></td><td class="confluenceTd"><p>Meets reliability benchmark; all 61 tests passed successfully</p></td></tr></tbody></table></div><hr/><h1 id="TestCoverageResultsandSummary-Highlights"><strong>Highlights</strong></h1><h3 id="TestCoverageResultsandSummary-High-CoverageAreas"><strong> High-Coverage Areas</strong></h3><ul><li><p><strong>Admin Panel (97%)</strong></p><ul><li><p>/api/admin/overview/, /user-activity/, /ai-usage/, /verify/&lt;uuid&gt;/ fully validated.</p></li><li><p>Role-based permission (IsAdminEmail) tested end-to-end.</p></li></ul></li><li><p><strong>Attempts (98%)</strong></p><ul><li><p>Attempt creation, correctness validation, and user activity analytics verified.</p></li></ul></li><li><p><strong>Questions (91%)</strong></p><ul><li><p>Full coverage of:</p><ul><li><p>MCQ &amp; Short Answer creation</p></li><li><p>Commenting (reply, like, unlike)</p></li><li><p>Rating and save/unsave endpoints</p></li></ul></li><li><p>Strong test reliability in both student and admin workflows.</p></li></ul></li><li><p><strong>Leaderboard (87%)</strong></p><ul><li><p>Both global and user-specific leaderboards tested.</p></li><li><p>Ranking and point calculation logic covered.</p></li></ul></li><li><p><strong>User (84%)</strong></p><ul><li><p>Registration, login/logout, password reset, CSRF, and profile picture upload covered.</p></li><li><p>Tested under authenticated and anonymous conditions.</p></li></ul></li></ul><h3 id="TestCoverageResultsandSummary-LowerCoverageAreas"><strong> Lower Coverage Areas</strong></h3><div class="table-wrap"><table data-layout="default" data-local-id="ecca7bab-91b2-4792-aa0f-73eda808740b" class="confluenceTable"><tbody><tr><th class="confluenceTh"><p><strong>File</strong></p></th><th class="confluenceTh"><p><strong>Coverage</strong></p></th><th class="confluenceTh"><p><strong>Missing Lines / Reason</strong></p></th></tr><tr><td class="confluenceTd"><p>questions/views.py</p></td><td class="confluenceTd"><p>78%</p></td><td class="confluenceTd"><p>52–64, 68–69, 247, 251, 262–265, 269, 316, 372–373, 384–411, 424–462 — rare API or exception branches</p></td></tr><tr><td class="confluenceTd"><p>user/serializers.py</p></td><td class="confluenceTd"><p>70%</p></td><td class="confluenceTd"><p>14–29, 96–100, 140–150, 186–258 — serializer validation and edge handling</p></td></tr><tr><td class="confluenceTd"><p>user/views.py</p></td><td class="confluenceTd"><p>78%</p></td><td class="confluenceTd"><p>121, 157–164, 208–273 — fallback/permission logic not triggered in tests</p></td></tr><tr><td class="confluenceTd"><p>config/asgi.py, config/wsgi.py, manage.py</p></td><td class="confluenceTd"><p>0%</p></td><td class="confluenceTd"><p>Django startup and deployment entry files (not functionally testable)</p></td></tr></tbody></table></div><hr/><h1 id="TestCoverageResultsandSummary-Interpretation"><strong>Interpretation</strong></h1><p>This test suite demonstrates <strong>high reliability and completeness</strong> across all implemented APIs.</p><ul><li><p>100% of functional features (user auth, questions, leaderboard, attempts, admin verification) are verified using Django REST Framework’s APIClient.</p></li><li><p>Untested lines are limited to:</p><ul><li><p>Exception fallbacks (e.g., OpenAI API, admin permission guard)</p></li><li><p>Django bootstrapping scripts (ASGI/WSGI)</p></li><li><p>Minor serializer logic branches</p></li></ul></li><li><p>The overall <strong>89% coverage</strong> exceeds typical academic and professional thresholds (≥85%), reflecting mature CI readiness and strong QA discipline.</p></li></ul><p />
+                    </div>
+
+                    
+                                                      
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Nov 08, 2025 13:21</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>

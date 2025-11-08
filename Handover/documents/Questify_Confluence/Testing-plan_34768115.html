@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>IT Project Team56 OOSD-Questify : Testing plan</title>
+        <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+
+    <body class="theme-default aui-theme-default">
+        <div id="page">
+            <div id="main" class="aui-page-panel">
+                <div id="main-header">
+                    <div id="breadcrumb-section">
+                        <ol id="breadcrumbs">
+                            <li class="first">
+                                <span><a href="index.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="IT-Project-Team56-OOSD-Questify_34668805.html">IT Project Team56 OOSD-Questify</a></span>
+                            </li>
+                                                    <li>
+                                <span><a href="Testing_34768111.html">Testing</a></span>
+                            </li>
+                                                </ol>
+                    </div>
+                    <h1 id="title-heading" class="pagetitle">
+                                                <span id="title-text">
+                            IT Project Team56 OOSD-Questify : Testing plan
+                        </span>
+                    </h1>
+                </div>
+
+                <div id="content" class="view">
+                    <div class="page-metadata">
+                            
+        
+    
+        
+    
+        
+        
+            Created by <span class='author'> Chang Chang</span>, last modified by <span class='editor'> Bill Park</span> on Sep 24, 2025
+                        </div>
+                    <div id="main-content" class="wiki-content group">
+                    <h4 id="Testingplan-Overview"><strong>Overview</strong></h4><p><strong>This testing plan outlines the strategy, scope, and activities to ensure the quality and functionality of the OOSD Questify System.</strong></p><h3 id="Testingplan-1.TestingObjectives"><strong>1. Testing Objectives</strong></h3><p>The primary objectives of this testing plan are to:</p><ul><li><p>Verify correct operation of backend (Django REST) and frontend (React) modules.</p></li><li><p>Ensure that the backend, database, and frontend integrate seamlessly.</p></li><li><p>Validate the accuracy of AI-enhanced features via mock testing.</p></li><li><p>Provide confidence through unit, integration, E2E, and manual testing before deployment.</p></li></ul><h3 id="Testingplan-2.ScopeofTesting"><strong>2. Scope of Testing</strong></h3><p><strong>Components to be Tested:</strong></p><ol start="1"><li><p><strong>Backend (Django REST Framework):</strong></p><ul><li><p>Models, serializers, views, API endpoints.</p></li><li><p>Data persistence and migrations (SQLite in dev, Postgres in CI/prod).</p></li></ul></li><li><p><strong>Frontend (React + Vite):</strong></p><ul><li><p>Component rendering and state handling.</p></li><li><p>API interactions with backend endpoints.</p></li><li><p>Responsiveness and accessibility across devices.</p></li></ul></li><li><p><strong>AI Integration (Mocked OpenAI):</strong></p><ul><li><p>Proper handling of AI API calls.</p></li><li><p>Error handling for unavailable or invalid AI responses.</p></li></ul></li><li><p><strong>End-to-End Workflows:</strong></p><ul><li><p>User login, creating questions, answering. (Might adjust the plan based on timeframe)</p></li><li><p>Complete flow validation from UI through backend to database.</p></li></ul></li><li><p><strong>Manual Testing:</strong></p><ul><li><p>Exploratory testing of UI/UX and cross-browser behavior.</p></li><li><p>Verifying error messages, empty states, and accessibility.</p></li></ul></li></ol><h3 id="Testingplan-3.TestingMethodology"><strong>3. Testing Methodology</strong></h3><p><strong>Testing Types:</strong></p><ol start="1"><li><p><strong>Unit Testing:</strong></p><ul><li><p><strong>Tools:</strong> PyTest (Django backend), Vitest (React frontend).</p></li><li><p><strong>Scope:</strong> Smallest units of logic, e.g., Django models/serializers and React components.</p></li></ul></li><li><p><strong>Integration Testing:</strong></p><ul><li><p><strong>Tools:</strong> PyTest + pytest-django.</p></li><li><p><strong>Scope:</strong> Backend ↔ database, backend ↔ AI API (mocked).</p></li></ul></li><li><p><strong>End-to-End Testing:</strong></p><ul><li><p><strong>Tools:</strong> Playwright.</p></li><li><p><strong>Scope:</strong> Simulate real user flows — login, creating and answering questions.</p></li></ul></li><li><p><strong>Manual Testing:</strong></p><ul><li><p><strong>Scope:</strong> Exploratory acceptance testing, usability, responsiveness, accessibility, error/edge-case validation.</p></li></ul></li></ol><h3 id="Testingplan-4.TestEnvironment"><strong>4. Test Environment</strong></h3><ol start="1"><li><p><strong>Development Environment:</strong></p><ul><li><p><strong>SQLite database.</strong></p></li><li><p><strong>Local backend and frontend servers.</strong></p></li><li><p><strong>Purpose:</strong> Unit and lightweight integration testing.</p></li></ul></li><li><p><strong>CI/CD Environment (GitHub Actions):</strong></p><ul><li><p><strong>Backend tested against Postgres service.</strong></p></li><li><p><strong>Automated backend (PyTest), frontend (Vitest), and E2E (Playwright).</strong></p></li></ul></li><li><p><strong>Deployment Environment (To be confirmed with client):</strong></p><ul><li><p><strong>Backend:</strong> Render with Postgres.</p></li><li><p><strong>Frontend:</strong> GitHub Pages with API calls to Render backend.</p></li><li><p><strong>Purpose:</strong> Staging/production acceptance and manual testing.</p></li></ul></li></ol><h3 id="Testingplan-5.TestCases"><strong>5. Test Cases</strong></h3><p><strong>Sample Test Cases:</strong></p><ol start="1"><li><p><strong>Backend API Testing:</strong></p><ul><li><p><strong>Test Case ID:</strong> API-001</p></li><li><p><strong>Description:</strong> Verify that /questions/all/ returns a valid list of questions.</p></li><li><p><strong>Expected Outcome:</strong> JSON response with all available questions, status 200.</p></li></ul></li><li><p><strong>Frontend UI Testing:</strong></p><ul><li><p><strong>Test Case ID:</strong> UI-001</p></li><li><p><strong>Description:</strong> Check that new questions appear in the UI after creation.</p></li><li><p><strong>Expected Outcome:</strong> Question list updates dynamically without refresh.</p></li></ul></li><li><p><strong>AI Integration Testing:</strong></p><ul><li><p><strong>Test Case ID:</strong> AI-001</p></li><li><p><strong>Description:</strong> Validate system behavior when OpenAI API returns an error.</p></li><li><p><strong>Expected Outcome:</strong> Application handles gracefully and displays fallback message.</p></li></ul></li><li><p><strong>End-to-End Testing:</strong></p><ul><li><p><strong>Test Case ID:</strong> E2E-001</p></li><li><p><strong>Description:</strong> User logs in, creates a question, another user answers, and the result is displayed.</p></li><li><p><strong>Expected Outcome:</strong> Full workflow executes successfully with persisted data.</p></li></ul></li><li><p><strong>Manual Testing:</strong></p><ul><li><p><strong>Test Case ID:</strong> MAN-001</p></li><li><p><strong>Description:</strong> Verify responsiveness of UI on Chrome, Firefox, and Safari.</p></li><li><p><strong>Expected Outcome:</strong> Layout adapts correctly and remains functional.</p></li></ul></li></ol><h3 id="Testingplan-6.TestingSchedule"><strong>6. Testing Schedule</strong></h3><p><strong>During development</strong></p><ul><li><p>Developers will write and run unit tests as we build the features.</p></li><li><p>These unit tests cover the smallest pieces of logic, such as Django models or React components.</p></li><li><p>Every pull request will automatically trigger the CI pipeline to build the code, run unit tests, and check integrations against the database and mocked AI services.</p></li></ul><p><strong>Mid-sprint</strong></p><ul><li><p>When we add or update external integrations (for example, connecting to the OpenAI API), we will run integration tests.</p></li><li><p>These tests validate that the backend works correctly with the database and with the AI service.</p></li><li><p>This ensures that new connections between systems don’t break existing functionality.</p></li></ul><p><strong>End of each sprint</strong></p><ul><li><p>We will re-run unit tests for all completed user stories to confirm stability.</p></li><li><p>The team will perform manual and User Acceptance Testing (UAT). This includes checking the user interface, responsiveness, error handling, accessibility, and behavior across different browsers. The goal is to verify that the system works as expected for actual users' needs.</p></li><li><p>We will also run End-to-End (E2E) tests in the development environment. These will simulate a full user workflow, such as logging in, creating a question, submitting an answer, and confirming that the data is saved correctly.</p></li></ul><p><strong>Final sprint or once core features are complete</strong></p><ul><li><p>We will run the End-to-End regression suite to validate core workflows across the system.</p></li><li><p>We will also run DAST (Dynamic Application Security Testing) scans on the deployed application to identify any security vulnerabilities.</p></li><li><p>After this, we will create a release tag and deploy to production. Post-deployment smoke tests will run to confirm that critical paths are functioning. If there are issues, the system will be rolled back to the previous stable release.</p></li></ul><h3 id="Testingplan-7.RolesandResponsibilities"><strong>7. Roles and Responsibilities</strong></h3><ul><li><p><strong>Test Lead:</strong> Coordinates testing, test planning, ensures coverage.</p></li><li><p><strong>Backend Developers:</strong> Write PyTest unit/integration tests (test cases).</p></li><li><p><strong>Frontend Developers:</strong> Write Vitest tests (test cases).</p></li><li><p><strong>All Team Members:</strong> Participate in manual testing and Playwright E2E tests.</p></li></ul><h3 id="Testingplan-8.TestDeliverables"><strong>8. Test Deliverables</strong></h3><ul><li><p><strong>Test Plan (this document).</strong></p></li><li><p><strong>Test Cases (unit, integration, E2E, manual).</strong></p></li><li><p><strong>Automated Test Scripts.</strong></p></li><li><p><strong>Test Reports (execution results, defect logs).</strong></p></li></ul><h3 id="Testingplan-Conclusion"><strong>Conclusion</strong></h3><p>This testing plan ensures that the OOSD Questify System is validated across backend, frontend, AI integration, and full workflows. By combining automated (unit, integration, E2E) and manual testing, the team will deliver a reliable and user-friendly system for academic use.</p><p />
+                    </div>
+
+                    
+                                                      
+                </div>             </div> 
+            <div id="footer" role="contentinfo">
+                <section class="footer-body">
+                    <p>Document generated by Confluence on Nov 08, 2025 13:21</p>
+                    <div id="footer-logo"><a href="http://www.atlassian.com/">Atlassian</a></div>
+                </section>
+            </div>
+        </div>     </body>
+</html>
